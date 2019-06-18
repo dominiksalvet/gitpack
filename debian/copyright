@@ -1,0 +1,17 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: template
+Upstream-Contact: Dominik Salvet <dominik.salvet@gmail.com>
+Source: https://github.com/dominiksalvet/template
+
+Files: README.md CONTRIBUTING.md SECURITY.md CHANGELOG.md
+Copyright: Copyright 2019 Dominik Salvet
+License: MIT
+
+Files: CODE_OF_CONDUCT.md
+Copyright: Copyright 2014-2019 Coraline Ada Ehmke
+           Copyright 2019 Dominik Salvet
+License: CC-BY-4.0
+
+Files: .github/*
+Copyright: Copyright 2019 Dominik Salvet
+License: MIT

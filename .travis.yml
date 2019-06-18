@@ -1,0 +1,20 @@
+#-------------------------------------------------------------------------------
+# Copyright 2019 Dominik Salvet
+# SPDX-License-Identifier: MIT
+# https://github.com/dominiksalvet/template
+#-------------------------------------------------------------------------------
+
+os: linux
+dist: xenial
+language: shell
+
+jobs:
+  include:
+    - stage: checks
+      name: Licensing
+      addons:
+        apt:
+          packages: python3-pip
+      install: pip3 install --user fsfe-reuse
+      before_script: reuse --version
+      script: reuse lint
