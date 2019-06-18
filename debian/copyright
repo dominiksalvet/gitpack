@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: template
+Upstream-Name: gitpack
 Upstream-Contact: Dominik Salvet <dominik.salvet@gmail.com>
-Source: https://github.com/dominiksalvet/template
+Source: https://github.com/dominiksalvet/gitpack
 
 Files: README.md CONTRIBUTING.md SECURITY.md CHANGELOG.md
 Copyright: Copyright 2019 Dominik Salvet

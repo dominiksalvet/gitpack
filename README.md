@@ -1,10 +1,10 @@
-# Template
+# GitPack
 
 [![reuse compliant](https://reuse.software/badge/reuse-compliant.svg)](https://reuse.software/)
 [![standard-readme compliant](https://img.shields.io/badge/readme_style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
-[![Build Status](https://travis-ci.com/dominiksalvet/template.svg?branch=master)](https://travis-ci.com/dominiksalvet/template)
+[![Build Status](https://travis-ci.com/dominiksalvet/gitpack.svg?branch=master)](https://travis-ci.com/dominiksalvet/gitpack)
 
-> Template for generating new repositories.
+> Simple Git-based package manager.
 
 Long description.
 
@@ -34,6 +34,6 @@ Do you want to contribute? Do you have any questions? Then the [*CONTRIBUTING.md
 
 ## License
 
-Licensing policy of template is compliant with [REUSE Practices](https://reuse.software/practices/2.0/).
+Licensing policy of GitPack is compliant with [REUSE Practices](https://reuse.software/practices/2.0/).
 
 The preferred license is the **MIT License** as stated in the [*LICENSE.txt*](LICENSE.txt) file.
