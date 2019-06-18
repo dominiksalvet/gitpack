@@ -4,7 +4,7 @@
 [![standard-readme compliant](https://img.shields.io/badge/readme_style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
 [![Build Status](https://travis-ci.com/dominiksalvet/gitpack.svg?branch=master)](https://travis-ci.com/dominiksalvet/gitpack)
 
-> Simple Git-based package manager.
+> Git-based package manager.
 
 Long description.
 
