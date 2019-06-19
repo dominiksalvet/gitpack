@@ -10,3 +10,100 @@
 # PARAMETERS:
 #   All given arguments are processed as GitPack's help describes.
 #-------------------------------------------------------------------------------
+
+
+#-------------------------------------------------------------------------------
+# ENTRY POINT
+#-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   This is the GitPack entry point and it is expected to be executed first, yet
+#   its calling should be at the end of this script.
+# PARAMETERS:
+#   $@ - GitPack arguments
+main() {
+    init_constants &&
+    init_strings &&
+    def_global_vars
+}
+
+#-------------------------------------------------------------------------------
+# STATIC INITIALIZATION
+#-------------------------------------------------------------------------------
+# All variables and constants of this section can be accessed everywhere below.
+#-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Initializes static constants.
+init_constants() {
+    # the current version of GitPack
+    VERSION=0.1.0
+
+    # GitPack actions
+    ACTION_INSTALL=install
+    ACTION_UNINSTALL=uninstall
+    ACTION_STATUS=status
+
+    # project states of install action
+    STATE_INSTALL=install # just installed
+    STATE_UPDATE=update # just updated
+    STATE_DOWNGRADE=downgrade # just downgraded
+    STATE_INSTALLED=installed # already installed
+    # project states of uninstall action
+    STATE_UNINSTALL=uninstall # just uninstalled
+    STATE_UNINSTALLED=uninstalled # already uninstalled
+    # project states of status action
+    STATE_NOTHING=nothing # a project is not installed
+    STATE_OLD=old # a project is outdated
+    STATE_LATEST=latest # a project is fully updated
+    STATE_DEV=dev # a project is in a developer version
+
+    # dynamic errors
+    ERROR_INSTALL_FAIL=INSTALL-FAIL
+    ERROR_UNINSTALL_FAIL=UNINSTALL-FAIL
+}
+
+# DESCRIPTION:
+#   Initializes strings usually used to display reports to the user. Constants
+#   must be already initialized.
+init_strings() {
+    HELP_MESSAGE="USAGE:
+  $0 ACTION URL...
+  $0 COMMAND
+
+ACTION:
+  $ACTION_INSTALL    install/update Git projects
+  $ACTION_UNINSTALL  uninstall Git projects
+  $ACTION_STATUS     show status of Git projects
+
+COMMAND:
+  clean  remove cache
+  help   show this help
+  about  show information"
+
+    ABOUT_MESSAGE="GitPack $VERSION
+Git-based package manager.
+
+Copy"'right 2019 Dominik Salvet
+SPDX License Identifier: MIT
+https://github.com/dominiksalvet/gitpack'
+
+    HINT_MESSAGE="Try '$0 help' for getting help."
+}
+
+# DESCRIPTION:
+#   Defines global variables. If there is a global variable, it must be stated
+#   here even though its value is going to be overwritten.
+def_global_vars() {
+    # errors of the current project
+    errors=
+
+    # state of the current project
+    state=
+}
+
+#-------------------------------------------------------------------------------
+# ENTRY POINT CALLING
+#-------------------------------------------------------------------------------
+
+main "$@" || exit
