@@ -36,10 +36,10 @@ main() {
 #   Checks whether all software dependencies are satisfied.
 check_deps() {
     # a list of required software
-    SW_LIST='command echo [ cd test pwd rm id mkdir touch dirname grep git ls'
+    sw_list='command echo [ cd test pwd rm id mkdir touch dirname grep git ls uname read cp'
 
     # check if any piece of software is missing
-    for sw in $SW_LIST; do
+    for sw in $sw_list; do
         if ! command -v -- "$sw" > /dev/null; then
             print_error "missing $sw software"
             return 1
@@ -148,8 +148,8 @@ safe_rm_rf_dir() {
         ( # remove only if the given directory path is not the root directory
             cd -- "${1:?}"/ 2>/dev/null &&
             test "$PWD" != / &&
-            resolved_pwd="$(pwd -P)" &&
-            test "$resolved_pwd" != /
+            pwd_out="$(pwd -P)" &&
+            test "$pwd_out" != /
         ) &&
         rm -rf -- "${1:?}"/
     fi
@@ -176,11 +176,15 @@ init_runtime() {
 #   stated here even though its value is going to be overwritten.
 init_global_vars() {
     # check if running as root and set up access level
-    if [ "$(id -u)" -eq 0 ]; then
+    id_out="$(id -u)" &&
+    if [ "$id_out" -eq 0 ]; then
         access=global
     else
         access=local
-    fi
+    fi &&
+
+    # get the current system name
+    system="$(uname)"
 }
 
 # DESCRIPTION:
@@ -201,12 +205,13 @@ init_paths() {
 
 # DESCRIPTION:
 #   Initializes GitPack's file structure including the check of its database
-#   based on prepared global variables. It fails if it cannot create a file or a
-#   directory or if GitPack does not have read or write permissions.
+#   based on prepared global variables. It fails if it cannot create a file or
+#   a directory or if GitPack does not have read or write permissions.
 init_database() {
     # create GitPack status file if it does not exist
     if [ ! -e "$STATUS_PATH" ]; then
-        mkdir -p "$(dirname "$STATUS_PATH")"/ &&
+        dirname_out="$(dirname "$STATUS_PATH")" &&
+        mkdir -p "$dirname_out"/ &&
         touch "$STATUS_PATH"
     fi &&
 
@@ -224,24 +229,33 @@ init_database() {
 # DESCRIPTION:
 #   Performs several checks, prepares target Git repository and executes the
 #   given action itself. Requires GitPack's runtime to be already initialized.
+#   Also prints a report after the execution.
 # PARAMETERS:
 #   $1 - action
 #   $2 - any URL
 process_action() {
-    # process given URL, which may include version
-    url="$(extract_short_url "$2")" &&
-    version="$(extract_version "$2")" &&
+    { # process given URL, which may include version
+    url="$(url_extract_short_url "$2")" &&
+    version="$(url_extract_version "$2")" &&
     check_short_url "$url" &&
 
     # prepare Git repository
-    touch_repo "$url"
+    touch_repo "$url" &&
+
+    # execute the action itself
+    execute_action "$1" "$url" "$version"
+    } || { # all possible errors during action processing are caught here
+        return_val="$?" # store return value
+        echo "<ERROR> $1 $2" >&2 # print some relevant GitPack information
+        return "$return_val" # propagate the return value further
+    }
 }
 
 # DESCRIPTION:
 #   Extracts a short URL from a given URL.
 # PARAMETERS:
 #   $1 - any URL
-extract_short_url() {
+url_extract_short_url() {
     url="${1%%=*}" && # remove version if any
     url="${url#https://}" && # remove https:// prefix
     echo "${url%.git}" # remove .git suffix
@@ -251,7 +265,7 @@ extract_short_url() {
 #   Extracts a version from a given URL.
 # PARAMETERS:
 #   $1 - any URL
-extract_version() {
+url_extract_version() {
     version="${1#*=}" && # remove URL and keep version
     if [ "$version" != "$1" ]; then # check if there was a version
         echo "$version"
@@ -299,6 +313,53 @@ touch_repo() { (
         git pull -q
     fi
 ) }
+
+#-------------------------------------------------------------------------------
+# CHOOSE ACTION
+#-------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# DESCRIPTION:
+#   Installs a project based on a given repository URL and commit hash.
+# $1 - URL
+# $2 - commit hash
+install() { (
+    cd_repo "$1" "$2" &&
+    # choose the most appropriate installation method
+    if [ -d .gitpack/methods/"${access}-$system"/ ]; then
+        cd .gitpack/methods/"${access}-$system"/ # specific for current system
+    else
+        cd .gitpack/methods/"$access"/ # common global or local for all systems
+    fi &&
+    if [ -x preinst ]; then # before files copy
+        ./preinst
+    fi &&
+    while read -r link; do # copy all files by defined links
+        # shellcheck disable=SC2086
+        eval cp -R -- $link
+    done < links &&
+    if [ -x postinst ]; then # after files copy
+        ./postinst
+    fi
+) }
+
 
 #-------------------------------------------------------------------------------
 # ENTRY POINT CALLING
