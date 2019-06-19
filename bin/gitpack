@@ -36,7 +36,7 @@ main() {
 #   Checks whether all software dependencies are satisfied.
 check_deps() {
     # a list of required software
-    SW_LIST='command echo [ cd test pwd rm id mkdir touch dirname'
+    SW_LIST='command echo [ cd test pwd rm id mkdir touch dirname grep'
 
     # check if any piece of software is missing
     for sw in $SW_LIST; do
@@ -100,7 +100,7 @@ init_constants() {
 #   must be already initialized.
 init_strings() {
     HELP_MESSAGE="USAGE:
-  $0 ACTION URL...
+  $0 ACTION URL[=VERSION]...
   $0 COMMAND
 
 ACTION:
@@ -138,7 +138,7 @@ process_args() {
             action="$1" # use the given action
             shift # shift arguments to URLs
             if [ "$#" -eq 0 ]; then # check if there is any URL argument
-                print_error 'no URL argument provided' "$HINT_MESSAGE"
+                print_error 'no URL provided' "$HINT_MESSAGE"
                 return 1
             fi
             ;;
@@ -244,8 +244,51 @@ init_database() {
 # ACTION PROCESSING
 #-------------------------------------------------------------------------------
 
+# DESCRIPTION:
+#   Performs several checks, prepares target Git repository and executes the
+#   given action itself. Requires GitPack's runtime to be already initialized.
+# PARAMETERS:
+#   $1 - action
+#   $2 - any URL
 process_action() {
-    echo
+    # process given URL, which may include version
+    url="$(extract_short_url "$2")" &&
+    version="$(extract_version "$2")" &&
+    check_short_url "$url"
+}
+
+# DESCRIPTION:
+#   Extracts a short URL from a given URL.
+# PARAMETERS:
+#   $1 - any URL
+extract_short_url() {
+    url="${1%%=*}" && # remove version if any
+    url="${url#https://}" && # remove https:// prefix
+    echo "${url%.git}" # remove .git suffix
+}
+
+# DESCRIPTION:
+#   Extracts a version from a given URL.
+# PARAMETERS:
+#   $1 - any URL
+extract_version() {
+    version="${1#*=}" && # remove URL and keep version
+    if [ "$version" != "$1" ]; then # check if there was a version
+        echo "$version"
+    fi
+}
+
+# DESCRIPTION:
+#   Checks whether given short URL is supported.
+# PARAMETERS:
+#   $1 - URL
+check_short_url() {
+    url_regex='^[[:alnum:]_][[:alnum:]_\.-]*(/[[:alnum:]_][[:alnum:]_\.-]*){2}$'
+
+    if ! echo "$1" | grep -q -E "$url_regex"; then
+        echo "$0: unsupported URL delivered" >&2
+        return 1
+    fi
 }
 
 #-------------------------------------------------------------------------------
