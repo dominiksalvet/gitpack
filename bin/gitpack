@@ -22,6 +22,7 @@
 # PARAMETERS:
 #   $@ - GitPack arguments
 main() {
+    check_deps &&
     init_constants &&
     init_strings &&
     def_global_vars &&
@@ -29,7 +30,38 @@ main() {
 }
 
 #-------------------------------------------------------------------------------
-# STATIC INITIALIZATION
+# SOFTWARE DEPENDENCIES
+#-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Checks whether all software dependencies are satisfied.
+check_deps() {
+    # a list of required software
+    SW_REQUIRED='command echo ['
+
+    # check if any piece of software is missing
+    for sw in $SW_REQUIRED; do
+        if ! command -v -- "$sw" > /dev/null; then
+            print_error "missing $sw software"
+            return 1
+        fi
+    done
+}
+
+# DESCRIPTION:
+#   Prints a given error text with a given hint text if present.
+# PARAMETERS:
+#   $1 - error text
+#   $2 - hint text (optional)
+print_error() {
+    echo "$0: $1" >&2
+    if [ "$2" ]; then
+        echo "$2" >&2
+    fi
+}
+
+#-------------------------------------------------------------------------------
+# INITIALIZATION
 #-------------------------------------------------------------------------------
 # All variables and constants of this section can be accessed everywhere below.
 #-------------------------------------------------------------------------------
@@ -126,25 +158,13 @@ process_args() {
         "$COMMAND_HELP") echo "$HELP_MESSAGE"; return ;;
         "$COMMAND_ABOUT") echo "$ABOUT_MESSAGE"; return ;;
         '') print_error 'no argument provided' "$HINT_MESSAGE"; return 1 ;;
-        *) print_error "unrecognized argument '$1'" "$HINT_MESSAGE"; return 1 ;;
+        *) print_error "unrecognized argument $1" "$HINT_MESSAGE"; return 1 ;;
     esac
 
     # check if there is any URL argument
     if [ "$#" -eq 0 ]; then
         print_error 'no URL argument provided' "$HINT_MESSAGE"
         return 1
-    fi
-}
-
-# DESCRIPTION:
-#   Prints a given error text with a given hint text if present.
-# PARAMETERS:
-#   $1 - error text
-#   $2 - hint text (optional)
-print_error() {
-    echo "$0: $1" >&2
-    if [ "$2" ]; then
-        echo "$2" >&2
     fi
 }
 
