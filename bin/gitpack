@@ -25,7 +25,6 @@ main() {
     check_deps &&
     init_constants &&
     init_strings &&
-    def_global_vars &&
     process_args "$@"
 }
 
@@ -37,10 +36,10 @@ main() {
 #   Checks whether all software dependencies are satisfied.
 check_deps() {
     # a list of required software
-    SW_REQUIRED='command echo ['
+    SW_LIST='command echo [ cd test pwd rm id mkdir touch dirname'
 
     # check if any piece of software is missing
-    for sw in $SW_REQUIRED; do
+    for sw in $SW_LIST; do
         if ! command -v -- "$sw" > /dev/null; then
             print_error "missing $sw software"
             return 1
@@ -61,9 +60,9 @@ print_error() {
 }
 
 #-------------------------------------------------------------------------------
-# INITIALIZATION
+# STATIC INITIALIZATION
 #-------------------------------------------------------------------------------
-# All variables and constants of this section can be accessed everywhere below.
+# All constants of this section can be read in other code.
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
@@ -76,10 +75,6 @@ init_constants() {
     ACTION_INSTALL=install
     ACTION_UNINSTALL=uninstall
     ACTION_STATUS=status
-    # GitPack commands
-    COMMAND_CLEAN=clean
-    COMMAND_HELP=help
-    COMMAND_ABOUT=about
 
     # project states of install action
     STATE_INSTALL=install # just installed
@@ -128,17 +123,6 @@ https://github.com/dominiksalvet/gitpack'
     HINT_MESSAGE="Try '$0 help' for getting help."
 }
 
-# DESCRIPTION:
-#   Defines global variables. If there is a global variable, it must be stated
-#   here even though its value is going to be overwritten.
-def_global_vars() {
-    # errors of the current project
-    errors=
-
-    # state of the current project
-    state=
-}
-
 #-------------------------------------------------------------------------------
 # ARGUMENT PARSING
 #-------------------------------------------------------------------------------
@@ -153,19 +137,115 @@ process_args() {
         "$ACTION_INSTALL" | "$ACTION_UNINSTALL" | "$ACTION_STATUS")
             action="$1" # use the given action
             shift # shift arguments to URLs
+            if [ "$#" -eq 0 ]; then # check if there is any URL argument
+                print_error 'no URL argument provided' "$HINT_MESSAGE"
+                return 1
+            fi
             ;;
-        "$COMMAND_CLEAN") ;;
-        "$COMMAND_HELP") echo "$HELP_MESSAGE"; return ;;
-        "$COMMAND_ABOUT") echo "$ABOUT_MESSAGE"; return ;;
+        clean) init_runtime && safe_rm_rf_dir "$CACHE_REPO_DIR"; return ;;
+        help) echo "$HELP_MESSAGE"; return ;;
+        about) echo "$ABOUT_MESSAGE"; return ;;
         '') print_error 'no argument provided' "$HINT_MESSAGE"; return 1 ;;
         *) print_error "unrecognized argument $1" "$HINT_MESSAGE"; return 1 ;;
     esac
 
-    # check if there is any URL argument
-    if [ "$#" -eq 0 ]; then
-        print_error 'no URL argument provided' "$HINT_MESSAGE"
-        return 1
+    init_runtime &&
+    for url in "$@"; do # process each URL individually with common action
+        process_action "$action" "$url" || return
+    done
+}
+
+# DESCRIPTION:
+#   Removes a given directory with its content performing a check for the root
+#   directory that is prevented to be removed and fails in that case. This
+#   function uses only the first parameter, others are ignored!
+# PARAMETERS:
+#   $1 - directory path
+safe_rm_rf_dir() {
+    if [ -d "${1:?}"/ ]; then # check if the directory exists
+        ( # remove only if the given directory path is not the root directory
+            cd -- "${1:?}"/ 2>/dev/null &&
+            test "$PWD" != / &&
+            resolved_pwd="$(pwd -P)" &&
+            test "$resolved_pwd" != /
+        ) &&
+        rm -rf -- "${1:?}"/
     fi
+}
+
+#-------------------------------------------------------------------------------
+# DYNAMIC INITIALIZATION
+#-------------------------------------------------------------------------------
+# All variables and constants of this section can be accessed in other code.
+#-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Prepares a runtime environment for GitPack. After calling this function,
+#   GitPack's essential file structure will be prepared and appropriate
+#   configuration will be applied.
+init_runtime() {
+    init_global_vars &&
+    init_paths &&
+    init_database
+}
+
+# DESCRIPTION:
+#   Initializes global variables. If there is a global variable, it must be
+#   stated here even though its value is going to be overwritten.
+init_global_vars() {
+    # check if running as root and set up access level
+    if [ "$(id -u)" -eq 0 ]; then
+        access=global
+    else
+        access=local
+    fi
+
+    # errors of the current project
+    errors=
+    # state of the current project
+    state=
+}
+
+# DESCRIPTION:
+#   Initializes all GitPack-specific paths. They must start with '/'.
+init_paths() {
+    if [ "$access" = global ]; then
+        CACHE_DIR=/var/cache/gitpack
+        DB_DIR=/var/lib/gitpack
+    else
+        CACHE_DIR="$HOME"/.cache/gitpack
+        DB_DIR="$HOME"/.local/share/gitpack
+    fi
+
+    # derived paths
+    CACHE_REPO_DIR="$CACHE_DIR"/repo # cache for Git repositories
+    STATUS_PATH="$DB_DIR"/status # database of installed projects
+}
+
+# DESCRIPTION:
+#   Initializes GitPack's file structure including the check of its database
+#   based on prepared global variables. It fails if it cannot create a file or a
+#   directory or if GitPack does not have read or write permissions.
+init_database() {
+    # create GitPack status file if it does not exist
+    if [ ! -e "$STATUS_PATH" ]; then
+        mkdir -p "$(dirname "$STATUS_PATH")"/ &&
+        touch "$STATUS_PATH"
+    fi &&
+
+    # check access to GitPack status file
+    if [ ! -r "$STATUS_PATH" ] || [ ! -w "$STATUS_PATH" ]; then
+        print_error "cannot access $STATUS_PATH file"
+        return 2
+    fi
+}
+
+#-------------------------------------------------------------------------------
+# ACTION PROCESSING
+#-------------------------------------------------------------------------------
+
+process_action() {
+    echo
 }
 
 #-------------------------------------------------------------------------------
