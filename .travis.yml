@@ -11,7 +11,11 @@ language: shell
 jobs:
   include:
     - stage: checks
-      name: Licensing
+      name: Static analysis
+      before_script: shellcheck --version
+      script: shellcheck bin/*
+
+    - name: Licensing
       addons:
         apt:
           packages: python3-pip

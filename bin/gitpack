@@ -75,24 +75,6 @@ init_constants() {
     ACTION_INSTALL=install
     ACTION_UNINSTALL=uninstall
     ACTION_STATUS=status
-
-    # project states of install action
-    STATE_INSTALL=install # just installed
-    STATE_UPDATE=update # just updated
-    STATE_DOWNGRADE=downgrade # just downgraded
-    STATE_INSTALLED=installed # already installed
-    # project states of uninstall action
-    STATE_UNINSTALL=uninstall # just uninstalled
-    STATE_UNINSTALLED=uninstalled # already uninstalled
-    # project states of status action
-    STATE_NOTHING=nothing # a project is not installed
-    STATE_OLD=old # a project is outdated
-    STATE_LATEST=latest # a project is fully updated
-    STATE_DEV=dev # a project is in a developer version
-
-    # dynamic errors
-    ERROR_INSTALL_FAIL=INSTALL-FAIL
-    ERROR_UNINSTALL_FAIL=UNINSTALL-FAIL
 }
 
 # DESCRIPTION:
@@ -199,11 +181,6 @@ init_global_vars() {
     else
         access=local
     fi
-
-    # errors of the current project
-    errors=
-    # state of the current project
-    state=
 }
 
 # DESCRIPTION:
