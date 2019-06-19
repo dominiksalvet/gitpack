@@ -24,7 +24,8 @@
 main() {
     init_constants &&
     init_strings &&
-    def_global_vars
+    def_global_vars &&
+    process_args "$@"
 }
 
 #-------------------------------------------------------------------------------
@@ -43,6 +44,10 @@ init_constants() {
     ACTION_INSTALL=install
     ACTION_UNINSTALL=uninstall
     ACTION_STATUS=status
+    # GitPack commands
+    COMMAND_CLEAN=clean
+    COMMAND_HELP=help
+    COMMAND_ABOUT=about
 
     # project states of install action
     STATE_INSTALL=install # just installed
@@ -100,6 +105,47 @@ def_global_vars() {
 
     # state of the current project
     state=
+}
+
+#-------------------------------------------------------------------------------
+# ARGUMENT PARSING
+#-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Processes given GitPack arguments and performs all associated operations.
+# PARAMETERS:
+#   $@ - GitPack arguments
+process_args() {
+    # process first argument
+    case "$1" in
+        "$ACTION_INSTALL" | "$ACTION_UNINSTALL" | "$ACTION_STATUS")
+            action="$1" # use the given action
+            shift # shift arguments to URLs
+            ;;
+        "$COMMAND_CLEAN") ;;
+        "$COMMAND_HELP") echo "$HELP_MESSAGE"; return ;;
+        "$COMMAND_ABOUT") echo "$ABOUT_MESSAGE"; return ;;
+        '') print_error 'no argument provided' "$HINT_MESSAGE"; return 1 ;;
+        *) print_error "unrecognized argument '$1'" "$HINT_MESSAGE"; return 1 ;;
+    esac
+
+    # check if there is any URL argument
+    if [ "$#" -eq 0 ]; then
+        print_error 'no URL argument provided' "$HINT_MESSAGE"
+        return 1
+    fi
+}
+
+# DESCRIPTION:
+#   Prints a given error text with a given hint text if present.
+# PARAMETERS:
+#   $1 - error text
+#   $2 - hint text (optional)
+print_error() {
+    echo "$0: $1" >&2
+    if [ "$2" ]; then
+        echo "$2" >&2
+    fi
 }
 
 #-------------------------------------------------------------------------------
