@@ -15,3 +15,7 @@ License: CC-BY-4.0
 Files: .github/*
 Copyright: Copyright 2019 Dominik Salvet
 License: MIT
+
+Files: .gitpack/*
+Copyright: Copyright 2019 Dominik Salvet
+License: MIT
