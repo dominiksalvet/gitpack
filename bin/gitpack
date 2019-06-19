@@ -36,7 +36,7 @@ main() {
 #   Checks whether all software dependencies are satisfied.
 check_deps() {
     # a list of required software
-    SW_LIST='command echo [ cd test pwd rm id mkdir touch dirname grep'
+    SW_LIST='command echo [ cd test pwd rm id mkdir touch dirname grep git ls'
 
     # check if any piece of software is missing
     for sw in $SW_LIST; do
@@ -254,7 +254,10 @@ process_action() {
     # process given URL, which may include version
     url="$(extract_short_url "$2")" &&
     version="$(extract_version "$2")" &&
-    check_short_url "$url"
+    check_short_url "$url" &&
+
+    # prepare Git repository
+    touch_repo "$url"
 }
 
 # DESCRIPTION:
@@ -290,6 +293,35 @@ check_short_url() {
         return 1
     fi
 }
+
+#-------------------------------------------------------------------------------
+# PREPARE REPOSITORY
+#-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Refreshes a Git repository from given URL. In case an associated directory
+#   does not exist, it is created and the repository is cloned. Otherwise, the
+#   repository is refreshed by fetching and merging changes.
+# PARAMETERS:
+#   $1 - URL
+touch_repo() { (
+    mkdir -p "$CACHE_REPO_DIR"/"$1"/ &&
+    cd "$CACHE_REPO_DIR"/"$1"/ &&
+
+    if [ ! "$(ls -A)" ]; then # if cached project directory is empty
+        # clone Git repository master branch, it may ask a user for a password
+        git clone -q --branch master https://"$1".git .
+    else
+        # discard any changes made to repository (just for case)
+        git clean -q -d -f &&
+        git reset -q --hard &&
+
+        # checkout the master branch
+        git checkout -q master &&
+        # fetch changes from master and merge them into local master branch
+        git pull -q
+    fi
+) }
 
 #-------------------------------------------------------------------------------
 # ENTRY POINT CALLING
