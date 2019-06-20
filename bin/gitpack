@@ -36,11 +36,11 @@ main() {
 #   Checks whether all software dependencies are satisfied.
 check_deps() {
     # a list of required software
-    sw_list='command echo [ cd test pwd rm id mkdir touch dirname grep git ls uname read cp'
+    sw_list='command echo [ cd test pwd rm id mkdir touch dirname grep git ls uname read cp head'
 
     # check if any piece of software is missing
     for sw in $sw_list; do
-        if ! command -v -- "$sw" > /dev/null; then
+        if ! command -v "$sw" > /dev/null; then
             print_error "missing $sw software"
             return 1
         fi
@@ -318,23 +318,70 @@ touch_repo() { (
 # CHOOSE ACTION
 #-------------------------------------------------------------------------------
 
+# DESCRIPTION:
+#   Chooses which action will be executed and executes it with an initialized
+#   Git repository. If no target version is delivered, GitPack chooses
+#   a preferred commit instead. Also prints a report after the execution.
+# PARAMETERS:
+#   $1 - action
+#   $2 - URL
+#   $3 - target version (optional)
+execute_action() {
+    # get source (already installed) project information
+    src_db_record="$(get_db_record "$2")" &&
+    src_url="${src_db_record%% *}" && # extract url
+    src_hash="${src_db_record#* }" && # extract commit hash
+    # get target (installation candidate) project information
+    if [ "$3" ]; then
+        tar_hash="$(git rev-parse "$3"'^{}')" # transform version to commit hash
+    else
+        tar_hash="$(get_repo_hash "$2")" # get preferred commit hash
+    fi
+}
+
+# DESCRIPTION:
+#   Selects the first record matching the given URL from the GitPack database.
+# PARAMETERS:
+#   $1 - URL
+get_db_record() {
+    grep -F "$1" "$STATUS_PATH" | head -n 1
+}
+
+# DESCRIPTION:
+#   Returns a preferred commit hash of a given project. It chooses latest tag's
+#   commit if it exists, otherwise latest commit is chosen.
+# PARAMETERS:
+#   $1 - URL
+get_repo_hash() { (
+    cd_repo "$1" &&
+    # latest tag (of any type)
+    if tag_name="$(git describe --tags --abbrev=0 master 2>/dev/null)"; then
+        git rev-parse "$tag_name"'^{}' # transform latest version to commit hash
+    else # latest commit
+        git rev-parse master
+    fi
+) }
+
+# DESCRIPTION:
+#   Changes current working directory to a given repository and checkouts its
+#   given commit. If the commit parameter is empty, no checkout is performed.
+# PARAMETERS:
+#   $1 - URL
+#   $2 - target commit
+cd_repo() {
+    cd "$CACHE_REPO_DIR"/"$1"/ &&
+    if [ "$2" ]; then
+        git checkout -q "$2"
+    fi
+}
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+#-------------------------------------------------------------------------------
+# INSTALLATION AND UNINSTALLATION
+#-------------------------------------------------------------------------------
 
 # DESCRIPTION:
 #   Installs a project based on a given repository URL and commit hash.
@@ -359,6 +406,9 @@ install() { (
         ./postinst
     fi
 ) }
+
+
+
 
 
 #-------------------------------------------------------------------------------
