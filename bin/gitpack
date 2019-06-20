@@ -37,7 +37,7 @@ main() {
 check_deps() {
     # a list of required software
     sw_list='command echo [ cd test pwd rm id mkdir touch dirname grep git ls '\
-'uname read cp head'
+'uname read cp head cut'
 
     # check if any piece of software is missing
     for sw in $sw_list; do
@@ -76,6 +76,20 @@ init_constants() {
     ACTION_INSTALL=install
     ACTION_UNINSTALL=uninstall
     ACTION_STATUS=status
+
+    # project states of install action
+    STATE_INSTALL=install # just installed
+    STATE_UPDATE=update # just updated
+    STATE_DOWNGRADE=downgrade # just downgraded
+    STATE_INSTALLED=installed # already installed
+    # project states of uninstall action
+    STATE_UNINSTALL=uninstall # just uninstalled
+    STATE_UNINSTALLED=uninstalled # already uninstalled
+    # project states of status action
+    STATE_NOTHING=nothing # project is not installed
+    STATE_OLD=old # project is outdated
+    STATE_LATEST=latest # project is fully updated
+    STATE_DEV=dev # project is in a developer version
 }
 
 # DESCRIPTION:
@@ -337,7 +351,10 @@ execute_action() {
         tar_hash="$(git rev-parse "$3"'^{}')" # transform version to commit hash
     else
         tar_hash="$(get_repo_hash "$2")" # get preferred commit hash
-    fi
+    fi &&
+
+    # print report
+    print_report "$state" "$2" "$src_hash" "$tar_hash"
 }
 
 # DESCRIPTION:
@@ -368,7 +385,7 @@ get_repo_hash() { (
 #   given commit. If the commit parameter is empty, no checkout is performed.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - target commit
+#   $2 - commit (optional)
 cd_repo() {
     cd "$CACHE_REPO_DIR"/"$1"/ &&
     if [ "$2" ]; then
@@ -400,7 +417,6 @@ install() { (
         ./preinst
     fi &&
     while read -r link; do # copy all files by defined links
-        # shellcheck disable=SC2086
         eval cp -R -- $link
     done < links &&
     if [ -x postinst ]; then # after files copy
@@ -411,6 +427,54 @@ install() { (
 
 
 
+
+#-------------------------------------------------------------------------------
+# STATE REPORT
+#-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Prints a report of a given Git project and all associated parameters.
+# PARAMETERS:
+#   $1 - state
+#   $2 - URL
+#   $3 - source commit hash
+#   $4 - target commit hash
+print_report() {
+    # prepare given arguments
+    prefix="[$1] $2" &&
+    src_version="$(beautify_hash "$2" "$3")" &&
+    tar_version="$(beautify_hash "$2" "$4")" &&
+
+    case "$1" in
+        "$STATE_INSTALL") echo "$prefix $tar_version" ;;
+        "$STATE_UPDATE") echo "$prefix $tar_version <- $src_version" ;;
+        "$STATE_DOWNGRADE") echo "$prefix $tar_version <- $src_version" ;;
+        "$STATE_INSTALLED") echo "$prefix $src_version" ;;
+        "$STATE_UNINSTALL") echo "$prefix $src_version" ;;
+        "$STATE_UNINSTALLED") echo "$prefix" ;;
+        "$STATE_NOTHING") echo "$prefix -> $tar_version" ;;
+        "$STATE_OLD") echo "$prefix $src_version -> $tar_version" ;;
+        "$STATE_LATEST") echo "$prefix $src_version" ;;
+        "$STATE_DEV") echo "$prefix $src_version -> $tar_version" ;;
+    esac
+}
+
+# DESCRIPTION:
+#   Beautifies the given commit hash prepared for a use in a report. If there is
+#   a tag associated with a given hash, uses this tag. Otherwise, it makes the
+#   given hash shorter. Always succeeds.
+# PARAMETERS:
+#   $1 - URL
+#   $2 - commit hash
+beautify_hash() { (
+    # check if given hash is associated with any tag
+    if cd_repo "$1" 2>/dev/null &&
+       tag_name="$(git describe --tags --exact-match "$2" 2>/dev/null)"; then
+        echo "$tag_name"
+    else # if no tag found, return short hash
+        echo "$2" | cut -c 1-7
+    fi
+) }
 
 #-------------------------------------------------------------------------------
 # ENTRY POINT CALLING
