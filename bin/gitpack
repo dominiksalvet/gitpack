@@ -118,8 +118,8 @@ process_args() {
     case "$1" in
         "$ACTION_INSTALL" | "$ACTION_UNINSTALL" | "$ACTION_STATUS")
             action="$1" # use the given action
-            shift # shift arguments to URLs
-            if [ "$#" -eq 0 ]; then # check if there is any URL argument
+            shift # shift arguments to references
+            if [ "$#" -eq 0 ]; then # check if there is any reference argument
                 print_error 'no URL provided' "$HINT_MESSAGE"
                 return 1
             fi
@@ -132,8 +132,8 @@ process_args() {
     esac
 
     init_runtime &&
-    for url in "$@"; do # process each URL individually with common action
-        process_action "$action" "$url" || return
+    for ref in "$@"; do # process each reference individually with common action
+        process_action "$action" "$ref" || return
     done
 }
 
@@ -232,12 +232,12 @@ init_database() {
 #   Also prints a report after the execution.
 # PARAMETERS:
 #   $1 - action
-#   $2 - any URL
+#   $2 - reference
 process_action() {
-    { # process given URL, which may include version
-    url="$(url_extract_short_url "$2")" &&
-    version="$(url_extract_version "$2")" &&
-    check_short_url "$url" &&
+    { # process given reference - URL + version (optional)
+    url="$(ref_to_url "$2")" &&
+    version="$(ref_to_version "$2")" &&
+    check_url "$url" &&
 
     # prepare Git repository
     touch_repo "$url" &&
@@ -252,20 +252,20 @@ process_action() {
 }
 
 # DESCRIPTION:
-#   Extracts a short URL from a given URL.
+#   Extracts an URL from a given reference.
 # PARAMETERS:
-#   $1 - any URL
-url_extract_short_url() {
+#   $1 - reference
+ref_to_url() {
     url="${1%%=*}" && # remove version if any
     url="${url#https://}" && # remove https:// prefix
     echo "${url%.git}" # remove .git suffix
 }
 
 # DESCRIPTION:
-#   Extracts a version from a given URL.
+#   Extracts a version from a given reference if there is any. Always succeeds.
 # PARAMETERS:
-#   $1 - any URL
-url_extract_version() {
+#   $1 - reference
+ref_to_version() {
     version="${1#*=}" && # remove URL and keep version
     if [ "$version" != "$1" ]; then # check if there was a version
         echo "$version"
@@ -273,10 +273,10 @@ url_extract_version() {
 }
 
 # DESCRIPTION:
-#   Checks whether given short URL is supported.
+#   Checks whether a given URL is supported.
 # PARAMETERS:
 #   $1 - URL
-check_short_url() {
+check_url() {
     url_regex='^[[:alnum:]_][[:alnum:]_\.-]*(/[[:alnum:]_][[:alnum:]_\.-]*){2}$'
 
     if ! echo "$1" | grep -q -E "$url_regex"; then
