@@ -36,7 +36,8 @@ main() {
 #   Checks whether all software dependencies are satisfied.
 check_deps() {
     # a list of required software
-    sw_list='command echo [ cd test pwd rm id mkdir touch dirname grep git ls uname read cp head'
+    sw_list='command echo [ cd test pwd rm id mkdir touch dirname grep git ls '\
+'uname read cp head'
 
     # check if any piece of software is missing
     for sw in $sw_list; do
@@ -390,10 +391,10 @@ cd_repo() {
 install() { (
     cd_repo "$1" "$2" &&
     # choose the most appropriate installation method
-    if [ -d .gitpack/methods/"${access}-$system"/ ]; then
-        cd .gitpack/methods/"${access}-$system"/ # specific for current system
+    if [ -d .gitpack/install/"${access}-$system"/ ]; then
+        cd .gitpack/install/"${access}-$system"/ # specific for current system
     else
-        cd .gitpack/methods/"$access"/ # common global or local for all systems
+        cd .gitpack/install/"$access"/ # common global or local for all systems
     fi &&
     if [ -x preinst ]; then # before files copy
         ./preinst
