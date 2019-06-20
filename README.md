@@ -6,6 +6,8 @@
 </p>
 
 <p align="center">
+    <a href="https://github.com/dominiksalvet/gitpack">
+        <img src="https://img.shields.io/badge/GitPack-ready-571997.svg" alt="GitPack ready"></a>
     <a href="https://reuse.software/">
         <img src="https://reuse.software/badge/reuse-compliant.svg" alt="reuse compliant"></a>
     <a href="https://github.com/RichardLitt/standard-readme">
