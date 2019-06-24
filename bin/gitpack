@@ -428,10 +428,8 @@ execute_install() {
         else
             state="$STATE_DOWNGRADE" # downgrade
         fi &&
-
         uninstall "$1" "$2" && # uninstall source commit
         delete_db_records "$1" && # update GitPack database
-
         install "$1" "$3" && # install target commit
         insert_db_record "$1" "$3" # update GitPack database
     fi
@@ -493,14 +491,11 @@ delete_db_records() {
     grep_out="$(grep -F -v "$1" "$STATUS_PATH")"
     grep_status="$?" # store exit status of the grep
 
-    # if there is no error, write back an updated status file contents
-    if [ "$grep_status" -eq 0 ]; then
+    if [ "$grep_status" -eq 0 ]; then # no error, update status file
         echo "$grep_out" > "$STATUS_PATH"
-    # if there were no lines selected, clear the status file contents
-    elif [ "$grep_status" -eq 1 ]; then
-        true > "$STATUS_PATH"
-    # in case of any other error, propagate it further
-    else
+    elif [ "$grep_status" -eq 1 ]; then # no lines selected, clear status file
+        true > "$STATUS_PATH" 
+    else # propagate any other error further
         return "$grep_status"
     fi
 }
@@ -516,10 +511,6 @@ is_ancestor_commit() { (
     cd_repo "$1" &&
     git merge-base --is-ancestor "$2" "$3"
 ) }
-
-
-
-
 
 #-------------------------------------------------------------------------------
 # INSTALLATION AND UNINSTALLATION
@@ -542,17 +533,38 @@ install() { (
         ./precp
     fi &&
     while read -r route; do # copy all files by defined routes
-        # shellcheck disable=SC2086
-        eval cp -R -- $route
+        # TODO: eval, mkdir, cp
+        echo "$route"
     done < map &&
     if [ -x postcp ]; then # after files copy
         ./postcp
     fi
 ) }
 
-
-
-
+# DESCRIPTION:
+#   Uninstalls a project based on a given repository URL and commit.
+# PARAMETERS:
+#   $1 - URL
+#   $2 - commit
+uninstall() { (
+    cd_repo "$1" "$2" &&
+    # choose the most appropriate uninstallation method
+    if [ -d .gitpack/install/"${access}-$system"/ ]; then
+        cd .gitpack/install/"${access}-$system"/ # specific for current system
+    else
+        cd .gitpack/install/"$access"/ # common global or local for all systems
+    fi &&
+    if [ -x prerm ]; then # before files removal
+        ./prerm
+    fi &&
+    while read -r route; do # remove all files by defined routes
+        # TODO: eval, rmdir, rm
+        echo "$route"
+    done < map &&
+    if [ -x postrm ]; then # after files removal
+        ./postrm
+    fi
+) }
 
 #-------------------------------------------------------------------------------
 # STATE REPORT
