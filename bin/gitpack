@@ -413,14 +413,14 @@ install() { (
     else
         cd .gitpack/install/"$access"/ # common global or local for all systems
     fi &&
-    if [ -x preinst ]; then # before files copy
-        ./preinst
+    if [ -x precp ]; then # before files copy
+        ./precp
     fi &&
     while read -r route; do # copy all files by defined routes
         eval cp -R -- $route
     done < map &&
-    if [ -x postinst ]; then # after files copy
-        ./postinst
+    if [ -x postcp ]; then # after files copy
+        ./postcp
     fi
 ) }
 
