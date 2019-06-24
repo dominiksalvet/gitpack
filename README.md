@@ -18,7 +18,7 @@
         <img src="https://img.shields.io/discord/588895022955495424.svg?logo=discord" alt="Discord chat"></a>
 </p>
 
-> Git-based package manager.
+> The simplest Git-based package manager.
 
 Long description.
 
