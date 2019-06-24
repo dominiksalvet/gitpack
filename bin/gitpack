@@ -416,9 +416,9 @@ install() { (
     if [ -x preinst ]; then # before files copy
         ./preinst
     fi &&
-    while read -r link; do # copy all files by defined links
-        eval cp -R -- $link
-    done < links &&
+    while read -r route; do # copy all files by defined routes
+        eval cp -R -- $route
+    done < map &&
     if [ -x postinst ]; then # after files copy
         ./postinst
     fi
