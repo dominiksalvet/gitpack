@@ -523,18 +523,15 @@ is_ancestor_commit() { (
 #   $2 - commit
 install() { (
     cd_repo "$1" "$2" &&
-    # choose the most appropriate installation method
-    if [ -d .gitpack/install/"${access}-$system"/ ]; then
-        cd .gitpack/install/"${access}-$system"/ # specific for current system
-    else
-        cd .gitpack/install/"$access"/ # common global or local for all systems
-    fi &&
+    cd_gitpack && # choose the most appropriate installation method
+
     if [ -x precp ]; then # before files copy
         ./precp
     fi &&
     while read -r route; do # copy all files by defined routes
-        # TODO: eval, mkdir, cp
-        echo "$route"
+        route="$(eval echo "$route")" && # evaluate current route
+        mkdir -p -- $route && # create all required directories
+        cp -R -- $route || return # copy all listed files recursively
     done < map &&
     if [ -x postcp ]; then # after files copy
         ./postcp
@@ -548,12 +545,8 @@ install() { (
 #   $2 - commit
 uninstall() { (
     cd_repo "$1" "$2" &&
-    # choose the most appropriate uninstallation method
-    if [ -d .gitpack/install/"${access}-$system"/ ]; then
-        cd .gitpack/install/"${access}-$system"/ # specific for current system
-    else
-        cd .gitpack/install/"$access"/ # common global or local for all systems
-    fi &&
+    cd_gitpack && # choose the most appropriate uninstallation method
+
     if [ -x prerm ]; then # before files removal
         ./prerm
     fi &&
@@ -565,6 +558,17 @@ uninstall() { (
         ./postrm
     fi
 ) }
+
+# DESCRIPTION:
+#   Changes current working directory to the most appropriate GitPack
+#   installation directory based on the runtime and system information.
+cd_gitpack() {
+    # try to find specific directory for the current system
+    if ! cd .gitpack/install/"${access}-$system"/ 2>/dev/null; then
+        # if it fails, use common global or local for any system
+        cd .gitpack/install/"$access"/
+    fi || return
+}
 
 #-------------------------------------------------------------------------------
 # STATE REPORT
