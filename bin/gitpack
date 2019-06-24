@@ -37,7 +37,7 @@ main() {
 check_deps() {
     # a list of required software
     sw_list='command echo [ cd test pwd rm id mkdir touch dirname grep git ls '\
-'uname read cp head cut'
+'uname read cp head cut true'
 
     # check if any piece of software is missing
     for sw in $sw_list; do
@@ -199,7 +199,10 @@ init_global_vars() {
     fi &&
 
     # get the current system name
-    system="$(uname)"
+    system="$(uname)" &&
+
+    # the state of the processed project
+    state=
 }
 
 # DESCRIPTION:
@@ -344,7 +347,6 @@ touch_repo() { (
 execute_action() {
     # get source (already installed) project information
     src_db_record="$(get_db_record "$2")" &&
-    src_url="${src_db_record%% *}" && # extract url
     src_hash="${src_db_record#* }" && # extract commit hash
     # get target (installation candidate) project information
     if [ "$3" ]; then
@@ -352,6 +354,13 @@ execute_action() {
     else
         tar_hash="$(get_repo_hash "$2")" # get preferred commit hash
     fi &&
+
+    # choose action and execute it
+    case "$1" in
+        "$ACTION_INSTALL") execute_install "$2" "$src_hash" "$tar_hash" ;;
+        "$ACTION_UNINSTALL") execute_uninstall "$2" "$src_hash" ;;
+        "$ACTION_STATUS") execute_status "$2" "$src_hash" "$tar_hash" ;;
+    esac &&
 
     # print report
     print_report "$state" "$2" "$src_hash" "$tar_hash"
@@ -393,6 +402,121 @@ cd_repo() {
     fi
 }
 
+#-------------------------------------------------------------------------------
+# ACTION EXECUTION
+#-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Decides whether install, update, or do nothing with a given project. If any
+#   operation is done, it will use only given commits and also updates the
+#   GitPack database.
+# PARAMETERS:
+#   $1 - URL
+#   $2 - source commit (optional)
+#   $3 - target commit
+execute_install() {
+    if [ ! "$2" ]; then
+        state="$STATE_INSTALL" && # installation
+        install "$1" "$3" && # install target commit
+        insert_db_record "$1" "$3" # update GitPack database
+    elif [ "$2" = "$3" ]; then
+        state="$STATE_INSTALLED" # already installed
+    else
+        # check if installed version is older than the target
+        if is_ancestor_commit "$1" "$2" "$3"; then
+            state="$STATE_UPDATE" # update
+        else
+            state="$STATE_DOWNGRADE" # downgrade
+        fi &&
+
+        uninstall "$1" "$2" && # uninstall source commit
+        delete_db_records "$1" && # update GitPack database
+
+        install "$1" "$3" && # install target commit
+        insert_db_record "$1" "$3" # update GitPack database
+    fi
+}
+
+# DESCRIPTION:
+#   Decides whether uninstall, or do nothing with a given project. If any
+#   operation is done, it will use only given commit and also updates the
+#   GitPack database.
+# PARAMETERS:
+#   $1 - URL
+#   $2 - commit
+execute_uninstall() {
+    if [ "$2" ]; then # if installed
+        state="$STATE_UNINSTALL" && # uninstallation
+        uninstall "$1" "$2" && # uninstall given commit
+        delete_db_records "$1" # update GitPack database
+    else
+        state="$STATE_UNINSTALLED" # already uninstalled
+    fi
+}
+
+# DESCRIPTION:
+#   Checks the given repository considering given source and target commits. It
+#   always succeeds.
+# PARAMETERS:
+#   $1 - URL
+#   $2 - source commit
+#   $3 - target commit
+execute_status() {
+    if [ ! "$2" ]; then
+        state="$STATE_NOTHING" # nothing installed from the URL
+    elif [ "$2" = "$3" ]; then
+        state="$STATE_LATEST" # the same as latest version
+    else
+        # check if installed version is older than the target
+        if is_ancestor_commit "$1" "$2" "$3"; then
+            state="$STATE_OLD" # older than latest version
+        else
+            state="$STATE_DEV" # newer than latest version
+        fi
+    fi
+}
+
+# DESCRIPTION:
+#   Inserts a given installation record into the GitPack database.
+# PARAMETERS:
+#   $1 - URL
+#   $2 - hash
+insert_db_record() {
+    echo "$1 $2" >> "$STATUS_PATH"
+}
+
+# DESCRIPTION:
+#   Deletes all installation records with given URL from the GitPack database.
+# PARAMETERS:
+#   $1 - URL
+delete_db_records() {
+    grep_out="$(grep -F -v "$1" "$STATUS_PATH")"
+    grep_status="$?" # store exit status of the grep
+
+    # if there is no error, write back an updated status file contents
+    if [ "$grep_status" -eq 0 ]; then
+        echo "$grep_out" > "$STATUS_PATH"
+    # if there were no lines selected, clear the status file contents
+    elif [ "$grep_status" -eq 1 ]; then
+        true > "$STATUS_PATH"
+    # in case of any other error, propagate it further
+    else
+        return "$grep_status"
+    fi
+}
+
+# DESCRIPTION:
+#   Checks whether the first given commit is an ancestor of the second commit in
+#   a given Git repository.
+# PARAMETERS:
+#   $1 - URL
+#   $2 - first commit
+#   $3 - second commit
+is_ancestor_commit() { (
+    cd_repo "$1" &&
+    git merge-base --is-ancestor "$2" "$3"
+) }
+
 
 
 
@@ -402,9 +526,10 @@ cd_repo() {
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   Installs a project based on a given repository URL and commit hash.
-# $1 - URL
-# $2 - commit hash
+#   Installs a project based on a given repository URL and commit.
+# PARAMETERS:
+#   $1 - URL
+#   $2 - commit
 install() { (
     cd_repo "$1" "$2" &&
     # choose the most appropriate installation method
@@ -417,6 +542,7 @@ install() { (
         ./precp
     fi &&
     while read -r route; do # copy all files by defined routes
+        # shellcheck disable=SC2086
         eval cp -R -- $route
     done < map &&
     if [ -x postcp ]; then # after files copy
@@ -437,8 +563,8 @@ install() { (
 # PARAMETERS:
 #   $1 - state
 #   $2 - URL
-#   $3 - source commit hash
-#   $4 - target commit hash
+#   $3 - source commit
+#   $4 - target commit
 print_report() {
     # prepare given arguments
     prefix="[$1] $2" &&
@@ -465,7 +591,7 @@ print_report() {
 #   given hash shorter. Always succeeds.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - commit hash
+#   $2 - commit
 beautify_hash() { (
     # check if given hash is associated with any tag
     if cd_repo "$1" 2>/dev/null &&
