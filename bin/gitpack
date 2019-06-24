@@ -111,7 +111,7 @@ COMMAND:
   about  show information"
 
     ABOUT_MESSAGE="GitPack $VERSION
-Git-based package manager.
+The simplest Git-based package manager.
 
 Copy"'right 2019 Dominik Salvet
 SPDX License Identifier: MIT
