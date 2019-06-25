@@ -523,18 +523,19 @@ is_ancestor_commit() { (
 #   $2 - commit
 install() { (
     cd_repo "$1" "$2" &&
-    cd_gitpack && # choose the most appropriate installation method
+    install_dir="$(get_install_dir)" && # choose the installation method
 
-    if [ -x precp ]; then # before files copy
-        ./precp
+    if [ -x "$install_dir"/precp ]; then # before files copy
+        "$install_dir"/precp
     fi &&
+
     while read -r route; do # copy all files by defined routes
-        route="$(eval echo "$route")" && # evaluate current route
-        mkdir -p -- $route && # create all required directories
-        cp -R -- $route || return # copy all listed files recursively
-    done < map &&
-    if [ -x postcp ]; then # after files copy
-        ./postcp
+        # shellcheck disable=SC2086
+        copy_files $route || return
+    done < "$install_dir"/map &&
+
+    if [ -x "$install_dir"/postcp ]; then # after files copy
+        "$install_dir"/postcp
     fi
 ) }
 
@@ -545,29 +546,49 @@ install() { (
 #   $2 - commit
 uninstall() { (
     cd_repo "$1" "$2" &&
-    cd_gitpack && # choose the most appropriate uninstallation method
+    install_dir="$(get_install_dir)" && # choose the uninstallation method
 
-    if [ -x prerm ]; then # before files removal
-        ./prerm
+    if [ -x "$install_dir"/prerm ]; then # before files removal
+        "$install_dir"/prerm
     fi &&
+
     while read -r route; do # remove all files by defined routes
-        # TODO: eval, rmdir, rm
-        echo "$route"
-    done < map &&
-    if [ -x postrm ]; then # after files removal
-        ./postrm
+        # shellcheck disable=SC2086
+        remove_files $route || return
+    done < "$install_dir"/map &&
+
+    if [ -x "$install_dir"/postrm ]; then # after files removal
+        "$install_dir"/postrm
     fi
 ) }
 
 # DESCRIPTION:
-#   Changes current working directory to the most appropriate GitPack
-#   installation directory based on the runtime and system information.
-cd_gitpack() {
-    # try to find specific directory for the current system
-    if ! cd .gitpack/install/"${access}-$system"/ 2>/dev/null; then
-        # if it fails, use common global or local for any system
-        cd .gitpack/install/"$access"/
-    fi || return
+#   Returns the most appropriate GitPack installation directory relative path
+#   based on the current runtime and system information.
+get_install_dir() {
+    if [ -d .gitpack/install/"${access}-$system"/ ]; then
+        echo .gitpack/install/"${access}-$system" # system-specific directory
+    else
+        echo .gitpack/install/"$access" # system-independent directory
+    fi
+}
+
+# DESCRIPTION:
+#   Copies files from the current directory by delivered map route.
+# PARAMAETERS:
+#   $@ - route
+copy_files() {
+    # TODO: eval, mkdir (for directories only), cp
+    echo "$@"
+}
+
+# DESCRIPTION:
+#   Removes files as defined by delivered map route and current directory files.
+# PARAMAETERS:
+#   $@ - route
+remove_files() {
+    # TODO: eval, rmdir, rm
+    echo "$@"
 }
 
 #-------------------------------------------------------------------------------
