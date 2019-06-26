@@ -157,10 +157,10 @@ process_args() {
 #   directory that is prevented to be removed and fails in that case. This
 #   function uses only the first parameter, others are ignored!
 # PARAMETERS:
-#   $1 - directory path
+#   $1 - directory
 safe_rm_rf_dir() {
     if [ -d "${1:?}"/ ]; then # check if the directory exists
-        ( # remove only if the given directory path is not the root directory
+        ( # remove only if the given directory is not the root directory
             cd -- "$1"/ 2>/dev/null &&
             test "$PWD" != / &&
             pwd_out="$(pwd -P)" &&
