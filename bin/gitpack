@@ -338,22 +338,18 @@ touch_repo() { (
 
 # DESCRIPTION:
 #   Chooses which action will be executed and executes it with an initialized
-#   Git repository. If no target version is delivered, GitPack chooses
-#   a preferred commit instead. Also prints a report after the execution.
+#   Git repository. If no version is delivered, GitPack chooses the preferred
+#   commit instead. Also prints a report after the execution.
 # PARAMETERS:
 #   $1 - action
 #   $2 - URL
-#   $3 - target version (optional)
+#   $3 - version (optional)
 execute_action() {
     # get source (already installed) project information
     src_db_record="$(get_db_record "$2")" &&
     src_hash="${src_db_record#* }" && # extract commit hash
     # get target (installation candidate) project information
-    if [ "$3" ]; then
-        tar_hash="$(git rev-parse "$3"'^{}')" # transform version to commit hash
-    else
-        tar_hash="$(get_repo_hash "$2")" # get preferred commit hash
-    fi &&
+    tar_hash="$(get_repo_hash "$2" "$3")" &&
 
     # choose action and execute it
     case "$1" in
@@ -379,13 +375,16 @@ get_db_record() {
 #   commit if it exists, otherwise latest commit is chosen.
 # PARAMETERS:
 #   $1 - URL
+#   $2 - version (optional)
 get_repo_hash() { (
     cd_repo "$1" &&
-    # latest tag (of any type)
-    if tag_name="$(git describe --tags --abbrev=0 master 2>/dev/null)"; then
-        git rev-parse "$tag_name"'^{}' # transform latest version to commit hash
-    else # latest commit
-        git rev-parse master
+
+    if [ "$2" ]; then
+        git rev-parse "$2"'^{}' # transform delivered version to commit hash
+    elif tag_name="$(git describe --tags --abbrev=0 master 2>/dev/null)"; then
+        git rev-parse "$tag_name"'^{}' # transform latest tag to commit hash
+    else
+        git rev-parse master # get latest commit hash
     fi
 ) }
 
