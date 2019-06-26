@@ -87,9 +87,9 @@ init_constants() {
     STATE_UNINSTALLED=uninstalled # already uninstalled
     # project states of status action
     STATE_NOTHING=nothing # project is not installed
-    STATE_OLD=old # project is outdated
-    STATE_LATEST=latest # project is fully updated
-    STATE_DEV=dev # project is in a developer version
+    STATE_OLDER=older # current version is older than target version
+    STATE_NEWER=newer # current version is newer than target version
+    STATE_OK=ok # current version is equal to target version
 }
 
 # DESCRIPTION:
@@ -462,13 +462,13 @@ execute_status() {
     if [ ! "$2" ]; then
         state="$STATE_NOTHING" # nothing installed from the URL
     elif [ "$2" = "$3" ]; then
-        state="$STATE_LATEST" # the same as latest version
+        state="$STATE_OK" # the same as latest version
     else
         # check if installed version is older than the target
         if is_ancestor_commit "$1" "$2" "$3"; then
-            state="$STATE_OLD" # older than latest version
+            state="$STATE_OLDER" # older than latest version
         else
-            state="$STATE_DEV" # newer than latest version
+            state="$STATE_NEWER" # newer than latest version
         fi
     fi
 }
@@ -647,9 +647,9 @@ print_report() {
         "$STATE_UNINSTALL") echo "$prefix $src_version" ;;
         "$STATE_UNINSTALLED") echo "$prefix" ;;
         "$STATE_NOTHING") echo "$prefix -> $tar_version" ;;
-        "$STATE_OLD") echo "$prefix $src_version -> $tar_version" ;;
-        "$STATE_LATEST") echo "$prefix $src_version" ;;
-        "$STATE_DEV") echo "$prefix $src_version -> $tar_version" ;;
+        "$STATE_OLDER") echo "$prefix $src_version -> $tar_version" ;;
+        "$STATE_NEWER") echo "$prefix $src_version -> $tar_version" ;;
+        "$STATE_OK") echo "$prefix $src_version" ;;
     esac
 }
 
