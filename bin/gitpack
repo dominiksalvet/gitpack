@@ -37,7 +37,7 @@ main() {
 check_deps() {
     # a list of required software
     sw_list='command echo [ cd test pwd rm id mkdir touch dirname grep git ls '\
-'uname read cp head cut true'
+'uname read cp head cut true basename find rmdir'
 
     # check if any piece of software is missing
     for sw in $sw_list; do
@@ -161,7 +161,7 @@ process_args() {
 safe_rm_rf_dir() {
     if [ -d "${1:?}"/ ]; then # check if the directory exists
         ( # remove only if the given directory path is not the root directory
-            cd -- "${1:?}"/ 2>/dev/null &&
+            cd -- "$1"/ 2>/dev/null &&
             test "$PWD" != / &&
             pwd_out="$(pwd -P)" &&
             test "$pwd_out" != /
@@ -478,7 +478,7 @@ execute_status() {
 #   Inserts a given installation record into the GitPack database.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - hash
+#   $2 - commit hash
 insert_db_record() {
     echo "$1 $2" >> "$STATUS_PATH"
 }
@@ -529,10 +529,8 @@ install() { (
         "$install_dir"/precp
     fi &&
 
-    while read -r route; do # copy all files by defined routes
-        # shellcheck disable=SC2086
-        copy_files $route || return
-    done < "$install_dir"/map &&
+    # copy all files by defined routes
+    for_each_route "$install_dir"/map copy_files &&
 
     if [ -x "$install_dir"/postcp ]; then # after files copy
         "$install_dir"/postcp
@@ -552,10 +550,8 @@ uninstall() { (
         "$install_dir"/prerm
     fi &&
 
-    while read -r route; do # remove all files by defined routes
-        # shellcheck disable=SC2086
-        remove_files $route || return
-    done < "$install_dir"/map &&
+    # remove all files by defined routes
+    for_each_route "$install_dir"/map remove_files &&
 
     if [ -x "$install_dir"/postrm ]; then # after files removal
         "$install_dir"/postrm
@@ -574,21 +570,57 @@ get_install_dir() {
 }
 
 # DESCRIPTION:
-#   Copies files from the current directory by delivered map route.
-# PARAMAETERS:
-#   $@ - route
-copy_files() {
-    # TODO: eval, mkdir (for directories only), cp
-    echo "$@"
+#   For each given map route, it calls a given function. It also prepares the
+#   map by removing comments and empty lines before calling any function so that
+#   it contains only required routes.
+# PARAMETERS:
+#   $1 - map path
+#   $2 - function name
+for_each_route() {
+    map="$(grep '^[^#]' "$1")" && # remove empty lines and comment lines
+    echo "$map" | # prepare pipe for reading map line by line
+    while read -r route; do
+        eval "$2" "$route" || return # call a given function for each route
+    done
 }
 
 # DESCRIPTION:
-#   Removes files as defined by delivered map route and current directory files.
+#   Copies files recursively based on given source and target paths. It also
+#   creates the target directory if it does not exist before copying.
 # PARAMAETERS:
-#   $@ - route
+#   $1 - source path
+#   $2 - target directory
+copy_files() {
+    : "${1:?}" "${2:?}" && # parameters must be set up
+    mkdir -p -- "$2"/ && # create target directory
+    cp -R -- "$1" "$2"/ # copy all files recursively (if directory)
+}
+
+# DESCRIPTION:
+#   Removes files based on given source and target paths.
+# PARAMAETERS:
+#   $1 - source path
+#   $2 - target directory
 remove_files() {
-    # TODO: eval, rmdir, rm
-    echo "$@"
+    : "${1:?}" "${2:?}" && # parameters must be set up
+    if [ -d "$1"/ ]; then
+        # scan source path to obtain files mask
+        files="$(cd -- "$1"/ && find . ! -type d)" &&
+        dirs="$(cd -- "$1"/ && find . ! -path . -type d)" &&
+        base_dir="$(basename -- "$1"/)" &&
+
+        ( # remove files and then directories by the files mask
+            cd -- "$2"/ &&
+            for file in $files; do
+                rm -f -- "$base_dir"/"$file" || return
+            done &&
+            for dir in $dirs; do
+                rmdir -p -- "$base_dir"/"$dir"/ 2>/dev/null; true
+            done
+        )
+    else # remove the file as a regular file
+        rm -f -- "$2"/"$(basename -- "$1")"
+    fi
 }
 
 #-------------------------------------------------------------------------------

@@ -11,3 +11,4 @@ The changes not yet present in any release are listed in this section.
 ### Added
 
 * Add support for installation of a given version.
+* Installation and uninstallation of GitPack ready projects has been implemented.
