@@ -12,3 +12,7 @@ The changes not yet present in any release are listed in this section.
 
 * Add support for installation of a given version.
 * Installation and uninstallation of GitPack projects has been implemented.
+
+### Changed
+
+* States of status action have been renamed; `old`, `dev`, `latest` -> `older`, `newer`, `ok`.
