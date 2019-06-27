@@ -3,7 +3,7 @@ Upstream-Name: gitpack
 Upstream-Contact: Dominik Salvet <dominik.salvet@gmail.com>
 Source: https://github.com/dominiksalvet/gitpack
 
-Files: README.md CONTRIBUTING.md SECURITY.md CHANGELOG.md
+Files: README.md CONTRIBUTING.md SECURITY.md CHANGELOG.md GUIDE.md
 Copyright: Copyright 2019 Dominik Salvet
 License: MIT
 
