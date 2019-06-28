@@ -100,7 +100,7 @@ Why should you use GitPack in your projects?
 * Easy-to-use for developers and users
 * Programming language independent
 * Runs on Linux, macOS and Windows (WSL)
-* Shell and Git is all you need
+* Shell environment and Git is all you need
 * Global and local installations
 * Delta updates
 * POSIX-friendly environment
