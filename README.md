@@ -38,7 +38,7 @@ If you are in, then GitPack comes in pretty handy. All you need is a URL of a Gi
 
 **Are you a developer?** Do you like the idea stated above? Then keep reading in the [Developer](#developer) section.
 
-> Do you want to support this awesome project? Then spread the word!
+> Do you want to support this awesome project? **Then spread the word!**
 
 ## Table of Contents
 
