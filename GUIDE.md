@@ -18,3 +18,7 @@ GitPack works with the *.gitpack* directory of Git repositories with the followi
   * E.g., *postcp* can modify */etc/rc.local* file to execute *asus-fan-control* after boot.
 
 Git repositories with such *.gitpack* directory can be installed, updated and uninstalled using GitPack by end users.
+
+## Examples
+
+If you are interested in examples of projects using GitPack, take a look at the [gitpack topic](https://github.com/topics/gitpack).
