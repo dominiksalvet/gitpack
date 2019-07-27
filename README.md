@@ -32,7 +32,7 @@ And when they are no longer needed, **uninstall** them that way?
 gitpack uninstall <url>
 ```
 
-If you are in, then GitPack comes in pretty handy. All you need is a URL of a Git project and GitPack will do the rest.
+If you are in, then GitPack comes in pretty handy. All you need is a URL of a compatible Git project.
 
 ---
 
@@ -90,7 +90,7 @@ Show **status** of a Git project:
 gitpack status <url>
 ```
 
-> Your favorite project is not compatible, right? Then encourage its developers to take a look at the [Developer](#developer) section.
+> Your favorite project is not compatible? Then encourage its developers to take a look at the [Developer](#developer) section.
 
 ## Developer
 
