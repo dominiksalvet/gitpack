@@ -54,7 +54,7 @@ check_deps() {
 #   $1 - error text
 #   $2 - hint text (optional)
 print_error() {
-    echo "$0: $1" >&2
+    echo "gitpack: $1" >&2
     if [ "$2" ]; then
         echo "$2" >&2
     fi
@@ -97,8 +97,8 @@ init_constants() {
 #   must be already initialized.
 init_strings() {
     HELP_MESSAGE="USAGE:
-  $0 ACTION URL[=VERSION]...
-  $0 COMMAND
+  gitpack ACTION URL[=VERSION]...
+  gitpack COMMAND
 
 ACTION:
   $ACTION_INSTALL    install/update Git projects
@@ -118,7 +118,7 @@ Copy"'right 2019 Dominik Salvet
 SPDX License Identifier: MIT
 https://github.com/dominiksalvet/gitpack'
 
-    HINT_MESSAGE="Try '$0 help' for getting help."
+    HINT_MESSAGE="Try 'gitpack help' for getting help."
 }
 
 #-------------------------------------------------------------------------------
@@ -311,7 +311,7 @@ check_url() {
     url_regex='^[[:alnum:]_][[:alnum:]_\.-]*(/[[:alnum:]_][[:alnum:]_\.-]*){2}$'
 
     if ! echo "$1" | grep -q -E "$url_regex"; then
-        echo "$0: unsupported URL delivered" >&2
+        print_error 'unsupported URL delivered'
         return 1
     fi
 }
