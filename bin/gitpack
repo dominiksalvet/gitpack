@@ -37,7 +37,7 @@ main() {
 check_deps() {
     # a list of required software
     sw_list='command echo [ cd test pwd rm id mkdir touch dirname grep git ls '\
-'uname read cp head cut true basename find rmdir'
+'uname read cp head cut true basename find rmdir tr'
 
     # check if any piece of software is missing
     for sw in $sw_list; do
@@ -283,13 +283,14 @@ process_action() {
 }
 
 # DESCRIPTION:
-#   Extracts an URL from a given reference.
+#   Extracts and normalizes the URL from a given reference.
 # PARAMETERS:
 #   $1 - reference
 ref_to_url() {
     url="${1%%=*}" && # remove version if any
     url="${url#https://}" && # remove https:// prefix
-    echo "${url%.git}" # remove .git suffix
+    url="${url%.git}" && # remove .git suffix
+    echo "$url" | tr '[:upper:]' '[:lower:]' # to lowercase
 }
 
 # DESCRIPTION:

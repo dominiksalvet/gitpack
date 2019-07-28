@@ -12,6 +12,10 @@ The changes not yet present in any release are listed in this section.
 
 * The `list` command has been added to list all installed Git projects using GitPack.
 
+### Changed
+
+* GitPack transforms every URL it works with to the lowercase form.
+
 ## 0.1.0 (2019-06-27)
 
 ### Added
