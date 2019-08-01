@@ -11,6 +11,7 @@ The changes not yet present in any release are listed in this section.
 ### Added
 
 * The `list` command has been added to list all installed Git projects using GitPack.
+* The support for processing dependencies has been added.
 
 ### Changed
 

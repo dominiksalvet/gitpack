@@ -215,7 +215,10 @@ init_global_vars() {
     system="$(uname)" &&
 
     # the state of the processed project
-    state=
+    state= &&
+
+    # prefix of the report of processed projects
+    report_prefix=
 }
 
 # DESCRIPTION:
@@ -365,6 +368,9 @@ execute_action() {
     # get target (installation candidate) project information
     tar_hash="$(get_repo_hash "$2" "$3")" &&
 
+    # process dependencies first
+    process_deps "$1" "$2" "$tar_hash" &&
+
     # choose action and execute it
     case "$1" in
         "$ACTION_INSTALL") execute_install "$2" "$src_hash" "$tar_hash" ;;
@@ -372,7 +378,6 @@ execute_action() {
         "$ACTION_STATUS") execute_status "$2" "$src_hash" "$tar_hash" ;;
     esac &&
 
-    # print report
     print_report "$state" "$2" "$src_hash" "$tar_hash"
 }
 
@@ -414,6 +419,38 @@ cd_repo() {
         git checkout -q "$2"
     fi
 }
+
+#-------------------------------------------------------------------------------
+# PROCESS DEPENDENCIES
+#-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Processes given dependencies considering the given action. Dependencies are
+#   obtained from a repository file of the given project URL.
+# PARAMETERS:
+#   $1 - action
+#   $2 - URL
+#   $3 - target commit
+process_deps() { (
+    # early return in uninstall case
+    if [ "$1" = "$ACTION_UNINSTALL" ]; then
+        return 0
+    fi
+
+    # prepare environment
+    #shellcheck disable=SC2030
+    report_prefix='+ ' && # indicate report for dependencies
+    cd_repo "$2" "$3" &&
+
+    # if there are any dependencies
+    if [ -r .gitpack/deps ]; then
+        # run the given action recursively for every dependency reference
+        while read -r dep_ref; do
+            # entering action with changed working directory
+            process_action "$1" "$dep_ref" || return
+        done < .gitpack/deps
+    fi
+) }
 
 #-------------------------------------------------------------------------------
 # ACTION EXECUTION
@@ -649,7 +686,8 @@ remove_files() {
 #   $4 - target commit
 print_report() {
     # prepare given arguments
-    prefix="[$1] $2" &&
+    #shellcheck disable=SC2031
+    prefix="${report_prefix}[$1] $2" &&
     src_version="$(beautify_hash "$2" "$3")" &&
     tar_version="$(beautify_hash "$2" "$4")" &&
 
