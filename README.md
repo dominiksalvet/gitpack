@@ -105,7 +105,7 @@ Why should you use GitPack in your projects?
 * Delta updates
 * POSIX-friendly environment
 
-How? The [*GUIDE.md*](GUIDE.md) file will guide you. Then users can **immediately use GitPack to install your projects**.
+How? The [*GUIDE.md*](GUIDE.md) file will show you the way. Then users can **immediately use GitPack to install your projects**.
 
 Not sure? Take a look at [*.gitpack*](.gitpack) directory of GitPack itself. It can be that simple.
 
