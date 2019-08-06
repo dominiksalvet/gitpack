@@ -1,1 +1,1 @@
-bin/gitpack /usr/local/bin
+src/gitpack /usr/local/bin

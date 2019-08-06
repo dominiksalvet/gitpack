@@ -13,7 +13,7 @@ jobs:
     - stage: checks
       name: Static analysis
       before_script: shellcheck --version
-      script: shellcheck bin/gitpack
+      script: shellcheck src/gitpack
 
     - name: Licensing
       addons:
