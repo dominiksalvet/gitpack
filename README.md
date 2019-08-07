@@ -97,13 +97,12 @@ gitpack status <url>
 Why should you use GitPack in your projects?
 
 * Simple by design
-* Easy-to-use for developers and users
-* Programming language independent
+* Language-independent
 * Runs on Linux, macOS and Windows (WSL)
 * Shell environment and Git is all you need
 * Global and local installations
 * Delta updates
-* POSIX-friendly environment
+* POSIX-friendly
 
 How? The [*GUIDE.md*](GUIDE.md) file will show you the way. Then users can **immediately use GitPack to install your projects**.
 
