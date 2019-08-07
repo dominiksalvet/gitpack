@@ -1,23 +1,31 @@
 # Guide
 
-GitPack works only with master branch of Git projects. It uses either latest tag or latest commit as a default commit.
+This file contains **everything you need to start** using GitPack in your awesome Git projects. Once you follow this guide, end users can immediately install, update or uninstall your projects. Immediately.
 
-GitPack works with the *.gitpack* directory of Git repositories with the following structure:
+## General
 
-* *.gitpack/install/\<method\>* is a directory
-  * **Its name always starts with** either *global* or *local* based on installation type.
-  * To restrict execution to a particular system, append its name as *-\<system\>*.
-  * E.g., file name *local-Darwin* represents local installation for macOS-only.
-* *.gitpack/install/\<method\>/map* is a file
-  * Describes which project files are recursively copied and where during installation.
-  * **Has only one source path** and one target directory path per line.
+GitPack works with the master branch of Git projects. It uses either latest tag or latest commit as the default commit.
+
+## Files
+
+GitPack works with the *.gitpack* directory of Git repositories matching the following structure:
+
+* *.gitpack/install/*`<method>` is a directory:
+  * **Its name starts with** either `global` or `local` based on installation type.
+  * To target a particular system only, append its name as `-<system>`.
+  * E.g., `local-Darwin` represents local installation for macOS-only.
+* *.gitpack/install/\<method\>/*`map` is a file:
+  * Describes which project files are copied and where during installation.
+  * **Has one source path** and one target directory path per line.
   * E.g., line `bin/vhdldep /usr/local/bin` copies *vhdldep* file to */usr/local/bin* directory.
-* *.gitpack/install/\<method\>/\<script\>* is an executable file **(optional)**
-  * Its name is *precp*, *postcp*, *prerm*, or *postrm*.
-  * It is run before file copying, after, before file removal, or after.
-  * E.g., *postcp* can modify */etc/rc.local* file to execute *asus-fan-control* after boot.
-
-Git repositories with such *.gitpack* directory can be installed, updated and uninstalled using GitPack by end users.
+* **[optional]** *.gitpack/install/\<method\>/*`<script>` is an executable file:
+  * Its name is `precp`, `postcp`, `prerm`, or `postrm`.
+  * It is run before the copying, after, before the removal, or after.
+  * E.g., `postcp` modifies */etc/rc.local* file to execute *asus-fan-control* after boot.
+* **[optional]** *.gitpack/*`deps` is a file:
+  * It represents a list of the project's Git dependencies.
+  * Has one dependency per line in the same format as the GitPack URL arguments.
+  * E.g., line `github.com/dominiksalvet/ux430ua-jack-volume=2.4.0`.
 
 ## Examples
 
