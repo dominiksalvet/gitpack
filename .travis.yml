@@ -10,15 +10,13 @@ language: shell
 
 jobs:
   include:
-    - stage: checks
+    - stage: Checks
       name: Static analysis
       before_script: shellcheck --version
       script: shellcheck src/gitpack
 
     - name: Licensing
-      addons:
-        apt:
-          packages: python3-pip
-      install: pip3 install --user fsfe-reuse
-      before_script: reuse --version
-      script: reuse lint
+      services: docker
+      install: docker pull fsfe/reuse:latest
+      before_script: docker run fsfe/reuse reuse --version
+      script: docker run -v "$TRAVIS_BUILD_DIR":/repo fsfe/reuse sh -c 'cd /repo && reuse lint'

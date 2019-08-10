@@ -70,7 +70,7 @@ print_error() {
 #   Initializes static constants.
 init_constants() {
     # the current version of GitPack
-    VERSION=0.1.0
+    VERSION=0.2.0
 
     # GitPack actions
     ACTION_INSTALL=install

@@ -8,7 +8,7 @@
 <p align="center">
     <a href="https://github.com/dominiksalvet/gitpack">
         <img src="https://img.shields.io/badge/Git-Pack-571997.svg" alt="GitPack"></a>
-    <a href="https://reuse.software/">
+    <a href="https://reuse.software">
         <img src="https://reuse.software/badge/reuse-compliant.svg" alt="reuse compliant"></a>
     <a href="https://github.com/RichardLitt/standard-readme">
         <img src="https://img.shields.io/badge/readme_style-standard-brightgreen.svg" alt="standard-readme compliant"></a>
@@ -130,6 +130,6 @@ Do you want to contribute? Do you have any questions? Then the [*CONTRIBUTING.md
 
 ## License
 
-Licensing policy of GitPack is compliant with [REUSE Practices](https://reuse.software/practices/2.0/).
+Licensing policy of GitPack is compliant with [REUSE Specification](https://reuse.software/spec/).
 
-The preferred license is the **MIT License** as stated in the [*LICENSE.txt*](LICENSE.txt) file.
+The preferred license is the **MIT License** as stated in the [*MIT.txt*](LICENSES/MIT.txt) file.
