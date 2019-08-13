@@ -44,6 +44,7 @@ If you are in, then GitPack comes in pretty handy. All you need is a URL of a co
 
 * [Install](#install)
 * [Usage](#usage)
+  * [Example](#example)
 * [Developer](#developer)
   * [Badge](#badge)
 * [Thanks](#thanks)
@@ -90,7 +91,15 @@ Show **status** of a Git project:
 gitpack status <url>
 ```
 
-> Your favorite project is not compatible? Then encourage its developers to take a look at the [Developer](#developer) section.
+> Your favorite project is not compatible? Then encourage its developers to take a look at the [Developer](#developer) section below.
+
+### Example
+
+<p align="center">
+    <img src="img/example.png" alt="GitPack example">
+</p>
+
+As demonstrated, GitPack works with either global or local installations based on whether it is run with root permissions.
 
 ## Developer
 

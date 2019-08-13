@@ -20,6 +20,6 @@ Files: .gitpack/*
 Copyright: Copyright 2019 Dominik Salvet
 License: MIT
 
-Files: img/gitpack.png
+Files: img/*
 Copyright: Copyright 2019 Dominik Salvet
 License: MIT
