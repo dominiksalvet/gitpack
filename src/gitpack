@@ -444,11 +444,12 @@ process_deps() { (
 
     # if there are any dependencies
     if [ -r .gitpack/deps ]; then
+        grep '^[^#]' .gitpack/deps | # remove empty and comment lines
         # run the given action recursively for every dependency reference
         while read -r dep_ref; do
             # entering action with changed working directory
             process_action "$1" "$dep_ref" || return
-        done < .gitpack/deps
+        done
     fi
 ) }
 
@@ -627,11 +628,15 @@ get_install_dir() {
 #   $1 - map path
 #   $2 - function name
 for_each_route() {
-    map="$(grep '^[^#]' "$1")" && # remove empty lines and comment lines
-    echo "$map" | # prepare pipe for reading map line by line
-    while read -r route; do
-        eval "$2" "$route" || return # call a given function for each route
-    done
+    if [ -r "$1" ]; then
+        grep '^[^#]' "$1" | # remove empty and comment lines
+        while read -r route; do
+            eval "$2" "$route" || return # call a given function for each route
+        done
+    else
+        print_error 'missing map file'
+        return 1
+    fi
 }
 
 # DESCRIPTION:
