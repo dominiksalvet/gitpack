@@ -18,9 +18,9 @@ jobs:
     - name: Code style
       script:
         - |
-          ( while read -r line; do
-              test "$(echo "$line" | wc -m)" -le 81 || exit
-          done < src/gitpack )
+          while read -r line; do
+              test "$(echo "$line" | wc -m)" -le 81 || break
+          done < src/gitpack
 
     - name: Licensing
       services: docker
