@@ -28,11 +28,9 @@ jobs:
       name: Global installation
       install: sudo src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
       script:
-        - sudo gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT" | grep -q '^\[ok\]'
-        - gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT" | grep -q '^\[nothing\]'
+        - sudo gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT" | grep -q '^\[ok\]' &&
+          gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT" | grep -q '^\[nothing\]'
 
     - name: Local installation
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script:
-        - gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT" | grep -q '^\[ok\]'
-        - sudo gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT" | grep -q '^\[nothing\]'
+      script: gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT" | grep -q '^\[ok\]'
