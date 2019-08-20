@@ -30,8 +30,9 @@ jobs:
       script:
         - sudo gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT" | grep -q '^\[ok\]' &&
           gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT" | grep -q '^\[nothing\]' &&
+          echo test1 &&
           false &&
-          echo test
+          echo test2
 
     - name: Local installation
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
