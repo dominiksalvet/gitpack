@@ -35,3 +35,18 @@ jobs:
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
       script: gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT" | grep -q '^\[ok\]' &&
               gitpack uninstall github.com/dominiksalvet/gitpack
+
+    - name: Basic usage
+      install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
+      before_script: gitpack about &&
+                     gitpack help &&
+                     gitpack clean
+      script: gitpack status github.com/dominiksalvet/vhdldep | grep -q '^\[nothing\]' &&
+              gitpack install github.com/dominiksalvet/vhdldep | grep -q '^\[install\]' &&
+              gitpack install github.com/dominiksalvet/vhdldep | grep -q '^\[installed\]' &&
+              gitpack status github.com/dominiksalvet/vhdldep | grep -q '^\[ok\]' &&
+              gitpack list | grep -qF 'github.com/dominiksalvet/vhdldep' &&
+              gitpack uninstall github.com/dominiksalvet/vhdldep | grep -q '^\[uninstall\]' &&
+              gitpack uninstall github.com/dominiksalvet/vhdldep | grep -q '^\[uninstalled\]' &&
+              gitpack status github.com/dominiksalvet/vhdldep | grep -q '^\[nothing\]' &&
+              gitpack clean
