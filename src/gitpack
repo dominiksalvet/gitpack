@@ -133,25 +133,38 @@ process_args() {
     # process first argument
     case "$1" in
         "$ACTION_INSTALL" | "$ACTION_UNINSTALL" | "$ACTION_STATUS")
-            action="$1" # use the given action
-            shift # shift arguments to references
-            if [ "$#" -eq 0 ]; then # check if there is any reference argument
+            if [ "$#" -eq 1 ]; then # check if there is any reference argument
                 print_error 'no URL provided' "$HINT_MESSAGE"
                 return 1
             fi
+            # process action-based arguments
+            process_actions "$@"
             ;;
-        list) init_runtime && list_installed; return ;;
-        clean) init_runtime && safe_rm_rf_dir "$CACHE_REPO_DIR"; return ;;
-        help) echo "$HELP_MESSAGE"; return ;;
-        about) echo "$ABOUT_MESSAGE"; return ;;
+        list) init_runtime && list_installed ;;
+        clean) init_runtime && safe_rm_rf_dir "$CACHE_REPO_DIR" ;;
+        help) echo "$HELP_MESSAGE" ;;
+        about) echo "$ABOUT_MESSAGE" ;;
         '') print_error 'no argument provided' "$HINT_MESSAGE"; return 1 ;;
         *) print_error "unrecognized argument $1" "$HINT_MESSAGE"; return 1 ;;
     esac
+}
 
-    init_runtime &&
+# DESCRIPTION:
+#   Processes a given action over all given repository references.
+# PARAMETERS:
+#   $1 - action
+#   $2.. - references
+process_actions() {
+    init_runtime || return # initialize runtime
+
+    action="$1" # use the given action
+    shift # shift arguments to references
+    action_return_val=0
     for ref in "$@"; do # process each reference individually with common action
-        process_action "$action" "$ref" || return
+        process_action "$action" "$ref" || { action_return_val="$?"; break; }
     done
+
+    return "$action_return_val"
 }
 
 # DESCRIPTION:
@@ -227,9 +240,11 @@ init_paths() {
     if [ "$access" = global ]; then
         CACHE_DIR=/var/cache/gitpack
         DB_DIR=/var/lib/gitpack
+        LOG_PATH=/var/log/gitpack.log
     else
         CACHE_DIR="${HOME:?}"/.cache/gitpack
         DB_DIR="$HOME"/.local/share/gitpack
+        LOG_PATH="$HOME"/.local/share/gitpack.log
     fi
 
     # derived paths
