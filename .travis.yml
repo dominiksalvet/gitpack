@@ -36,7 +36,7 @@ jobs:
       script: gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT" | grep -q '^\[ok\]' &&
               gitpack uninstall github.com/dominiksalvet/gitpack
 
-    - name: Basic usage
+    - name: Usage
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
       before_script: gitpack about &&
                      gitpack help &&
