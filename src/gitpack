@@ -229,7 +229,7 @@ init_paths() {
         DB_DIR=/var/lib/gitpack
     else
         CACHE_DIR="${HOME:?}"/.cache/gitpack
-        DB_DIR="${HOME:?}"/.local/share/gitpack
+        DB_DIR="$HOME"/.local/share/gitpack
     fi
 
     # derived paths
