@@ -240,11 +240,11 @@ init_paths() {
     if [ "$access" = global ]; then
         CACHE_DIR=/var/cache/gitpack
         DB_DIR=/var/lib/gitpack
-        LOG_PATH=/var/log/gitpack.log
+        # LOG_PATH=/var/log/gitpack.log
     else
         CACHE_DIR="${HOME:?}"/.cache/gitpack
         DB_DIR="$HOME"/.local/share/gitpack
-        LOG_PATH="$HOME"/.local/share/gitpack.log
+        # LOG_PATH="$HOME"/.local/share/gitpack.log
     fi
 
     # derived paths

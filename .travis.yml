@@ -29,4 +29,6 @@ jobs:
       before_script: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
       script:
         - src/gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT" | grep -q '^\[ok\]'
+        - echo "$TRAVIS_COMMIT"
         - src/gitpack list | grep -qF 'github.com/dominiksalvet/gitpack '"$TRAVIS_COMMIT"
+        - echo "$TRAVIS_COMMIT"
