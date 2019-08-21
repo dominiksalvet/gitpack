@@ -130,15 +130,13 @@ https://github.com/dominiksalvet/gitpack'
 # PARAMETERS:
 #   $@ - GitPack arguments
 process_args() {
-    # process first argument
-    case "$1" in
+    case "$1" in # process arguments based on the first argument
         "$ACTION_INSTALL" | "$ACTION_UNINSTALL" | "$ACTION_STATUS")
             if [ "$#" -eq 1 ]; then # check if there is any reference argument
                 print_error 'no URL provided' "$HINT_MESSAGE"
                 return 1
             fi
-            # process action-based arguments
-            process_action_args "$@"
+            process_action_args "$@" # process action-based arguments
             ;;
         list) init_runtime && list_installed ;;
         clean) init_runtime && safe_rm_rf_dir "$CACHE_REPO_DIR" ;;
