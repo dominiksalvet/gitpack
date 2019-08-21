@@ -279,7 +279,7 @@ log() {
     date_out="$(date '+%Y-%m-%d %H:%M:%S')" && # catch time immediately
     logtype="$1" && # use the given log type
     shift && # shift arguments to details
-    echo "$date_out [$logtype] $*" >> "$LOG_PATH" # store the log item
+    echo "$date_out [$logtype]${*:+ $*}" >> "$LOG_PATH" # store the log item
 }
 
 #-------------------------------------------------------------------------------
