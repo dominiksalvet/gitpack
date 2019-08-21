@@ -37,7 +37,7 @@ main() {
 check_deps() {
     # a list of required software
     sw_list='command echo [ cd test pwd rm id mkdir touch dirname grep git ls '\
-'uname read cp head cut true basename find rmdir tr'
+'uname read cp head cut true basename find rmdir tr date'
 
     # check if any piece of software is missing
     for sw in $sw_list; do
@@ -234,11 +234,11 @@ init_paths() {
     if [ "$access" = global ]; then
         CACHE_DIR=/var/cache/gitpack
         DB_DIR=/var/lib/gitpack
-        # LOG_PATH=/var/log/gitpack.log
+        LOG_PATH=/var/log/gitpack.log
     else
         CACHE_DIR="${HOME:?}"/.cache/gitpack
         DB_DIR="$HOME"/.local/share/gitpack
-        # LOG_PATH="$HOME"/.local/share/gitpack.log
+        LOG_PATH="$HOME"/.local/share/gitpack.log
     fi
 
     # derived paths
@@ -263,6 +263,23 @@ init_database() {
         print_error "cannot access $STATUS_PATH file"
         return 2
     fi
+}
+
+#-------------------------------------------------------------------------------
+# LOGGING
+#-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Creates a new log item in the predefined log file with current date and time
+#   based on a given type and details.
+# PARAMETERS:
+#   $1 - type
+#   $2.. - details (optional)
+log() {
+    date_out="$(date '+%Y-%m-%d %H:%M:%S')" && # catch time immediately
+    logtype="$1" && # use the given log type
+    shift && # shift arguments to details
+    echo "$date_out [$logtype] $*" >> "$LOG_PATH" # store the log item
 }
 
 #-------------------------------------------------------------------------------
