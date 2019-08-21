@@ -138,7 +138,7 @@ process_args() {
                 return 1
             fi
             # process action-based arguments
-            process_actions "$@"
+            process_action_args "$@"
             ;;
         list) init_runtime && list_installed ;;
         clean) init_runtime && safe_rm_rf_dir "$CACHE_REPO_DIR" ;;
@@ -154,7 +154,7 @@ process_args() {
 # PARAMETERS:
 #   $1 - action
 #   $2.. - references
-process_actions() {
+process_action_args() {
     init_runtime && # initialize runtime
     action="$1" && # use the given action
     shift && # shift arguments to references
