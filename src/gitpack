@@ -155,16 +155,12 @@ process_args() {
 #   $1 - action
 #   $2.. - references
 process_actions() {
-    init_runtime || return # initialize runtime
-
-    action="$1" # use the given action
-    shift # shift arguments to references
-    action_return_val=0
+    init_runtime && # initialize runtime
+    action="$1" && # use the given action
+    shift && # shift arguments to references
     for ref in "$@"; do # process each reference individually with common action
-        process_action "$action" "$ref" || { action_return_val="$?"; break; }
+        process_action "$action" "$ref" || return
     done
-
-    return "$action_return_val"
 }
 
 # DESCRIPTION:
