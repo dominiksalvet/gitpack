@@ -22,6 +22,7 @@ The changes not yet present in any release are listed in this section.
 ### Changed
 
 * GitPack transforms every URL it works with to the lowercase form.
+* Meet REUSE Specification - Version 3.0.
 
 ## 0.1.0 (2019-06-27)
 
