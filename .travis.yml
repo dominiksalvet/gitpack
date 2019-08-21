@@ -41,8 +41,13 @@ jobs:
       before_script: gitpack about &&
                      gitpack help &&
                      gitpack clean
-      script: gitpack status github.com/dominiksalvet/vhdldep | grep -q '^\[nothing\]' &&
-              gitpack install github.com/dominiksalvet/vhdldep | grep -q '^\[install\]' &&
+      script: gitpack status github.com/dominiksalvet/vhdldep=2.1.0 | grep -q '^\[nothing\]' &&
+              gitpack install github.com/dominiksalvet/vhdldep=2.1.0 | grep -q '^\[install\]' &&
+              gitpack install github.com/dominiksalvet/vhdldep=2.1.0 | grep -q '^\[installed\]' &&
+              gitpack status github.com/dominiksalvet/vhdldep=2.1.0 | grep -q '^\[ok\]' &&
+              gitpack list | grep -qF 'github.com/dominiksalvet/vhdldep' &&
+              gitpack status github.com/dominiksalvet/vhdldep | grep -q '^\[older\]' &&
+              gitpack install github.com/dominiksalvet/vhdldep | grep -q '^\[update\]' &&
               gitpack install github.com/dominiksalvet/vhdldep | grep -q '^\[installed\]' &&
               gitpack status github.com/dominiksalvet/vhdldep | grep -q '^\[ok\]' &&
               gitpack list | grep -qF 'github.com/dominiksalvet/vhdldep' &&
