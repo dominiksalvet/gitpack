@@ -16,7 +16,7 @@ jobs:
       script: shellcheck src/gitpack
 
     - name: Code style
-      script: ( while read -r line; do test "$(echo "$line" | wc -m)" -le 81 || exit; done < src/gitpack )
+      script: .travis/code-style.sh
 
     - name: Licensing
       services: docker
@@ -27,41 +27,12 @@ jobs:
     - stage: Execution
       name: Global installation
       install: sudo src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: gitpack_out="$(sudo gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
-              echo "$gitpack_out" | grep '^\[ok\]' &&
-              gitpack_out="$(gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
-              echo "$gitpack_out" | grep '^\[nothing\]' &&
-              gitpack_out="$(sudo gitpack uninstall github.com/dominiksalvet/gitpack)" &&
-              echo "$gitpack_out" | grep '^\[uninstall\]'
+      script: .travis/global-installation.sh
 
     - name: Local installation
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: gitpack_out="$(gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
-              echo "$gitpack_out" | grep '^\[ok\]' &&
-              gitpack_out="$(gitpack uninstall github.com/dominiksalvet/gitpack)" &&
-              echo "$gitpack_out" | grep '^\[uninstall\]'
+      script: .travis/local-installation.sh
 
     - name: Usage
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      before_script: gitpack about &&
-                     gitpack help &&
-                     gitpack clean
-      script: gitpack status github.com/dominiksalvet/vhdldep=2.1.0 | grep -q '^\[nothing\]' &&
-              gitpack install github.com/dominiksalvet/vhdldep=2.1.0 | grep -q '^\[install\]' &&
-              gitpack install github.com/dominiksalvet/vhdldep=2.1.0 | grep -q '^\[installed\]' &&
-              gitpack status github.com/dominiksalvet/vhdldep=2.1.0 | grep -q '^\[ok\]' &&
-              gitpack list | grep -qF 'github.com/dominiksalvet/vhdldep' &&
-              gitpack status github.com/dominiksalvet/vhdldep | grep -q '^\[older\]' &&
-              gitpack install github.com/dominiksalvet/vhdldep | grep -q '^\[update\]' &&
-              gitpack install github.com/dominiksalvet/vhdldep | grep -q '^\[installed\]' &&
-              gitpack status github.com/dominiksalvet/vhdldep | grep -q '^\[ok\]' &&
-              gitpack list | grep -qF 'github.com/dominiksalvet/vhdldep' &&
-              gitpack status github.com/dominiksalvet/vhdldep=2.1.0 | grep -q '^\[newer\]' &&
-              gitpack install github.com/dominiksalvet/vhdldep=2.1.0 | grep -q '^\[downgrade\]' &&
-              gitpack install github.com/dominiksalvet/vhdldep=2.1.0 | grep -q '^\[installed\]' &&
-              gitpack status github.com/dominiksalvet/vhdldep=2.1.0 | grep -q '^\[ok\]' &&
-              gitpack list | grep -qF 'github.com/dominiksalvet/vhdldep' &&
-              gitpack uninstall github.com/dominiksalvet/vhdldep | grep -q '^\[uninstall\]' &&
-              gitpack uninstall github.com/dominiksalvet/vhdldep | grep -q '^\[uninstalled\]' &&
-              gitpack status github.com/dominiksalvet/vhdldep | grep -q '^\[nothing\]' &&
-              gitpack clean
+      script: .travis/usage.sh
