@@ -6,7 +6,7 @@
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-
+# check whether installed locally and uninstall it
 gitpack_out="$(gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
 echo "$gitpack_out" | grep '^\[ok\]' &&
 gitpack_out="$(gitpack uninstall github.com/dominiksalvet/gitpack)" &&
