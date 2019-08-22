@@ -27,14 +27,19 @@ jobs:
     - stage: Execution
       name: Global installation
       install: sudo src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: sudo gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT" | grep -q '^\[ok\]' &&
-              gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT" | grep -q '^\[nothing\]' &&
-              sudo gitpack uninstall github.com/dominiksalvet/gitpack
+      script: gitpack_out="$(sudo gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
+              echo "$gitpack_out" | grep -q '^\[ok\]' &&
+              gitpack_out="$(gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
+              echo "$gitpack_out" | grep -q '^\[nothing\]' &&
+              gitpack_out="$(sudo gitpack uninstall github.com/dominiksalvet/gitpack)" &&
+              echo "$gitpack_out" | grep -q '^\[uninstall\]'
 
     - name: Local installation
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT" | grep -q '^\[ok\]' &&
-              gitpack uninstall github.com/dominiksalvet/gitpack
+      script: gitpack_out="$(gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
+              echo "$gitpack_out" | grep -q '^\[ok\]' &&
+              gitpack_out="$(gitpack uninstall github.com/dominiksalvet/gitpack)" &&
+              echo "$gitpack_out" | grep -q '^\[uninstall\]'
 
     - name: Usage
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
