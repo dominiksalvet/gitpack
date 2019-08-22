@@ -51,6 +51,11 @@ jobs:
               gitpack install github.com/dominiksalvet/vhdldep | grep -q '^\[installed\]' &&
               gitpack status github.com/dominiksalvet/vhdldep | grep -q '^\[ok\]' &&
               gitpack list | grep -qF 'github.com/dominiksalvet/vhdldep' &&
+              gitpack status github.com/dominiksalvet/vhdldep=2.1.0 | grep -q '^\[newer\]' &&
+              gitpack install github.com/dominiksalvet/vhdldep=2.1.0 | grep -q '^\[downgrade\]' &&
+              gitpack install github.com/dominiksalvet/vhdldep=2.1.0 | grep -q '^\[installed\]' &&
+              gitpack status github.com/dominiksalvet/vhdldep=2.1.0 | grep -q '^\[ok\]' &&
+              gitpack list | grep -qF 'github.com/dominiksalvet/vhdldep' &&
               gitpack uninstall github.com/dominiksalvet/vhdldep | grep -q '^\[uninstall\]' &&
               gitpack uninstall github.com/dominiksalvet/vhdldep | grep -q '^\[uninstalled\]' &&
               gitpack status github.com/dominiksalvet/vhdldep | grep -q '^\[nothing\]' &&
