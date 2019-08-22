@@ -18,6 +18,10 @@ jobs:
     - name: Code style
       script: .travis/code-style.sh
 
+    - name: Travis scripts
+      before_script: shellcheck --version
+      scripts: shellcheck .travis/*.sh
+
     - name: Licensing
       services: docker
       install: docker pull fsfe/reuse:latest
