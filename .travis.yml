@@ -10,7 +10,7 @@ language: shell
 
 jobs:
   include:
-    - stage: Travis
+    - stage: Initialization
       name: Scripts
       before_script: shellcheck --version
       script: shellcheck .travis/*.sh
