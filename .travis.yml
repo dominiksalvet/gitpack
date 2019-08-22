@@ -20,7 +20,7 @@ jobs:
 
     - name: Travis scripts
       before_script: shellcheck --version
-      scripts: shellcheck .travis/*.sh
+      script: shellcheck .travis/*.sh
 
     - name: Licensing
       services: docker
