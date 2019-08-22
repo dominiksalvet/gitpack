@@ -10,6 +10,11 @@ language: shell
 
 jobs:
   include:
+    - stage: Travis
+      name: Scripts
+      before_script: shellcheck --version
+      script: shellcheck .travis/*.sh
+
     - stage: Checks
       name: Static analysis
       before_script: shellcheck --version
@@ -17,10 +22,6 @@ jobs:
 
     - name: Code style
       script: .travis/code-style.sh
-
-    - name: Travis scripts
-      before_script: shellcheck --version
-      script: shellcheck .travis/*.sh
 
     - name: Licensing
       services: docker
