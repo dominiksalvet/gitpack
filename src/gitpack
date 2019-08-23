@@ -239,7 +239,7 @@ rm_rf_dir_check() { (
 init_runtime() {
     init_global_vars &&
     init_paths &&
-    log "$LOGTYPE_INIT" "$@" &&
+    log "$LOGTYPE_INIT" "$0" "$@" &&
     init_database
 }
 
