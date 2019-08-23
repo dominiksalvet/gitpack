@@ -138,7 +138,7 @@ process_args() {
             process_action_args "$@" # process action-based arguments
             ;;
         list) init_runtime && list_installed ;;
-        clean) init_runtime && safe_rm_rf_dir "$CACHE_REPO_DIR" ;;
+        clean) init_runtime && clean_cache ;;
         help) echo "$HELP_MESSAGE" ;;
         about) echo "$ABOUT_MESSAGE" ;;
         '') print_error 'no argument provided' "$HINT_MESSAGE"; return 1 ;;
@@ -172,22 +172,32 @@ list_installed() {
 }
 
 # DESCRIPTION:
-#   Removes a given directory with its content performing a check for the root
-#   directory that is prevented to be removed and fails in that case. This
-#   function uses only the first parameter, others are ignored!
-# PARAMETERS:
-#   $1 - directory
-safe_rm_rf_dir() {
-    if [ -d "${1:?}"/ ]; then # check if the directory exists
-        ( # remove only if the given directory is not the root directory
-            cd -- "$1"/ 2>/dev/null &&
-            test "$PWD" != / &&
-            pwd_out="$(pwd -P)" &&
-            test "$pwd_out" != /
-        ) &&
-        rm -rf -- "${1:?}"/
+#   Cleans the GitPack cache performing checks for unintended removal.
+clean_cache() {
+    if [ -d "${CACHE_REPO_DIR:?}"/ ]; then # check if cache exists
+        if rm_rf_dir_check "$CACHE_REPO_DIR"; then
+            rm -rf -- "${CACHE_REPO_DIR:?}"/
+        else
+            print_error 'prevent removing the root directory'
+            return 1
+        fi
     fi
 }
+
+# DESCRIPTION:
+#   Checks whether it is possible to recursively remove a given directory. It
+#   prevents from removing the root directory. This function uses only the first
+#   parameter, others are ignored.
+# PARAMETERS:
+#   $1 - directory
+rm_rf_dir_check() { (
+    test "$1" && # the directory path must be empty
+    cd -- "$1"/ 2>/dev/null && # fails if the given directory doesn't exist
+    # double check for the root directory
+    test "$PWD" != / &&
+    pwd_out="$(pwd -P)" &&
+    test "$pwd_out" != /
+) }
 
 #-------------------------------------------------------------------------------
 # DYNAMIC INITIALIZATION
