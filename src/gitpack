@@ -11,7 +11,6 @@
 #   All given arguments are processed as GitPack's help describes.
 #-------------------------------------------------------------------------------
 
-
 #-------------------------------------------------------------------------------
 # ENTRY POINT
 #-------------------------------------------------------------------------------
@@ -261,7 +260,7 @@ init_database() {
     # check access to GitPack status file
     if [ ! -r "$STATUS_PATH" ] || [ ! -w "$STATUS_PATH" ]; then
         print_error "cannot access $STATUS_PATH file"
-        return 2
+        return 1
     fi
 }
 
@@ -674,7 +673,7 @@ for_each_route() {
 copy_files() {
     : "${1:?}" "${2:?}" && # parameters must be set up
     mkdir -p -- "$2"/ && # create target directory
-    cp -R -- "$1" "$2"/ # copy all files recursively (if directory)
+    cp -R -- "$1" "$2"/ # copy the files recursively
 }
 
 # DESCRIPTION:
@@ -684,23 +683,23 @@ copy_files() {
 #   $2 - target directory
 remove_files() {
     : "${1:?}" "${2:?}" && # parameters must be set up
+    basename_out="$(basename -- "$1")" && # get the last part of the source path
     if [ -d "$1"/ ]; then
         # scan source path to obtain files mask
         files="$(cd -- "$1"/ && find . ! -type d)" &&
         dirs="$(cd -- "$1"/ && find . ! -path . -type d)" &&
-        base_dir="$(basename -- "$1"/)" &&
 
-        ( # remove files and then directories by the files mask
+        (   # remove files and then directories by the files mask
             cd -- "$2"/ &&
             for file in $files; do
-                rm -f -- "$base_dir"/"$file" || return
+                rm -f -- "${basename_out:?}"/"${file:?}" || return
             done &&
             for dir in $dirs; do
-                rmdir -p -- "$base_dir"/"$dir"/ 2>/dev/null; true
+                rmdir -p -- "${basename_out:?}"/"${dir:?}"/ 2>/dev/null; true
             done
         )
     else # remove the file as a regular file
-        rm -f -- "$2"/"$(basename -- "$1")"
+        rm -f -- "${2:?}"/"${basename_out:?}"
     fi
 }
 
