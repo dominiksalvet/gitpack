@@ -415,12 +415,8 @@ touch_repo() { (
         # clone Git repository master branch, it may ask a user for a password
         git clone -q --branch master https://"$1".git .
     else
-        # discard any changes made to repository (just for case)
-        git clean -q -d -f &&
-        git reset -q --hard &&
-
-        # checkout the master branch
-        git checkout -q master &&
+        # checkout the master branch (also discard any changes)
+        git checkout -qf master &&
         # fetch changes from master and merge them into local master branch
         git pull -q
     fi
