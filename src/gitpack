@@ -67,6 +67,7 @@ print_error() {
 
 # DESCRIPTION:
 #   Initializes static constants.
+# shellcheck disable=SC2209
 init_constants() {
     # the current version of GitPack
     VERSION=0.2.0
@@ -89,6 +90,30 @@ init_constants() {
     STATE_OLDER=older # current version is older than target version
     STATE_NEWER=newer # current version is newer than target version
     STATE_OK=ok # current version is equal to target version
+
+    # global log types
+    LOGTYPE_INIT=init # logging initialization
+    LOGTYPE_EXIT=exit # exit the program
+    LOGTYPE_SIGNAL=signal # a caught signal
+    # command log types
+    LOGTYPE_LIST=list # list command
+    LOGTYPE_CLEAN=clean # clean command
+    # action log types
+    LOGTYPE_PROCESS=process # action processing
+    LOGTYPE_URL=url # URL check
+    LOGTYPE_TOUCH=touch # touch repository
+    LOGTYPE_EXECUTE=execute # action executing
+    LOGTYPE_DEPS=deps # processing dependencies
+    # installation log types
+    LOGTYPE_PRECP=precp # precp script execution
+    LOGTYPE_CP=cp # copy files using map
+    LOGTYPE_POSTCP=postcp # postcp script execution
+    LOGTYPE_INSERT=insert # insert a database item
+    # uninstallation log types
+    LOGTYPE_PRERM=prerm # prerm script execution
+    LOGTYPE_RM=rm # remove files using map
+    LOGTYPE_POSTRM=postrm # postrm script execution
+    LOGTYPE_DELETE=delete # delete database items
 }
 
 # DESCRIPTION:
@@ -135,10 +160,11 @@ process_args() {
                 print_error 'no URL provided' "$HINT_MESSAGE"
                 return 1
             fi
+            init_runtime "$@" && # initialize runtime
             process_action_args "$@" # process action-based arguments
             ;;
-        list) init_runtime && list_installed ;;
-        clean) init_runtime && clean_cache ;;
+        list) init_runtime "$@" && list_installed ;;
+        clean) init_runtime "$@" && clean_cache ;;
         help) echo "$HELP_MESSAGE" ;;
         about) echo "$ABOUT_MESSAGE" ;;
         '') print_error 'no argument provided' "$HINT_MESSAGE"; return 1 ;;
@@ -152,7 +178,6 @@ process_args() {
 #   $1 - action
 #   $2.. - references
 process_action_args() {
-    init_runtime && # initialize runtime
     action="$1" && # use the given action
     shift && # shift arguments to references
     for ref in "$@"; do # process each reference individually with common action
@@ -163,6 +188,7 @@ process_action_args() {
 # DESCRIPTION:
 #   Outputs all installed Git projects and their version or commit hash.
 list_installed() {
+    log "$LOGTYPE_LIST" &&
     while read -r db_record; do
         url="${db_record%% *}" && # extract URL
         version="${db_record#* }" && # extract commit hash
@@ -174,6 +200,7 @@ list_installed() {
 # DESCRIPTION:
 #   Cleans the GitPack cache performing checks for unintended removal.
 clean_cache() {
+    log "$LOGTYPE_CLEAN" &&
     if [ -d "${CACHE_REPO_DIR:?}"/ ]; then # check if cache exists
         if rm_rf_dir_check "$CACHE_REPO_DIR"; then
             rm -rf -- "${CACHE_REPO_DIR:?}"/
@@ -206,12 +233,15 @@ rm_rf_dir_check() { (
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   Prepares a runtime environment for GitPack. After calling this function,
-#   GitPack's essential file structure will be prepared and appropriate
-#   configuration will be applied.
+#   Prepares a runtime environment for GitPack and log initialization based on
+#   all GitPack arguments. After calling this function, GitPack's essential file
+#   structure will be prepared and appropriate configuration will be applied.
+# PARAMETERS:
+#   $@ - GitPack arguments
 init_runtime() {
     init_global_vars &&
     init_paths &&
+    log "$LOGTYPE_INIT" "$@" &&
     init_database
 }
 
@@ -288,7 +318,16 @@ log() {
     date_out="$(date '+%Y-%m-%d %H:%M:%S')" && # catch time immediately
     logtype="$1" && # use the given log type
     shift && # shift arguments to details
-    echo "$date_out [$logtype]${*:+ $*}" >> "$LOG_PATH" # store the log item
+
+    details= && # start with no details
+    for detail in "$@"; do # get all details
+        if [ "$detail" ]; then # ignore empty ones
+            details="$details $detail"
+        fi
+    done &&
+
+    # store the log item
+    echo "$date_out [$logtype]$details" >> "$LOG_PATH"
 }
 
 #-------------------------------------------------------------------------------
@@ -303,7 +342,9 @@ log() {
 #   $1 - action
 #   $2 - reference
 process_action() {
-    {   # process given reference - URL + version (optional)
+    {   # log current action processing
+        log "$LOGTYPE_PROCESS" "$1" "$2" &&
+        # process given reference - URL + version (optional)
         url="$(ref_to_url "$2")" &&
         version="$(ref_to_version "$2")" &&
         check_url "$url" &&
@@ -348,6 +389,7 @@ ref_to_version() {
 # PARAMETERS:
 #   $1 - URL
 check_url() {
+    log "$LOGTYPE_URL" "$1" || return
     url_regex='^[[:alnum:]_][[:alnum:]_\.-]*(/[[:alnum:]_][[:alnum:]_\.-]*){2}$'
 
     if ! echo "$1" | grep -q -E "$url_regex"; then
@@ -367,6 +409,7 @@ check_url() {
 # PARAMETERS:
 #   $1 - URL
 touch_repo() { (
+    log "$LOGTYPE_TOUCH" "$1" &&
     mkdir -p "$CACHE_REPO_DIR"/"$1"/ &&
     cd "$CACHE_REPO_DIR"/"$1"/ &&
 
@@ -398,6 +441,7 @@ touch_repo() { (
 #   $2 - URL
 #   $3 - version (optional)
 execute_action() {
+    log "$LOGTYPE_EXECUTE" "$1" "$2" "$3" &&
     # get source (already installed) project information
     src_db_record="$(get_db_record "$2")" &&
     src_hash="${src_db_record#* }" && # extract commit hash
@@ -473,13 +517,12 @@ process_deps() { (
         return 0
     fi
 
-    # prepare environment
-    #shellcheck disable=SC2030
-    report_prefix='+ ' && # indicate report for dependencies
     cd_repo "$2" "$3" &&
-
     # if there are any dependencies
     if [ -r .gitpack/deps ]; then
+        #shellcheck disable=SC2030
+        log "$LOGTYPE_DEPS" "$1" "$2" "$3" &&
+        report_prefix='+ ' && # indicate report for dependencies
         grep '^[^#]' .gitpack/deps | # remove empty and comment lines
         # run the given action recursively for every dependency reference
         while read -r dep_ref; do
@@ -567,6 +610,7 @@ execute_status() {
 #   $1 - URL
 #   $2 - commit hash
 insert_db_record() {
+    log "$LOGTYPE_INSERT" "$1" "$2" &&
     echo "$1 $2" >> "$STATUS_PATH"
 }
 
@@ -575,6 +619,7 @@ insert_db_record() {
 # PARAMETERS:
 #   $1 - URL
 delete_db_records() {
+    log "$LOGTYPE_DELETE" "$1" || return
     grep_out="$(grep -F -v "$1" "$STATUS_PATH")"
     grep_status="$?" # store exit status of the grep
 
@@ -613,13 +658,16 @@ install() { (
     install_dir="$(get_install_dir)" && # choose the installation method
 
     if [ -x "$install_dir"/precp ]; then # before files copy
+        log "$LOGTYPE_PRECP" "$1" "$2" &&
         "$install_dir"/precp
     fi &&
 
     # copy all files by defined routes
+    log "$LOGTYPE_CP" "$1" "$2" &&
     for_each_route "$install_dir"/map copy_files &&
 
     if [ -x "$install_dir"/postcp ]; then # after files copy
+        log "$LOGTYPE_POSTCP" "$1" "$2" &&
         "$install_dir"/postcp
     fi
 ) }
@@ -634,13 +682,16 @@ uninstall() { (
     install_dir="$(get_install_dir)" && # choose the uninstallation method
 
     if [ -x "$install_dir"/prerm ]; then # before files removal
+        log "$LOGTYPE_PRERM" "$1" "$2" &&
         "$install_dir"/prerm
     fi &&
 
     # remove all files by defined routes
+    log "$LOGTYPE_RM" "$1" "$2" &&
     for_each_route "$install_dir"/map remove_files &&
 
     if [ -x "$install_dir"/postrm ]; then # after files removal
+        log "$LOGTYPE_POSTRM" "$1" "$2" &&
         "$install_dir"/postrm
     fi
 ) }
