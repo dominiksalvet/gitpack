@@ -186,7 +186,7 @@ process_action_args() {
 # DESCRIPTION:
 #   Outputs all installed Git projects and their version or commit hash.
 list_installed() {
-    log "$LOGTYPE_LIST" &&
+    log "$LOGTYPE_LIST" "$STATUS_PATH" &&
     while read -r db_record; do
         url="${db_record%% *}" && # extract URL
         version="${db_record#* }" && # extract commit hash
@@ -198,7 +198,7 @@ list_installed() {
 # DESCRIPTION:
 #   Cleans the GitPack cache performing checks for unintended removal.
 clean_cache() {
-    log "$LOGTYPE_CLEAN" &&
+    log "$LOGTYPE_CLEAN" "$CACHE_REPO_DIR" &&
     if [ -d "${CACHE_REPO_DIR:?}"/ ]; then # check if cache exists
         if rm_rf_dir_check "$CACHE_REPO_DIR"; then
             rm -rf -- "${CACHE_REPO_DIR:?}"/
@@ -407,7 +407,7 @@ check_url() {
 # PARAMETERS:
 #   $1 - URL
 touch_repo() { (
-    log "$LOGTYPE_TOUCH" "$1" &&
+    log "$LOGTYPE_TOUCH" "$CACHE_REPO_DIR"/"$1" &&
     mkdir -p "$CACHE_REPO_DIR"/"$1"/ &&
     cd "$CACHE_REPO_DIR"/"$1"/ &&
 
@@ -608,7 +608,7 @@ execute_status() {
 #   $1 - URL
 #   $2 - commit hash
 insert_db_record() {
-    log "$LOGTYPE_INSERT" "$1" "$2" &&
+    log "$LOGTYPE_INSERT" "$1" "$2" "$STATUS_PATH" &&
     echo "$1 $2" >> "$STATUS_PATH"
 }
 
@@ -617,7 +617,7 @@ insert_db_record() {
 # PARAMETERS:
 #   $1 - URL
 delete_db_records() {
-    log "$LOGTYPE_DELETE" "$1" || return
+    log "$LOGTYPE_DELETE" "$1" "$STATUS_PATH" || return
     grep_out="$(grep -F -v "$1" "$STATUS_PATH")"
     grep_status="$?" # store exit status of the grep
 
@@ -656,16 +656,16 @@ install() { (
     install_dir="$(get_install_dir)" && # choose the installation method
 
     if [ -x "$install_dir"/precp ]; then # before files copy
-        log "$LOGTYPE_PRECP" "$1" "$2" &&
+        log "$LOGTYPE_PRECP" "$1" "$2" "$install_dir" &&
         "$install_dir"/precp
     fi &&
 
     # copy all files by defined routes
-    log "$LOGTYPE_CP" "$1" "$2" &&
+    log "$LOGTYPE_CP" "$1" "$2" "$install_dir" &&
     for_each_route "$install_dir"/map copy_files &&
 
     if [ -x "$install_dir"/postcp ]; then # after files copy
-        log "$LOGTYPE_POSTCP" "$1" "$2" &&
+        log "$LOGTYPE_POSTCP" "$1" "$2" "$install_dir" &&
         "$install_dir"/postcp
     fi
 ) }
@@ -680,16 +680,16 @@ uninstall() { (
     install_dir="$(get_install_dir)" && # choose the uninstallation method
 
     if [ -x "$install_dir"/prerm ]; then # before files removal
-        log "$LOGTYPE_PRERM" "$1" "$2" &&
+        log "$LOGTYPE_PRERM" "$1" "$2" "$install_dir" &&
         "$install_dir"/prerm
     fi &&
 
     # remove all files by defined routes
-    log "$LOGTYPE_RM" "$1" "$2" &&
+    log "$LOGTYPE_RM" "$1" "$2" "$install_dir" &&
     for_each_route "$install_dir"/map remove_files &&
 
     if [ -x "$install_dir"/postrm ]; then # after files removal
-        log "$LOGTYPE_POSTRM" "$1" "$2" &&
+        log "$LOGTYPE_POSTRM" "$1" "$2" "$install_dir" &&
         "$install_dir"/postrm
     fi
 ) }
