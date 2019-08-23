@@ -198,7 +198,7 @@ list_installed() {
 # DESCRIPTION:
 #   Cleans the GitPack cache performing checks for unintended removal.
 clean_cache() {
-    log "$LOGTYPE_CLEAN" "$CACHE_REPO_DIR" &&
+    log "$LOGTYPE_CLEAN" "$CACHE_REPO_DIR"/ &&
     if [ -d "${CACHE_REPO_DIR:?}"/ ]; then # check if cache exists
         if rm_rf_dir_check "$CACHE_REPO_DIR"; then
             rm -rf -- "${CACHE_REPO_DIR:?}"/
@@ -407,7 +407,7 @@ check_url() {
 # PARAMETERS:
 #   $1 - URL
 touch_repo() { (
-    log "$LOGTYPE_TOUCH" "$CACHE_REPO_DIR"/"$1" &&
+    log "$LOGTYPE_TOUCH" "$CACHE_REPO_DIR"/"$1"/ &&
     mkdir -p "$CACHE_REPO_DIR"/"$1"/ &&
     cd "$CACHE_REPO_DIR"/"$1"/ &&
 
@@ -474,7 +474,7 @@ get_db_record() {
 #   $1 - URL
 #   $2 - version (optional)
 get_repo_hash() { (
-    cd_repo "$1" &&
+    repo_cd "$1" &&
 
     if [ "$2" ]; then
         git rev-parse "$2"'^{}' # transform delivered version to commit hash
@@ -491,7 +491,7 @@ get_repo_hash() { (
 # PARAMETERS:
 #   $1 - URL
 #   $2 - commit (optional)
-cd_repo() {
+repo_cd() {
     cd "$CACHE_REPO_DIR"/"$1"/ &&
     if [ "$2" ]; then
         git checkout -q "$2"
@@ -515,7 +515,7 @@ process_deps() { (
         return 0
     fi
 
-    cd_repo "$2" "$3" &&
+    repo_cd "$2" "$3" &&
     # if there are any dependencies
     if [ -r .gitpack/deps ]; then
         #shellcheck disable=SC2030
@@ -638,7 +638,7 @@ delete_db_records() {
 #   $2 - first commit
 #   $3 - second commit
 is_ancestor_commit() { (
-    cd_repo "$1" &&
+    repo_cd "$1" &&
     git merge-base --is-ancestor "$2" "$3"
 ) }
 
@@ -652,7 +652,7 @@ is_ancestor_commit() { (
 #   $1 - URL
 #   $2 - commit
 install() { (
-    cd_repo "$1" "$2" &&
+    repo_cd "$1" "$2" &&
     install_dir="$(get_install_dir)" && # choose the installation method
 
     if [ -x "$install_dir"/precp ]; then # before files copy
@@ -676,7 +676,7 @@ install() { (
 #   $1 - URL
 #   $2 - commit
 uninstall() { (
-    cd_repo "$1" "$2" &&
+    repo_cd "$1" "$2" &&
     install_dir="$(get_install_dir)" && # choose the uninstallation method
 
     if [ -x "$install_dir"/prerm ]; then # before files removal
@@ -804,7 +804,7 @@ print_report() {
 #   $2 - commit
 beautify_hash() { (
     # check if given hash is associated with any tag
-    if cd_repo "$1" 2>/dev/null &&
+    if repo_cd "$1" 2>/dev/null &&
        tag_name="$(git describe --tags --exact-match "$2" 2>/dev/null)"; then
         echo "$tag_name"
     else # if no tag found, return short hash
