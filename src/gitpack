@@ -303,19 +303,20 @@ log() {
 #   $1 - action
 #   $2 - reference
 process_action() {
-    { # process given reference - URL + version (optional)
-    url="$(ref_to_url "$2")" &&
-    version="$(ref_to_version "$2")" &&
-    check_url "$url" &&
+    {   # process given reference - URL + version (optional)
+        url="$(ref_to_url "$2")" &&
+        version="$(ref_to_version "$2")" &&
+        check_url "$url" &&
 
-    # prepare Git repository
-    touch_repo "$url" &&
+        # prepare Git repository
+        touch_repo "$url" &&
 
-    # execute the action itself
-    execute_action "$1" "$url" "$version"
-    } || { # all possible errors during action processing are caught here
+        # execute the action itself
+        execute_action "$1" "$url" "$version"
+    } || {
+        # all possible errors during action processing are caught here
         return_val="$?" # store return value
-        echo "<ERROR> $1 $2" >&2 # print some relevant GitPack information
+        echo "${report_prefix}<ERROR> $1 $2" >&2 # report GitPack information
         return "$return_val" # propagate the return value further
     }
 }
