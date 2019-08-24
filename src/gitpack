@@ -66,7 +66,7 @@ print_error() {
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   Initializes static constants.
+#   Initializes static constants. They must not be changed later.
 # shellcheck disable=SC2209
 init_constants() {
     # the current version of GitPack
@@ -115,8 +115,8 @@ init_constants() {
 }
 
 # DESCRIPTION:
-#   Initializes strings usually used to display reports to the user. Constants
-#   must be already initialized.
+#   Initializes strings usually used to display reports to the user. They must
+#   not be changed later. Constants must be already initialized.
 init_strings() {
     HELP_MESSAGE="USAGE:
   gitpack ACTION URL[=VERSION]...
@@ -266,7 +266,8 @@ init_global_vars() {
 }
 
 # DESCRIPTION:
-#   Initializes all GitPack-specific paths. They must start with '/'.
+#   Initializes all GitPack-specific paths. They must start with '/' and must
+#   not be changed later.
 init_paths() {
     if [ "$access" = global ]; then
         CACHE_DIR=/var/cache/gitpack
