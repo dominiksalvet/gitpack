@@ -407,9 +407,10 @@ check_url() {
 # PARAMETERS:
 #   $1 - URL
 touch_repo() { (
-    log "$LOGTYPE_TOUCH" "$CACHE_REPO_DIR"/"$1"/ &&
-    mkdir -p "$CACHE_REPO_DIR"/"$1"/ &&
-    cd "$CACHE_REPO_DIR"/"$1"/ &&
+    repo_dir="$(url_to_path "$1")" && # get the repository directory path
+    log "$LOGTYPE_TOUCH" "$repo_dir"/ &&
+    mkdir -p "$repo_dir"/ &&
+    cd "$repo_dir"/ &&
 
     if [ ! "$(ls -A)" ]; then # if cached project directory is empty
         # clone Git repository master branch, it may ask a user for a password
@@ -421,6 +422,15 @@ touch_repo() { (
         git pull -q
     fi
 ) }
+
+# DESCRIPTION:
+#   Transforms a given URL of a Git repository to an actual path where the local
+#   repository is stored.
+# PARAMETERS:
+#   $1 - URL
+url_to_path() {
+    echo "$CACHE_REPO_DIR"/"$1"
+}
 
 #-------------------------------------------------------------------------------
 # CHOOSE ACTION
@@ -488,7 +498,7 @@ get_repo_hash() { (
 #   $1 - URL
 #   $2 - commit (optional)
 repo_cd() {
-    cd "$CACHE_REPO_DIR"/"$1"/ &&
+    cd "$(url_to_path "$1")"/ && # transform the given URL to path
     if [ "$2" ]; then
         git checkout -q "$2"
     fi
@@ -515,7 +525,7 @@ process_deps() { (
     # if there are any dependencies
     if [ -r .gitpack/deps ]; then
         #shellcheck disable=SC2030
-        log "$LOGTYPE_DEPS" "$1" "$2" "$3" &&
+        log "$LOGTYPE_DEPS" "$1" "$(url_to_path "$2"/.gitpack/deps)" "$3" &&
         report_prefix='+ ' && # indicate report for dependencies
         grep '^[^#]' .gitpack/deps | # remove empty and comment lines
         # run the given action recursively for every dependency reference
@@ -652,16 +662,16 @@ install() { (
     install_dir="$(get_install_dir)" && # choose the installation method
 
     if [ -x "$install_dir"/precp ]; then # before files copy
-        log "$LOGTYPE_PRECP" "$1" "$2" "$install_dir" &&
+        log "$LOGTYPE_PRECP" "$(url_to_path "$1"/"$install_dir")"/ "$2" &&
         "$install_dir"/precp
     fi &&
 
     # copy all files by defined routes
-    log "$LOGTYPE_CP" "$1" "$2" "$install_dir" &&
+    log "$LOGTYPE_CP" "$(url_to_path "$1"/"$install_dir")"/ "$2" &&
     for_each_route "$install_dir"/map copy_files &&
 
     if [ -x "$install_dir"/postcp ]; then # after files copy
-        log "$LOGTYPE_POSTCP" "$1" "$2" "$install_dir" &&
+        log "$LOGTYPE_POSTCP" "$(url_to_path "$1"/"$install_dir")"/ "$2" &&
         "$install_dir"/postcp
     fi
 ) }
@@ -676,16 +686,16 @@ uninstall() { (
     install_dir="$(get_install_dir)" && # choose the uninstallation method
 
     if [ -x "$install_dir"/prerm ]; then # before files removal
-        log "$LOGTYPE_PRERM" "$1" "$2" "$install_dir" &&
+        log "$LOGTYPE_PRERM" "$(url_to_path "$1"/"$install_dir")"/ "$2" &&
         "$install_dir"/prerm
     fi &&
 
     # remove all files by defined routes
-    log "$LOGTYPE_RM" "$1" "$2" "$install_dir" &&
+    log "$LOGTYPE_RM" "$(url_to_path "$1"/"$install_dir")"/ "$2" &&
     for_each_route "$install_dir"/map remove_files &&
 
     if [ -x "$install_dir"/postrm ]; then # after files removal
-        log "$LOGTYPE_POSTRM" "$1" "$2" "$install_dir" &&
+        log "$LOGTYPE_POSTRM" "$(url_to_path "$1"/"$install_dir")"/ "$2" &&
         "$install_dir"/postrm
     fi
 ) }
