@@ -357,9 +357,9 @@ process_action() {
         execute_action "$1" "$url" "$version"
     } || {
         # all possible errors during action processing are caught here
-        return_val="$?" # store return value
+        action_status="$?" # store the action exit status
         echo "${report_prefix}<ERROR> $1 $2" >&2 # report GitPack information
-        return "$return_val" # propagate the return value further
+        return "$action_status" # propagate the status further
     }
 }
 
