@@ -624,9 +624,16 @@ is_ancestor_commit() { (
 # PARAMETERS:
 #   $1 - URL
 get_db_record() {
-    log "$LOGTYPE_GET" "$1" "$STATUS_PATH" &&
-    grep_out="$(grep -F "$1" "$STATUS_PATH")" &&
-    echo "$grep_out" | head -n 1
+    log "$LOGTYPE_GET" "$1" "$STATUS_PATH" || return
+    grep_out="$(grep -F "$1" "$STATUS_PATH")"
+    grep_status="$?" # store exit status of the grep
+
+    # if there is no error, return the first line of the grep output
+    if [ "$grep_status" -le 1 ]; then
+        echo "$grep_out" | head -n 1
+    else # propagate any other error further
+        return "$grep_status"
+    fi
 }
 
 # DESCRIPTION:
