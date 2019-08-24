@@ -102,16 +102,18 @@ init_constants() {
     LOGTYPE_TOUCH=touch # touch repository
     LOGTYPE_EXECUTE=execute # action executing
     LOGTYPE_DEPS=deps # processing dependencies
+    # database log types
+    LOGTYPE_GET=get # get database item
+    LOGTYPE_INSERT=insert # insert a database item
+    LOGTYPE_DELETE=delete # delete database items
     # installation log types
     LOGTYPE_PRECP=precp # precp script execution
     LOGTYPE_CP=cp # copy files using map
     LOGTYPE_POSTCP=postcp # postcp script execution
-    LOGTYPE_INSERT=insert # insert a database item
     # uninstallation log types
     LOGTYPE_PRERM=prerm # prerm script execution
     LOGTYPE_RM=rm # remove files using map
     LOGTYPE_POSTRM=postrm # postrm script execution
-    LOGTYPE_DELETE=delete # delete database items
 }
 
 # DESCRIPTION:
@@ -467,14 +469,6 @@ execute_action() {
 }
 
 # DESCRIPTION:
-#   Selects the first record matching the given URL from the GitPack database.
-# PARAMETERS:
-#   $1 - URL
-get_db_record() {
-    grep -F "$1" "$STATUS_PATH" | head -n 1
-}
-
-# DESCRIPTION:
 #   Returns a preferred commit hash of a given project. It chooses latest tag's
 #   commit if it exists, otherwise latest commit is chosen.
 # PARAMETERS:
@@ -610,6 +604,32 @@ execute_status() {
 }
 
 # DESCRIPTION:
+#   Checks whether the first given commit is an ancestor of the second commit in
+#   a given Git repository.
+# PARAMETERS:
+#   $1 - URL
+#   $2 - first commit
+#   $3 - second commit
+is_ancestor_commit() { (
+    repo_cd "$1" &&
+    git merge-base --is-ancestor "$2" "$3"
+) }
+
+#-------------------------------------------------------------------------------
+# DATABASE OPERATIONS
+#-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Selects the first record matching the given URL from the GitPack database.
+# PARAMETERS:
+#   $1 - URL
+get_db_record() {
+    log "$LOGTYPE_GET" "$1" "$STATUS_PATH" &&
+    grep_out="$(grep -F "$1" "$STATUS_PATH")" &&
+    echo "$grep_out" | head -n 1
+}
+
+# DESCRIPTION:
 #   Inserts a given installation record into the GitPack database.
 # PARAMETERS:
 #   $1 - URL
@@ -636,18 +656,6 @@ delete_db_records() {
         return "$grep_status"
     fi
 }
-
-# DESCRIPTION:
-#   Checks whether the first given commit is an ancestor of the second commit in
-#   a given Git repository.
-# PARAMETERS:
-#   $1 - URL
-#   $2 - first commit
-#   $3 - second commit
-is_ancestor_commit() { (
-    repo_cd "$1" &&
-    git merge-base --is-ancestor "$2" "$3"
-) }
 
 #-------------------------------------------------------------------------------
 # INSTALLATION AND UNINSTALLATION
