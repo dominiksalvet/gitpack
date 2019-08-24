@@ -93,8 +93,6 @@ init_constants() {
 
     # global log types
     LOGTYPE_INIT=init # logging initialization
-    LOGTYPE_EXIT=exit # exit the program
-    LOGTYPE_SIGNAL=signal # a caught signal
     # command log types
     LOGTYPE_LIST=list # list command
     LOGTYPE_CLEAN=clean # clean command
