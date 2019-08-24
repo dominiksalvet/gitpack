@@ -21,7 +21,7 @@ jobs:
       script: shellcheck src/gitpack
 
     - name: Code style
-      script: .travis/code-style.sh
+      script: .travis/code-style-checks.sh
 
     - name: Licensing
       services: docker
@@ -29,15 +29,14 @@ jobs:
       before_script: docker run fsfe/reuse reuse --version
       script: docker run -v "$TRAVIS_BUILD_DIR":/repo fsfe/reuse sh -c 'cd /repo && reuse lint'
 
-    - stage: Execution
-      name: Global installation
-      install: sudo src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
+    - stage: Installation
+      name: Global
       script: .travis/global-installation.sh
 
-    - name: Local installation
-      install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
+    - name: Local
       script: .travis/local-installation.sh
 
-    - name: Usage
+    - stage: Tests
+      name: Usage
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: .travis/usage.sh
+      script: .travis/usage-tests.sh

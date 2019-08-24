@@ -54,4 +54,4 @@ gitpack_out="$(gitpack uninstall github.com/dominiksalvet/vhdldep)" &&
 echo "$gitpack_out" | grep '^\[uninstalled\]' &&
 gitpack_out="$(gitpack status github.com/dominiksalvet/vhdldep)" &&
 echo "$gitpack_out" | grep '^\[nothing\]' &&
-gitpack clean
+gitpack clean # clean the GitPack repository cache
