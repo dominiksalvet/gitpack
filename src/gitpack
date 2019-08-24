@@ -93,6 +93,8 @@ init_constants() {
 
     # global log types
     LOGTYPE_INIT=init # logging initialization
+    LOGTYPE_EXIT=exit # exit the program
+    LOGTYPE_SIGNAL=signal # a caught signal
     # command log types
     LOGTYPE_LIST=list # list command
     LOGTYPE_CLEAN=clean # clean command
@@ -410,8 +412,8 @@ check_url() {
 # PARAMETERS:
 #   $1 - URL
 touch_repo() { (
+    log "$LOGTYPE_TOUCH" "$1" &&
     repo_dir="$(url_to_path "$1")" && # get the repository directory path
-    log "$LOGTYPE_TOUCH" "$repo_dir"/ &&
     mkdir -p "$repo_dir"/ &&
     cd "$repo_dir"/ &&
 
@@ -520,7 +522,7 @@ process_deps() { (
     # if there are any dependencies
     if [ -r .gitpack/deps ]; then
         #shellcheck disable=SC2030
-        log "$LOGTYPE_DEPS" "$1" "$(url_to_path "$2"/.gitpack/deps)" "$3" &&
+        log "$LOGTYPE_DEPS" "$1" "$2" "$3" .gitpack/deps &&
         report_prefix='+ ' && # indicate report for dependencies
         grep '^[^#]' .gitpack/deps | # remove empty and comment lines
         # run the given action recursively for every dependency reference
@@ -678,16 +680,16 @@ install() { (
     install_dir="$(get_install_dir)" && # choose the installation method
 
     if [ -x "$install_dir"/precp ]; then # before files copy
-        log "$LOGTYPE_PRECP" "$(url_to_path "$1"/"$install_dir")"/ "$2" &&
+        log "$LOGTYPE_PRECP" "$1" "$2" "$install_dir"/precp &&
         "$install_dir"/precp
     fi &&
 
     # copy all files by defined routes
-    log "$LOGTYPE_CP" "$(url_to_path "$1"/"$install_dir")"/ "$2" &&
+    log "$LOGTYPE_CP" "$1" "$2" "$install_dir"/map &&
     for_each_route "$install_dir"/map copy_files &&
 
     if [ -x "$install_dir"/postcp ]; then # after files copy
-        log "$LOGTYPE_POSTCP" "$(url_to_path "$1"/"$install_dir")"/ "$2" &&
+        log "$LOGTYPE_POSTCP" "$1" "$2" "$install_dir"/postcp &&
         "$install_dir"/postcp
     fi
 ) }
@@ -702,16 +704,16 @@ uninstall() { (
     install_dir="$(get_install_dir)" && # choose the uninstallation method
 
     if [ -x "$install_dir"/prerm ]; then # before files removal
-        log "$LOGTYPE_PRERM" "$(url_to_path "$1"/"$install_dir")"/ "$2" &&
+        log "$LOGTYPE_PRERM" "$1" "$2" "$install_dir"/prerm &&
         "$install_dir"/prerm
     fi &&
 
     # remove all files by defined routes
-    log "$LOGTYPE_RM" "$(url_to_path "$1"/"$install_dir")"/ "$2" &&
+    log "$LOGTYPE_RM" "$1" "$2" "$install_dir"/map &&
     for_each_route "$install_dir"/map remove_files &&
 
     if [ -x "$install_dir"/postrm ]; then # after files removal
-        log "$LOGTYPE_POSTRM" "$(url_to_path "$1"/"$install_dir")"/ "$2" &&
+        log "$LOGTYPE_POSTRM" "$1" "$2" "$install_dir"/postrm &&
         "$install_dir"/postrm
     fi
 ) }
