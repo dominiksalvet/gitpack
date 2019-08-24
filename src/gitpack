@@ -97,7 +97,7 @@ init_constants() {
     LOGTYPE_LIST=list # list command
     LOGTYPE_CLEAN=clean # clean command
     # action log types
-    LOGTYPE_PROCESS=process # action processing
+    LOGTYPE_ACTION=action # action processing
     LOGTYPE_URL=url # URL check
     LOGTYPE_TOUCH=touch # touch repository
     LOGTYPE_EXECUTE=execute # action executing
@@ -344,7 +344,7 @@ log() {
 #   $2 - reference
 process_action() {
     {   # log current action processing
-        log "$LOGTYPE_PROCESS" "$1" "$2" &&
+        log "$LOGTYPE_ACTION" "$1" "$2" &&
         # process given reference - URL + version (optional)
         url="$(ref_to_url "$2")" &&
         version="$(ref_to_version "$2")" &&
