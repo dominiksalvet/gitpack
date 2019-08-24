@@ -21,7 +21,7 @@ jobs:
       script: shellcheck src/gitpack
 
     - name: Code style
-      script: .travis/code-style-checks.sh
+      script: .travis/checks-code-style.sh
 
     - name: Licensing
       services: docker
@@ -31,12 +31,12 @@ jobs:
 
     - stage: Installation
       name: Global
-      script: .travis/global-installation.sh
+      script: .travis/installation-global.sh
 
     - name: Local
-      script: .travis/local-installation.sh
+      script: .travis/installation-local.sh
 
     - stage: Tests
       name: Usage
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: .travis/usage-tests.sh
+      script: .travis/tests-usage.sh
