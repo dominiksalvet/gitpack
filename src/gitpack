@@ -520,7 +520,7 @@ process_deps() { (
     # if there are any dependencies
     if [ -r .gitpack/deps ]; then
         #shellcheck disable=SC2030
-        log "$LOGTYPE_DEPS" "$1" "$2" "$3" .gitpack/deps &&
+        log "$LOGTYPE_DEPS" "$1" "$2" "$3" &&
         report_prefix='+ ' && # indicate report for dependencies
         grep '^[^#]' .gitpack/deps | # remove empty and comment lines
         # run the given action recursively for every dependency reference
@@ -675,19 +675,20 @@ delete_db_records() {
 #   $2 - commit
 install() { (
     repo_cd "$1" "$2" &&
-    install_dir="$(get_install_dir)" && # choose the installation method
+    install_method="$(get_install_method)" && # choose the installation method
+    install_dir="$(install_method_to_path "$1")" && # get an actual directory
 
     if [ -x "$install_dir"/precp ]; then # before files copy
-        log "$LOGTYPE_PRECP" "$1" "$2" "$install_dir"/precp &&
+        log "$LOGTYPE_PRECP" "$1" "$2" "$install_method" &&
         "$install_dir"/precp
     fi &&
 
     # copy all files by defined routes
-    log "$LOGTYPE_CP" "$1" "$2" "$install_dir"/map &&
+    log "$LOGTYPE_CP" "$1" "$2" "$install_method" &&
     for_each_route "$install_dir"/map copy_files &&
 
     if [ -x "$install_dir"/postcp ]; then # after files copy
-        log "$LOGTYPE_POSTCP" "$1" "$2" "$install_dir"/postcp &&
+        log "$LOGTYPE_POSTCP" "$1" "$2" "$install_method" &&
         "$install_dir"/postcp
     fi
 ) }
@@ -699,32 +700,42 @@ install() { (
 #   $2 - commit
 uninstall() { (
     repo_cd "$1" "$2" &&
-    install_dir="$(get_install_dir)" && # choose the uninstallation method
+    install_method="$(get_install_method)" && # choose the uninstallation method
+    install_dir="$(install_method_to_path "$1")" && # get an actual directory
 
     if [ -x "$install_dir"/prerm ]; then # before files removal
-        log "$LOGTYPE_PRERM" "$1" "$2" "$install_dir"/prerm &&
+        log "$LOGTYPE_PRERM" "$1" "$2" "$install_method" &&
         "$install_dir"/prerm
     fi &&
 
     # remove all files by defined routes
-    log "$LOGTYPE_RM" "$1" "$2" "$install_dir"/map &&
+    log "$LOGTYPE_RM" "$1" "$2" "$install_method" &&
     for_each_route "$install_dir"/map remove_files &&
 
     if [ -x "$install_dir"/postrm ]; then # after files removal
-        log "$LOGTYPE_POSTRM" "$1" "$2" "$install_dir"/postrm &&
+        log "$LOGTYPE_POSTRM" "$1" "$2" "$install_method" &&
         "$install_dir"/postrm
     fi
 ) }
 
 # DESCRIPTION:
-#   Returns the most appropriate GitPack installation directory relative path
-#   based on the current runtime and system information.
-get_install_dir() {
+#   Returns the appropriate GitPack installation method based on the current
+#   runtime and system information.
+get_install_method() {
     if [ -d .gitpack/install/"${access}-$system"/ ]; then
-        echo .gitpack/install/"${access}-$system" # system-specific directory
+        echo "${access}-$system" # system-specific directory
     else
-        echo .gitpack/install/"$access" # system-independent directory
+        echo "$access" # system-independent directory
     fi
+}
+
+# DESCRIPTION:
+#   Transforms a given installation method to an actual relative path where the
+#   instructions are stored.
+# PARAMETERS:
+#   $1 - installation method
+install_method_to_path() {
+    echo .gitpack/install/"$1"
 }
 
 # DESCRIPTION:
@@ -745,6 +756,10 @@ for_each_route() {
         return 1
     fi
 }
+
+#-------------------------------------------------------------------------------
+# COPY AND REMOVE FILES
+#-------------------------------------------------------------------------------
 
 # DESCRIPTION:
 #   Copies files recursively based on given source and target paths. It also
