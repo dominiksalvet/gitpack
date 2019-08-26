@@ -676,7 +676,7 @@ delete_db_records() {
 install() { (
     repo_cd "$1" "$2" &&
     install_method="$(get_install_method)" && # choose the installation method
-    install_dir="$(install_method_to_path "$1")" && # get an actual directory
+    install_dir="$(install_method_to_path "$install_method")" &&
 
     if [ -x "$install_dir"/precp ]; then # before files copy
         log "$LOGTYPE_PRECP" "$1" "$2" "$install_method" &&
@@ -701,7 +701,7 @@ install() { (
 uninstall() { (
     repo_cd "$1" "$2" &&
     install_method="$(get_install_method)" && # choose the uninstallation method
-    install_dir="$(install_method_to_path "$1")" && # get an actual directory
+    install_dir="$(install_method_to_path "$install_method")" &&
 
     if [ -x "$install_dir"/prerm ]; then # before files removal
         log "$LOGTYPE_PRERM" "$1" "$2" "$install_method" &&
