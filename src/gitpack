@@ -93,6 +93,8 @@ init_constants() {
 
     # global log types
     LOGTYPE_INIT=init # logging initialization
+    LOGTYPE_EXIT=exit # exit the program
+    LOGTYPE_SIGNAL=signal # a caught signal
     # command log types
     LOGTYPE_LIST=list # list command
     LOGTYPE_CLEAN=clean # clean command
@@ -190,10 +192,10 @@ process_action_args() {
 list_installed() {
     log "$LOGTYPE_LIST" "$STATUS_PATH" &&
     while read -r db_record; do
-        url="${db_record%% *}" && # extract URL
-        version="${db_record#* }" && # extract commit hash
+        url="${db_record%% *}" # extract URL
+        version="${db_record#* }" # extract commit hash
         version="$(beautify_hash "$url" "$version")" && # try to beautify it
-        echo "$url $version"
+        echo "$url $version" || return
     done < "$STATUS_PATH"
 }
 
@@ -368,9 +370,9 @@ process_action() {
 # PARAMETERS:
 #   $1 - reference
 ref_to_url() {
-    url="${1%%=*}" && # remove version if any
-    url="${url#https://}" && # remove https:// prefix
-    url="${url%.git}" && # remove .git suffix
+    url="${1%%=*}" # remove version if any
+    url="${url#https://}" # remove https:// prefix
+    url="${url%.git}" # remove .git suffix
     echo "$url" | tr '[:upper:]' '[:lower:]' # to lowercase
 }
 
@@ -379,7 +381,7 @@ ref_to_url() {
 # PARAMETERS:
 #   $1 - reference
 ref_to_version() {
-    version="${1#*=}" && # remove URL and keep version
+    version="${1#*=}" # remove URL and keep version
     if [ "$version" != "$1" ]; then # check if there was a version
         echo "$version"
     fi
