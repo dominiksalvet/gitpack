@@ -519,7 +519,7 @@ process_deps() { (
     repo_cd "$2" "$3" &&
     # if there are any dependencies
     if [ -r .gitpack/deps ]; then
-        #shellcheck disable=SC2030
+        # shellcheck disable=SC2030
         log "$LOGTYPE_DEPS" "$1" "$2" "$3" &&
         report_prefix='+ ' && # indicate report for dependencies
         grep '^[^#]' .gitpack/deps | # remove empty and comment lines
@@ -813,7 +813,7 @@ remove_files() {
 #   $4 - target commit
 print_report() {
     # prepare given arguments
-    #shellcheck disable=SC2031
+    # shellcheck disable=SC2031
     prefix="${report_prefix}[$1] $2" &&
     src_version="$(beautify_hash "$2" "$3")" &&
     tar_version="$(beautify_hash "$2" "$4")" &&
