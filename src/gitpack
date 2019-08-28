@@ -94,6 +94,8 @@ init_constants() {
 
     # global log types
     LOGTYPE_INIT=init # logging initialization
+    LOGTYPE_EXIT=exit # exit the program
+    LOGTYPE_SIGNAL=signal # a handled signal
     # command log types
     LOGTYPE_LIST=list # list command
     LOGTYPE_CLEAN=clean # clean command
@@ -261,6 +263,7 @@ init_runtime() {
     init_global_vars &&
     init_paths &&
     log "$LOGTYPE_INIT" "$COMMAND" && # initialize logging
+    init_traps &&
     init_database
 }
 
@@ -303,6 +306,22 @@ init_paths() {
     # derived paths
     CACHE_REPO_DIR="$CACHE_DIR"/repo # cache for Git repositories
     STATUS_PATH="$DB_DIR"/status # database of installed projects
+}
+
+# DESCRIPTION:
+#   Initializes traps of all handled signals in GitPack.
+init_traps() {
+    trap 'log "$LOGTYPE_EXIT" "$?"' EXIT && # log GitPack exit
+    trap handle_signal INT QUIT TERM # log signal handling
+}
+
+# DESCRIPTION:
+#   Handles previously selected signals sent to GitPack. It logs the signal
+#   number and exits with its exit code.
+handle_signal() {
+    status="$?" # get exit code of the signal
+    log "$LOGTYPE_SIGNAL" "$((status - 128))" # derive signal number
+    exit "$status" # propagate exit code further
 }
 
 # DESCRIPTION:
