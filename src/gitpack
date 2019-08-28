@@ -704,7 +704,7 @@ install() { (
 
     if [ -x "$install_dir"/precp ]; then # before files copy
         log "$LOGTYPE_PRECP" "$1" "$2" "$install_method" &&
-        "$install_dir"/precp
+        call_script "$install_dir"/precp
     fi &&
 
     # copy all files by defined routes
@@ -713,7 +713,7 @@ install() { (
 
     if [ -x "$install_dir"/postcp ]; then # after files copy
         log "$LOGTYPE_POSTCP" "$1" "$2" "$install_method" &&
-        "$install_dir"/postcp
+        call_script "$install_dir"/postcp
     fi
 ) }
 
@@ -729,7 +729,7 @@ uninstall() { (
 
     if [ -x "$install_dir"/prerm ]; then # before files removal
         log "$LOGTYPE_PRERM" "$1" "$2" "$install_method" &&
-        "$install_dir"/prerm
+        call_script "$install_dir"/prerm
     fi &&
 
     # remove all files by defined routes
@@ -738,7 +738,7 @@ uninstall() { (
 
     if [ -x "$install_dir"/postrm ]; then # after files removal
         log "$LOGTYPE_POSTRM" "$1" "$2" "$install_method" &&
-        "$install_dir"/postrm
+        call_script "$install_dir"/postrm
     fi
 ) }
 
@@ -760,6 +760,18 @@ get_install_method() {
 #   $1 - installation method
 install_method_to_path() {
     echo .gitpack/install/"$1"
+}
+
+# DESCRIPTION:
+#   Calls a given custom script and prints an error if failed.
+# PARAMETERS:
+#   $1 - script path
+call_script() {
+    ./"$1" || {
+        script_status="$?"
+        echo "$(basename "$1") script failed" >&2
+        return "$script_status"
+    }
 }
 
 #-------------------------------------------------------------------------------
