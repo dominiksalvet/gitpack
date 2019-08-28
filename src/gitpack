@@ -218,7 +218,8 @@ clean_cache() {
 
     # clean log shortening it to a defined number of last lines
     tail -n "$LOG_LINES_KEPT" "$LOG_PATH" > "$LOG_PATH".tmp &&
-    mv "$LOG_PATH".tmp "$LOG_PATH" && # breaks file watchers like 'tail -f'
+    # file watchers like 'tail -f' may be affected by moving the file
+    mv "$LOG_PATH".tmp "$LOG_PATH" &&
 
     # clean Git repository cache
     if [ -d "${CACHE_REPO_DIR:?}"/ ]; then # check if cache exists
