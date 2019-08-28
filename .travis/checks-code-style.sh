@@ -18,10 +18,12 @@ IGNORED_FUNCTIONS='init_constants init_strings' # function length exceptions
 # LINE LENGTH
 #-------------------------------------------------------------------------------
 
+lineno=0 # initialize line counter
 # shellcheck disable=SC2016
 while read -r line; do
+    lineno=$((lineno + 1)) # increment line counter
     if [ "${#line}" -gt "$MAX_LINE_LENGTH" ]; then # check line length
-        echo "src/gitpack must have lines with $MAX_LINE_LENGTH characters at most" >&2
+        echo "src/gitpack:$lineno line has more than $MAX_LINE_LENGTH characters" >&2
         return 1
     fi
 done < src/gitpack &&
@@ -32,7 +34,7 @@ done < src/gitpack &&
 
 # transforms a given shell script into '<function> <lines>' per line output
 AWK_PROGRAM='{ if (/\(\)/) {
-    printf $1" "
+    printf NR" "$1" "
     lines=1
 } else if (/^(\) )?\}$/) {
     print lines
@@ -44,8 +46,9 @@ AWK_PROGRAM='{ if (/\(\)/) {
 awk_out="$(awk -F '(' "$AWK_PROGRAM" src/gitpack)" &&
 echo "$awk_out" |
 while read -r line; do
-    function="${line%% *}" # extract function name
-    lines="${line##* }" # extract function length in lines
+    lineno="$(echo "$line" | cut -f 1 -d ' ')" && # extract line number
+    function="$(echo "$line" | cut -f 2 -d ' ')" && # extract function name
+    lines="$(echo "$line" | cut -f 3 -d ' ')" || return # extract function length in lines
 
     for ignored_function in $IGNORED_FUNCTIONS; do # exclude ignored functions
         if [ "$function" = "$ignored_function" ]; then
@@ -54,7 +57,7 @@ while read -r line; do
     done
 
     if [ "$lines" -gt "$MAX_FUNCTION_LENGTH" ]; then # check function length
-        echo "src/gitpack must have functions with $MAX_FUNCTION_LENGTH lines at most" >&2
+        echo "src/gitpack:$lineno $function() has more than $MAX_FUNCTION_LENGTH lines" >&2
         return 1
     fi
 done
