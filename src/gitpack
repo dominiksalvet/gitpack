@@ -63,6 +63,8 @@ print_error() {
 #-------------------------------------------------------------------------------
 # STATIC INITIALIZATION
 #-------------------------------------------------------------------------------
+# All constants of this section can be read in other code.
+#-------------------------------------------------------------------------------
 
 # DESCRIPTION:
 #   Initializes static constants. They must not be changed later.
@@ -236,11 +238,13 @@ rm_rf_dir_check() { (
 #-------------------------------------------------------------------------------
 # DYNAMIC INITIALIZATION
 #-------------------------------------------------------------------------------
+# All constants of this section can be read in other code. All global variables
+# of this section can be accessed in other code.
+#-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   Prepares a runtime environment for GitPack and log initialization based on
-#   all GitPack arguments. After calling this function, GitPack's essential file
-#   structure will be prepared and appropriate configuration will be applied.
+#   Initializes a runtime environment for GitPack. After calling this function,
+#   GitPack's environment, logging and file structure will be prepared.
 # PARAMETERS:
 #   $@ - GitPack arguments
 init_runtime() {
@@ -255,7 +259,7 @@ init_runtime() {
 #   stated here even though its value is going to be overwritten.
 init_global_vars() {
     # check if running as root and set up access level
-    id_out="$(id -u)" &&
+    id_out="$(id -u)" && # not a global variable
     if [ "$id_out" -eq 0 ]; then
         access=global
     else
