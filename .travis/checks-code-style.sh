@@ -20,7 +20,7 @@ IGNORED_FUNCTIONS='init_constants init_strings' # function length exceptions
 
 lineno=0 # initialize line counter
 # shellcheck disable=SC2016
-while read -r line; do
+while IFS= read -r line; do
     lineno=$((lineno + 1)) # increment line counter
     if [ "${#line}" -gt "$MAX_LINE_LENGTH" ]; then # check line length
         echo "src/gitpack:$lineno line has more than $MAX_LINE_LENGTH characters" >&2
