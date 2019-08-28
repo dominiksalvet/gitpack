@@ -132,7 +132,7 @@ ACTION:
 
 COMMAND:
   list   list installed Git projects
-  clean  remove cache
+  clean  clean cache and log
   help   show this help
   about  show information"
 
@@ -155,8 +155,8 @@ https://github.com/dominiksalvet/gitpack'
 init_configuration() {
     # current GitPack command
     COMMAND="$0 $*"
-    # logging configuration
-    MAX_LOG_LENGTH=1000 # keep shortening the log file to this value
+    # clean configuration
+    LOG_LINES_KEPT=1000 # when shortening the log file, keep those last lines
 }
 
 #-------------------------------------------------------------------------------
@@ -212,9 +212,15 @@ list_installed() {
 }
 
 # DESCRIPTION:
-#   Cleans the GitPack cache performing checks for unintended removal.
+#   Cleans the GitPack cache and log performing checks for unintended removal.
 clean_cache() {
-    log "$LOGTYPE_CLEAN" "$CACHE_REPO_DIR"/ &&
+    log "$LOGTYPE_CLEAN" "$CACHE_REPO_DIR"/ && # log clean operation
+
+    # clean log shortening it to a defined number of last lines
+    tail -n "$LOG_LINES_KEPT" "$LOG_PATH" > "$LOG_PATH".tmp &&
+    mv "$LOG_PATH".tmp "$LOG_PATH" &&
+
+    # clean Git repository cache
     if [ -d "${CACHE_REPO_DIR:?}"/ ]; then # check if cache exists
         if rm_rf_dir_check "$CACHE_REPO_DIR"; then
             rm -rf -- "${CACHE_REPO_DIR:?}"/
@@ -253,7 +259,7 @@ rm_rf_dir_check() { (
 init_runtime() {
     init_global_vars &&
     init_paths &&
-    init_logging &&
+    log "$LOGTYPE_INIT" "$COMMAND" && # initialize logging
     init_database
 }
 
@@ -320,17 +326,6 @@ init_database() {
 #-------------------------------------------------------------------------------
 # LOGGING
 #-------------------------------------------------------------------------------
-
-# DESCRIPTION:
-#   Checks the GitPack log file whether it has a maintainable number of lines.
-#   If not, this function shortens it. Then, it initializes logging.
-init_logging() {
-    if [ -w "$LOG_PATH" ]; then
-        tail -n "$MAX_LOG_LENGTH" "$LOG_PATH" > "$LOG_PATH".tmp &&
-        mv "$LOG_PATH".tmp "$LOG_PATH"
-    fi &&
-    log "$LOGTYPE_INIT" "$COMMAND"
-}
 
 # DESCRIPTION:
 #   Creates a new log item in the predefined log file with current date and time
