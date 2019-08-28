@@ -42,22 +42,10 @@ check_deps() {
     # check if any piece of software is missing
     for sw in $sw_list; do
         if ! command -v "$sw" > /dev/null; then
-            print_error "missing $sw software"
+            echo "missing $sw software" >&2
             return 1
         fi
     done
-}
-
-# DESCRIPTION:
-#   Prints a given error text with a given hint text if present.
-# PARAMETERS:
-#   $1 - error text
-#   $2 - hint text (optional)
-print_error() {
-    echo "gitpack: $1" >&2
-    if [ "$2" ]; then
-        echo "$2" >&2
-    fi
 }
 
 #-------------------------------------------------------------------------------
@@ -144,8 +132,6 @@ The simplest Git-based package manager.
 Copy"'right 2019 Dominik Salvet
 SPDX License Identifier: MIT
 https://github.com/dominiksalvet/gitpack'
-
-    HINT_MESSAGE="Try 'gitpack help' for getting help."
 }
 
 # DESCRIPTION:
@@ -173,7 +159,7 @@ process_args() {
     case "$1" in # process arguments based on the first argument
         "$ACTION_INSTALL" | "$ACTION_UNINSTALL" | "$ACTION_STATUS")
             if [ "$#" -eq 1 ]; then # check if there is any reference argument
-                print_error 'no URL provided' "$HINT_MESSAGE"
+                echo 'no URL provided' >&2
                 return 1
             fi
             init_runtime && # initialize runtime
@@ -183,8 +169,8 @@ process_args() {
         clean) init_runtime && clean_cache ;;
         help) echo "$HELP_MESSAGE" ;;
         about) echo "$ABOUT_MESSAGE" ;;
-        '') print_error 'no argument provided' "$HINT_MESSAGE"; return 1 ;;
-        *) print_error "unrecognized argument $1" "$HINT_MESSAGE"; return 1 ;;
+        '') echo 'no argument provided' >&2; return 1 ;;
+        *) echo "unrecognized argument $1" >&2; return 1 ;;
     esac
 }
 
@@ -228,7 +214,7 @@ clean_cache() {
         if rm_rf_dir_check "$CACHE_REPO_DIR"; then
             rm -rf -- "${CACHE_REPO_DIR:?}"/
         else
-            print_error 'prevent removing the root directory'
+            echo 'prevent removing the root directory' >&2
             return 1
         fi
     fi
@@ -338,7 +324,7 @@ init_database() {
 
     # check access to GitPack status file
     if [ ! -r "$STATUS_PATH" ] || [ ! -w "$STATUS_PATH" ]; then
-        print_error "cannot access $STATUS_PATH file"
+        echo "cannot access $STATUS_PATH file" >&2
         return 1
     fi
 }
@@ -432,7 +418,7 @@ check_url() {
     url_regex='^[[:alnum:]_][[:alnum:]_\.-]*(/[[:alnum:]_][[:alnum:]_\.-]*){2}$'
 
     if ! echo "$1" | grep -q -E "$url_regex"; then
-        print_error 'unsupported URL delivered'
+        echo 'unsupported URL delivered' >&2
         return 1
     fi
 }
@@ -776,6 +762,10 @@ install_method_to_path() {
     echo .gitpack/install/"$1"
 }
 
+#-------------------------------------------------------------------------------
+# COPY AND REMOVE FILES
+#-------------------------------------------------------------------------------
+
 # DESCRIPTION:
 #   For each given map route, it calls a given function. It also prepares the
 #   map by removing comments and empty lines before calling any function so that
@@ -790,14 +780,10 @@ for_each_route() {
             eval "$2" "$route" || return # call a given function for each route
         done
     else
-        print_error 'missing map file'
+        echo 'missing map file' >&2
         return 1
     fi
 }
-
-#-------------------------------------------------------------------------------
-# COPY AND REMOVE FILES
-#-------------------------------------------------------------------------------
 
 # DESCRIPTION:
 #   Copies files recursively based on given source and target paths. It also
