@@ -24,7 +24,7 @@ main() {
     check_deps &&
     init_constants &&
     init_strings &&
-    init_configuration &&
+    init_configuration "$@" &&
     process_args "$@"
 }
 
@@ -147,9 +147,14 @@ https://github.com/dominiksalvet/gitpack'
 }
 
 # DESCRIPTION:
-#   Initializes constants used as a part of the static GitPack configuration.
-#   They must not be changed later.
+#   Stores a copy of a complete command, which invoked this GitPack instance
+#   based on given GitPack arguments and initializes other constants used as
+#   a part of the GitPack configuration. None of them may be changed later.
+# PARAMETERS:
+#   $@ - GitPack arguments
 init_configuration() {
+    # current GitPack command
+    COMMAND="$0 $*"
     # logging configuration
     MAX_LOG_LENGTH=1000 # keep shortening the log file to this value
 }
@@ -169,11 +174,11 @@ process_args() {
                 print_error 'no URL provided' "$HINT_MESSAGE"
                 return 1
             fi
-            init_runtime "$@" && # initialize runtime
+            init_runtime && # initialize runtime
             process_action_args "$@" # process action-based arguments
             ;;
-        list) init_runtime "$@" && list_installed ;;
-        clean) init_runtime "$@" && clean_cache ;;
+        list) init_runtime && list_installed ;;
+        clean) init_runtime && clean_cache ;;
         help) echo "$HELP_MESSAGE" ;;
         about) echo "$ABOUT_MESSAGE" ;;
         '') print_error 'no argument provided' "$HINT_MESSAGE"; return 1 ;;
@@ -245,12 +250,10 @@ rm_rf_dir_check() { (
 # DESCRIPTION:
 #   Initializes a runtime environment for GitPack. After calling this function,
 #   GitPack's environment, logging and file structure will be prepared.
-# PARAMETERS:
-#   $@ - GitPack arguments
 init_runtime() {
     init_global_vars &&
     init_paths &&
-    init_logging "$@" &&
+    init_logging &&
     init_database
 }
 
@@ -321,14 +324,12 @@ init_database() {
 # DESCRIPTION:
 #   Checks the GitPack log file whether it has a maintainable number of lines.
 #   If not, this function shortens it. Then, it initializes logging.
-# PAREMETRS:
-#   $@ - GitPack arguments
 init_logging() {
     if [ -w "$LOG_PATH" ]; then
         tail -n "$MAX_LOG_LENGTH" "$LOG_PATH" > "$LOG_PATH".tmp &&
         mv "$LOG_PATH".tmp "$LOG_PATH"
     fi &&
-    log "$LOGTYPE_INIT" "$0" "$@"
+    log "$LOGTYPE_INIT" "$COMMAND"
 }
 
 # DESCRIPTION:
