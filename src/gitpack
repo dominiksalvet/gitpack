@@ -306,7 +306,7 @@ init_traps() {
 #   and exits with its exit status.
 handle_signal() {
     status="$?" # get exit status of the signal
-    log "$LOGTYPE_SIGNAL" "$(kill -l "$status")" # get signal name
+    log "$LOGTYPE_SIGNAL" "SIG$(kill -l "$status")" # get signal name
     exit "$status" # propagate exit status further
 }
 
