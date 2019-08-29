@@ -11,6 +11,7 @@ The changes not yet present in any release are listed in this section.
 ### Added
 
 * The support for execution logging has been added.
+* Custom scripts of GitPack projects are called with a timeout.
 
 ### Fixed
 
