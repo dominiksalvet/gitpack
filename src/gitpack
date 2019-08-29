@@ -303,11 +303,11 @@ init_traps() {
 
 # DESCRIPTION:
 #   Handles previously selected signals sent to GitPack. It logs the signal
-#   number and exits with its exit code.
+#   number and exits with its exit status.
 handle_signal() {
-    status="$?" # get exit code of the signal
+    status="$?" # get exit status of the signal
     log "$LOGTYPE_SIGNAL" "$((status - 128))" # derive signal number
-    exit "$status" # propagate exit code further
+    exit "$status" # propagate exit status further
 }
 
 # DESCRIPTION:
