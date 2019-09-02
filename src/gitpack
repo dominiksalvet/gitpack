@@ -223,17 +223,24 @@ clean_cache() {
 
 # DESCRIPTION:
 #   Checks whether it is possible to recursively remove a given directory. It
-#   prevents from removing the root directory. This function uses only the first
-#   parameter, others are ignored.
+#   prevents from removing the root and home directories. This function uses
+#   only the first parameter due to possible unintended globbing.
 # PARAMETERS:
 #   $1 - directory
 rm_rf_dir_check() { (
-    test "$1" && # the directory path must be empty
+    test "$1" && # the directory path must not be empty
     cd -- "$1"/ 2>/dev/null && # fails if the given directory doesn't exist
-    # double check for the root directory
+    pwd_out="$(pwd -P)" && # store physical path of the current directory
+
+    # check for the root directory
     test "$PWD" != / &&
-    pwd_out="$(pwd -P)" &&
-    test "$pwd_out" != /
+    test "$pwd_out" != / &&
+    test "$PWD" != // && # two slashes may not be shortened to a single slash
+    test "$pwd_out" != // &&
+
+    # check for home directory
+    test "$PWD" != "$HOME" &&
+    test "$pwd_out" != "$HOME"
 ) }
 
 #-------------------------------------------------------------------------------
