@@ -6,11 +6,11 @@
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
+# remove log of the initial installation
+rm -f "$HOME"/.local/share/gitpack.log &&
 # clean cache
 echo test1 && gitpack clean > /dev/null &&
 # check logging
-echo "$HOME" &&
-grep -c '\[init\]' "$HOME"/.local/share/gitpack.log &&
 echo test2 && test "$(grep -c '\[init\]' "$HOME"/.local/share/gitpack.log)" -eq 1 &&
 echo test3 && test "$(grep -c '\[clean\]' "$HOME"/.local/share/gitpack.log)" -eq 1 &&
 echo test4 && test "$(grep -c '\[exit\]' "$HOME"/.local/share/gitpack.log)" -eq 1 &&
