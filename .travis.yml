@@ -40,3 +40,7 @@ jobs:
       name: Usage
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
       script: .travis/tests-usage.sh
+
+    - name: Logging
+      install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
+      script: .travis/tests-logging.sh
