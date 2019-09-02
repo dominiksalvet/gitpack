@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Create a report to improve GitPack
 title: ''
 labels: bug
 assignees: dominiksalvet
@@ -8,7 +8,7 @@ assignees: dominiksalvet
 ---
 
 **Environment**
-State installed version of this project and your OS information.
+State installed version of GitPack and your OS information.
 
 **Describe the bug**
 A clear and concise description of what the bug is.
@@ -22,6 +22,17 @@ Steps to reproduce the behavior:
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
+
+**Execution log**
+State the used log file: global - */var/log/gitpack.log*, or local - *"$HOME"/.local/share/gitpack.log*.
+
+<details>
+    <summary>gitpack.log</summary>
+
+```
+<gitpack.log contents>
+```
+</details>
 
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
