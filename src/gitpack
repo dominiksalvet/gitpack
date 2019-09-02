@@ -202,7 +202,8 @@ list_installed() {
 # DESCRIPTION:
 #   Cleans the GitPack cache and log performing checks for unintended removal.
 clean_cache() {
-    log "$LOGTYPE_CLEAN" "$CACHE_REPO_DIR"/ && # log clean operation
+    # log clean operation, creates a log file if it does not exit
+    log "$LOGTYPE_CLEAN" "$CACHE_REPO_DIR"/ &&
 
     # clean log shortening it to a defined number of last lines
     tail -n "$LOG_LINES_KEPT" "$LOG_PATH" > "$LOG_PATH".tmp &&
