@@ -60,7 +60,7 @@ check_deps() {
 # shellcheck disable=SC2209
 init_constants() {
     # the current version of GitPack
-    VERSION=0.2.0
+    VERSION=0.3.0
 
     # GitPack actions
     ACTION_INSTALL=install
