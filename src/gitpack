@@ -542,24 +542,42 @@ repo_cd() {
 #   $1 - action
 #   $2 - URL
 #   $3 - commit
-process_deps() { (
-    # early return in uninstall case
+process_deps() {
+    # early return in the uninstall case
     if [ "$1" = "$ACTION_UNINSTALL" ]; then
         return 0
     fi
 
-    repo_cd "$2" "$3" &&
-    # if there are any dependencies
-    if [ -r .gitpack/deps ]; then
-        # shellcheck disable=SC2030
-        log "$LOGTYPE_DEPS" "$1" "$2" "$3" &&
-        report_prefix='+ ' && # indicate report for dependencies
-        grep '^[^#]' .gitpack/deps | # remove empty and comment lines
-        # run the given action recursively for every dependency reference
-        while read -r dep_ref; do
-            # entering action with changed working directory
-            process_action "$1" "$dep_ref" || return
+    deps="$(get_deps "$2" "$3")" && # get all dependencies
+    if [ "$deps" ]; then # if there are any
+        # run the given action recursively for each dependency reference
+        echo "$deps" | while read -r dep; do
+            # run each action in a separate subshell
+            ( report_prefix='+ ' process_action "$1" "$dep" ) || return
         done
+    fi
+}
+
+# DESCRIPTION:
+#   Prints all dependencies of a given project's URL and commit if any.
+# PARAMETERS:
+#   $1 - URL
+#   $2 - commit
+get_deps() { (
+    repo_cd "$1" "$2" &&
+    # if there is a file describing dependencies
+    if [ -r .gitpack/deps ]; then
+        log "$LOGTYPE_DEPS" "$2" "$3" &&
+        # remove empty and comment lines
+        {   grep '^[^#]' .gitpack/deps
+            grep_status="$?" # store exit status of the grep
+
+            # an empty grep selection is not a fail in this case
+            if [ "$grep_status" -le 1 ]; then
+                grep_status=0
+            fi
+            return "$grep_status"
+        }
     fi
 ) }
 
@@ -868,7 +886,6 @@ remove_files() {
 #   $4 - target commit
 print_report() {
     # prepare given arguments
-    # shellcheck disable=SC2031
     prefix="${report_prefix}[$1] $2" &&
     src_version="$(beautify_hash "$2" "$3")" &&
     tar_version="$(beautify_hash "$2" "$4")" &&
