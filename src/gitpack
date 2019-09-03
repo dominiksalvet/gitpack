@@ -687,11 +687,10 @@ delete_db_records() {
     grep_out="$(grep -F -v "$1" "$STATUS_PATH")"
     grep_status="$?" # store exit status of the grep
 
-    if [ "$grep_status" -eq 0 ]; then # no error, update status file
+    # an empty grep selection is not a fail in this case
+    if [ "$grep_status" -le 1 ]; then
         echo "$grep_out" > "$STATUS_PATH"
-    elif [ "$grep_status" -eq 1 ]; then # no lines selected, clear status file
-        true > "$STATUS_PATH" 
-    else # propagate any other error further
+    else # propagate any error further
         return "$grep_status"
     fi
 }
