@@ -690,7 +690,7 @@ delete_db_records() {
     # an empty grep selection is not a fail in this case
     if [ "$grep_status" -le 1 ]; then
         echo "$grep_out" > "$STATUS_PATH"
-    else # propagate any error further
+    else # propagate any other error further
         return "$grep_status"
     fi
 }
