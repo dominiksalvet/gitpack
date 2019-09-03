@@ -501,7 +501,7 @@ execute_action() {
 }
 
 # DESCRIPTION:
-#   Returns a preferred commit hash of a given project. It chooses latest tag's
+#   Prints a preferred commit hash of a given project. It chooses latest tag's
 #   commit if it exists, otherwise latest commit is chosen.
 # PARAMETERS:
 #   $1 - URL
@@ -541,7 +541,7 @@ repo_cd() {
 # PARAMETERS:
 #   $1 - action
 #   $2 - URL
-#   $3 - target commit
+#   $3 - commit
 process_deps() { (
     # early return in uninstall case
     if [ "$1" = "$ACTION_UNINSTALL" ]; then
@@ -751,7 +751,7 @@ uninstall() { (
 ) }
 
 # DESCRIPTION:
-#   Returns the appropriate GitPack installation method based on the current
+#   Prints the appropriate GitPack installation method based on the current
 #   runtime and system information.
 get_install_method() {
     if [ -d .gitpack/install/"${access}-$system"/ ]; then
