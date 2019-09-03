@@ -21,7 +21,7 @@
 # PARAMETERS:
 #   $@ - GitPack arguments
 main() {
-    check_deps &&
+    check_sw_deps &&
     init_constants &&
     init_strings &&
     init_configuration "$@" &&
@@ -34,16 +34,16 @@ main() {
 
 # DESCRIPTION:
 #   Checks whether all software dependencies are satisfied.
-check_deps() {
+check_sw_deps() {
     # a list of required software
-    sw_list='command echo [ cd test pwd rm id mkdir touch dirname grep git ls
+    sw_deps='command echo [ cd test pwd rm id mkdir touch dirname grep git ls
              uname read cp head cut true basename find rmdir tr date tail mv
              kill sleep wait'
 
     # check if any piece of software is missing
-    for sw in $sw_list; do
-        if ! command -v "$sw" > /dev/null; then
-            echo "missing $sw software" >&2
+    for sw_dep in $sw_deps; do
+        if ! command -v "$sw_dep" > /dev/null; then
+            echo "missing $sw_dep software" >&2
             return 1
         fi
     done
