@@ -823,12 +823,21 @@ run_with_timeout() { (
 #   $1 - map path
 #   $2 - function name
 for_each_route() {
-    if [ -r "$1" ]; then
-        grep '^[^#]' "$1" | # remove empty and comment lines
-        while read -r route; do
-            eval "$2" "$route" || return # call a given function for each route
-        done
-    else
+    if [ -r "$1" ]; then # check whether the map file exists
+        grep_out="$(grep '^[^#]' "$1")" # remove empty and comment lines
+        grep_status="$?" # store exit status of the grep
+
+        if [ "$grep_status" -le 1 ]; then # empty selection is a not a fail here
+            if [ "$grep_out" ]; then # if there are any routes in the path file
+                # call a given function for each route
+                echo "$grep_out" | while read -r route; do
+                    eval "$2" "$route" || return
+                done
+            fi
+        else # propagate any other error further
+            return "$grep_status"
+        fi
+    else # if the map file does not exist, fails
         echo 'missing map file' >&2
         return 1
     fi
