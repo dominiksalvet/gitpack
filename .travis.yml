@@ -44,3 +44,7 @@ jobs:
     - name: Logging
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
       script: .travis/tests-logging.sh
+
+    - name: Execution
+      install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
+      script: .travis/tests-execution.sh
