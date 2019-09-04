@@ -315,7 +315,7 @@ init_traps() {
 handle_term_signal() {
     status="$?" # get exit status of the signal
     log "$LOGTYPE_SIGNAL" "SIG$(kill -l "$status")" # get signal name
-    exit "$status" # propagate exit status further (it also invokes EXIT trap)
+    exit "$status" # exit GitPack (it also invokes the EXIT trap)
 }
 
 # DESCRIPTION:
