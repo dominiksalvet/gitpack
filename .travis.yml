@@ -37,11 +37,11 @@ jobs:
       script: .travis/installation-local.sh
 
     - stage: Tests
-    - name: Execution
+      name: Execution
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
       script: .travis/tests-execution.sh
 
-      name: Usage
+    - name: Usage
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
       script: .travis/tests-usage.sh
 
