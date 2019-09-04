@@ -8,6 +8,7 @@
 
 # clean cache
 echo test1 && gitpack clean > /dev/null &&
+ps &&
 echo test2 && test "$(ps | wc -l)" -eq 5 &&
 
 # install an example project, vhdldep, in version 2.1.0 (not the latest release)
