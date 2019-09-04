@@ -314,7 +314,7 @@ init_traps() {
 #   to GitPack. It logs the signal name and exits with its exit status.
 term_action() {
     status="$?" # get exit status of the signal
-    log "$LOGTYPE_SIGNAL" "SIG$(kill -l "$status")" # get signal name
+    log "$LOGTYPE_SIGNAL" "SIG$(kill -l "$status")" # log signal name
     exit "$status" # exit GitPack (it also invokes the EXIT trap)
 }
 
