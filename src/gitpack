@@ -306,7 +306,7 @@ init_paths() {
 #   Initializes traps of all handled signals in GitPack.
 init_traps() {
     trap 'log "$LOGTYPE_EXIT" "$?"' EXIT && # log GitPack exit
-    trap handle_signal INT QUIT TERM # log signal handling
+    trap handle_signal HUP INT QUIT TERM # log signal handling
 }
 
 # DESCRIPTION:
