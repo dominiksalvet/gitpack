@@ -729,7 +729,7 @@ install() { (
 
     if [ -x "$install_dir"/precp ]; then # before files copy
         log "$LOGTYPE_PRECP" "$1" "$2" "$install_method" &&
-        run_with_timeout "$install_dir"/precp "$SCRIPT_TIMEOUT"
+        run_control_script "$install_dir"/precp
     fi &&
 
     # copy all files by defined routes
@@ -738,7 +738,7 @@ install() { (
 
     if [ -x "$install_dir"/postcp ]; then # after files copy
         log "$LOGTYPE_POSTCP" "$1" "$2" "$install_method" &&
-        run_with_timeout "$install_dir"/postcp "$SCRIPT_TIMEOUT"
+        run_control_script "$install_dir"/postcp
     fi
 ) }
 
@@ -754,7 +754,7 @@ uninstall() { (
 
     if [ -x "$install_dir"/prerm ]; then # before files removal
         log "$LOGTYPE_PRERM" "$1" "$2" "$install_method" &&
-        run_with_timeout "$install_dir"/prerm "$SCRIPT_TIMEOUT"
+        run_control_script "$install_dir"/prerm
     fi &&
 
     # remove all files by defined routes
@@ -763,7 +763,7 @@ uninstall() { (
 
     if [ -x "$install_dir"/postrm ]; then # after files removal
         log "$LOGTYPE_POSTRM" "$1" "$2" "$install_method" &&
-        run_with_timeout "$install_dir"/postrm "$SCRIPT_TIMEOUT"
+        run_control_script "$install_dir"/postrm
     fi
 ) }
 
@@ -787,29 +787,56 @@ install_method_to_path() {
     echo .gitpack/install/"$1"
 }
 
-# DESCRIPTION:
-#   Runs a given script with a given timeout. Prints an error if failed.
-# PARAMETERS:
-#   $1 - script path
-#   $2 - timeout in seconds
-run_with_timeout() { (
-    # once a child process terminates, the other gets killed by the trap
-    trap 'kill "$sleep_pid" 2>/dev/null || kill "$script_pid"' CHLD || return
-    ./"$1" & script_pid="$!" # run the given script and store its process ID
-    sleep "$2" & sleep_pid="$!" # run the timer and store its process ID
-    wait "$script_pid" && # wait for the script process to terminate
-    return # return early if wait (i.e., the script) was successful
+#-------------------------------------------------------------------------------
+# CONTROL SCRIPT EXECUTION
+#-------------------------------------------------------------------------------
 
-    script_status="$?" # catch wait exit status
-    trap - CHLD || return # reset SIGCHLD signal handler to default value
-    if [ "$script_status" -gt 128 ]; then # only SIGCHLD signal considered
+# DESCRIPTION:
+#   Runs a given control script of a GitPack project with a timeout. In case of
+#   timed out or a script fail, it prints an error report.
+# PARAMETERS:
+#   $1 - control script path
+run_control_script() {
+    timeout "$SCRIPT_TIMEOUT" "$1" && # run the script with a predefined timeout
+    return # return early if the script returned successfully and not timed out
+
+    timeout_status="$?" # store the failed exit status of the timeout
+    if [ "$timeout_status" -gt 128 ]; then # if SIGCHLD exit status
         echo "$(basename "$1") script timed out" >&2
-        return 1
-    else # script execution failed
-        echo "$(basename "$1") script failed" >&2
-        return "$script_status"
+    else # if a failed script execution exit status
+        echo "$(basename "$1") script execution failed" >&2
     fi
+    return "$timeout_status" # propagate the error further
+}
+
+# DESCRIPTION:
+#   Runs a given script with a given timeout. Returns a SIGCHLD exit status when
+#   timed out. Otherwise, returns the exit status of the given script execution.
+# PARAMETERS:
+#   $1 - duration in seconds
+#   $2 - script path
+timeout() { (
+    # in case of a termination signal, kill both processes and exit
+    trap 'timeout_term_action "$sleep_pid" "$script_pid"' HUP INT QUIT TERM &&
+    # once a child process terminates, both processes must be killed
+    trap 'kill "$sleep_pid" "$script_pid" 2>/dev/null' CHLD || return
+
+    ./"$2" & script_pid="$!" # run the given script and store its process ID
+    sleep "$1" & sleep_pid="$!" # run the timer and store its process ID
+    wait "$script_pid" # wait for the script to terminate (or get killed)
 ) }
+
+# DESCRIPTION:
+#   This function is expected to handle all termination signals that can be sent
+#   to timeout during its execution. It kills both sleep and script processes.
+# PARAMETERS:
+#   $1 - sleep process ID
+#   $2 - script process ID
+timeout_term_action() {
+    status="$?" # get exit status of the signal
+    kill "$1" "$2" 2>/dev/null # kill both timeout processes
+    exit "$status" # exit timeout
+}
 
 #-------------------------------------------------------------------------------
 # COPY AND REMOVE FILES
