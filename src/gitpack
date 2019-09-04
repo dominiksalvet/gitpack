@@ -305,17 +305,17 @@ init_paths() {
 # DESCRIPTION:
 #   Initializes traps of all handled signals in GitPack.
 init_traps() {
-    trap 'log "$LOGTYPE_EXIT" "$?"' EXIT && # log GitPack exit
-    trap handle_signal HUP INT QUIT TERM # log signal handling
+    trap 'log "$LOGTYPE_EXIT" "$?"' EXIT && # log GitPack exit status on exit
+    trap handle_term_signal HUP INT QUIT TERM # handle termination signals
 }
 
 # DESCRIPTION:
-#   Handles previously selected signals sent to GitPack. It logs the signal name
-#   and exits with its exit status.
-handle_signal() {
+#   This function is expected to handle all termination signals that can be sent
+#   to GitPack process. It logs the signal name and exits with its exit status.
+handle_term_signal() {
     status="$?" # get exit status of the signal
     log "$LOGTYPE_SIGNAL" "SIG$(kill -l "$status")" # get signal name
-    exit "$status" # propagate exit status further
+    exit "$status" # propagate exit status further (it also invokes EXIT trap)
 }
 
 # DESCRIPTION:
