@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: MIT
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
+# DESCRIPTION:
+#   This test checks whether the main GitPack script meets a basic code style.
+#-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
 # CONFIGURATION

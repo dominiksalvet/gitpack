@@ -5,6 +5,11 @@
 # SPDX-License-Identifier: MIT
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
+# DESCRIPTION:
+#   This test checks whether it is possible to install GitPack locally from the
+#   source. It also checks whether the installed GitPack is able to uninstall
+#   itself.
+#-------------------------------------------------------------------------------
 
 # install GitPack from the current commit locally
 gitpack_out="$(src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&

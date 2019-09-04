@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: MIT
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
+# DESCRIPTION:
+#   This test checks GitPack execution characteristics.
+#-------------------------------------------------------------------------------
 
 # clean cache
 echo test1 && gitpack clean > /dev/null &&
