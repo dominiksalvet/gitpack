@@ -390,7 +390,7 @@ process_action() {
         check_url "$url" &&
 
         # prepare Git repository
-        #clone_repo "$url" &&
+        clone_repo "$url" &&
 
         # execute the action itself
         execute_action "$1" "$url" "$version"
