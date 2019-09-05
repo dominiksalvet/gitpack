@@ -12,6 +12,10 @@ The changes not yet present in any release are listed in this section.
 
 * A simple mechanism for cyclic dependencies prevention has been added.
 
+### Changed
+
+* If there is a fail, it will get logged with the `[fail]` logtype.
+
 ## 0.3.0 (2019-09-02)
 
 ### Added

@@ -83,8 +83,9 @@ init_constants() {
 
     # global log types
     LOGTYPE_INIT=init # logging initialization
-    LOGTYPE_EXIT=exit # exit the program
+    LOGTYPE_FAIL=fail # any recorder fail
     LOGTYPE_SIGNAL=signal # a handled signal
+    LOGTYPE_EXIT=exit # exit the program
     # command log types
     LOGTYPE_LIST=list # list command
     LOGTYPE_CLEAN=clean # clean command
@@ -215,7 +216,7 @@ clean_cache() {
         if rm_rf_dir_check "$CACHE_REPO_DIR"; then
             rm -rf -- "${CACHE_REPO_DIR:?}"/
         else
-            echo 'prevent removing the root directory' >&2
+            echof 'prevent removing the root directory'
             return 1
         fi
     fi
@@ -328,7 +329,7 @@ init_database() {
 
     # check access to GitPack status file
     if [ ! -r "$STATUS_PATH" ] || [ ! -w "$STATUS_PATH" ]; then
-        echo "cannot access $STATUS_PATH file" >&2
+        echof "cannot access $STATUS_PATH file"
         return 1
     fi
 }
@@ -359,6 +360,16 @@ log() {
     echo "$date_out [$logtype]$details" >> "$LOG_PATH"
 }
 
+# DESCRIPTION:
+#   Logs the exact output of the echo based on the given parameters as a fail to
+#   the GitPack log file and prints them as well to the standard error stream.
+# PARAMETERS:
+#   $@ - echo parameters
+echof() {
+    log "$LOGTYPE_FAIL" "$@" && # log the fail
+    echo "$@" >&2 # print the fail
+}
+
 #-------------------------------------------------------------------------------
 # ACTION PROCESSING
 #-------------------------------------------------------------------------------
@@ -379,7 +390,7 @@ process_action() {
         check_url "$url" &&
 
         # prepare Git repository
-        clone_repo "$url" &&
+        #clone_repo "$url" &&
 
         # execute the action itself
         execute_action "$1" "$url" "$version"
@@ -422,7 +433,7 @@ check_url() {
     url_regex='^[[:alnum:]_][[:alnum:]_\.-]*(/[[:alnum:]_][[:alnum:]_\.-]*){2}$'
 
     if ! echo "$1" | grep -q -E "$url_regex"; then
-        echo 'unsupported URL delivered' >&2
+        echof 'unsupported URL delivered'
         return 1
     fi
 }
@@ -593,7 +604,7 @@ next_dep_depth() {
 
     # check whether the new dependency depth value is valid
     if [ "$dep_depth" -gt "$MAX_DEP_DEPTH" ]; then
-        echo 'maximum dependency depth reached' >&2
+        echof 'maximum dependency depth reached'
         return 1
     fi
 }
@@ -805,9 +816,9 @@ run_control_script() {
 
     timeout_status="$?" # store the failed exit status of the timeout
     if [ "$timeout_status" -gt 128 ]; then # if SIGCHLD exit status
-        echo "$(basename "$1") script timed out" >&2
+        echof "$(basename "$1") script timed out"
     else # if a failed script execution exit status
-        echo "$(basename "$1") script execution failed" >&2
+        echof "$(basename "$1") script execution failed"
     fi
     return "$timeout_status" # propagate the error further
 }
@@ -862,7 +873,7 @@ for_each_route() {
             done
         fi
     else # if the map file does not exist, fails
-        echo 'missing map file' >&2
+        echof 'missing map file'
         return 1
     fi
 }
