@@ -568,18 +568,25 @@ get_deps() { (
     # if there is a file describing dependencies
     if [ -r .gitpack/deps ]; then
         log "$LOGTYPE_DEPS" "$2" "$3" &&
-        # remove empty and comment lines
-        {   grep '^[^#]' .gitpack/deps
-            grep_status="$?" # store exit status of the grep
-
-            # an empty grep selection is not a fail in this case
-            if [ "$grep_status" -le 1 ]; then
-                grep_status=0
-            fi
-            return "$grep_status"
-        }
+        grepe '^[^#]' .gitpack/deps # remove empty and comment lines
     fi
 ) }
+
+# DESCRIPTION:
+#   This function is a grep wrapper. Succeeds even in the case of an empty grep
+#   selection.
+# PARAMETERS:
+#   $@ - grep arguments
+grepe() {
+    grep "$@" # execute the grep itself
+    grep_status="$?" # store its exit status
+
+    # suppress the empty selection error indicator (exit status of 1)
+    if [ "$grep_status" -eq 1 ]; then
+        grep_status=0
+    fi
+    return "$grep_status" # return the modified exit status
+}
 
 #-------------------------------------------------------------------------------
 # ACTION EXECUTION
@@ -674,16 +681,9 @@ is_ancestor_commit() { (
 # PARAMETERS:
 #   $1 - URL
 get_db_record() {
-    log "$LOGTYPE_GET" "$1" "$STATUS_PATH" || return
-    grep_out="$(grep -F "$1" "$STATUS_PATH")"
-    grep_status="$?" # store exit status of the grep
-
-    # if there is no error, return the first line of the grep output
-    if [ "$grep_status" -le 1 ]; then
-        echo "$grep_out" | head -n 1
-    else # propagate any other error further
-        return "$grep_status"
-    fi
+    log "$LOGTYPE_GET" "$1" "$STATUS_PATH" &&
+    grepe_out="$(grepe -F "$1" "$STATUS_PATH")" &&
+    echo "$grepe_out" | head -n 1
 }
 
 # DESCRIPTION:
@@ -701,16 +701,9 @@ insert_db_record() {
 # PARAMETERS:
 #   $1 - URL
 delete_db_records() {
-    log "$LOGTYPE_DELETE" "$1" "$STATUS_PATH" || return
-    grep_out="$(grep -F -v "$1" "$STATUS_PATH")"
-    grep_status="$?" # store exit status of the grep
-
-    # an empty grep selection is not a fail in this case
-    if [ "$grep_status" -le 1 ]; then
-        echo "$grep_out" > "$STATUS_PATH"
-    else # propagate any other error further
-        return "$grep_status"
-    fi
+    log "$LOGTYPE_DELETE" "$1" "$STATUS_PATH" &&
+    grepe_out="$(grepe -F -v "$1" "$STATUS_PATH")" &&
+    echo "$grepe_out" > "$STATUS_PATH"
 }
 
 #-------------------------------------------------------------------------------
@@ -851,18 +844,12 @@ timeout_term_action() {
 #   $2 - function name
 for_each_route() {
     if [ -r "$1" ]; then # check whether the map file exists
-        grep_out="$(grep '^[^#]' "$1")" # remove empty and comment lines
-        grep_status="$?" # store exit status of the grep
-
-        if [ "$grep_status" -le 1 ]; then # empty selection is a not a fail here
-            if [ "$grep_out" ]; then # if there are any routes in the path file
-                # call a given function for each route
-                echo "$grep_out" | while read -r route; do
-                    eval "$2" "$route" || return
-                done
-            fi
-        else # propagate any other error further
-            return "$grep_status"
+        grepe_out="$(grepe '^[^#]' "$1")" && # remove empty and comment lines
+        if [ "$grepe_out" ]; then # if there are any routes in the path file
+            # call a given function for each route
+            echo "$grepe_out" | while read -r route; do
+                eval "$2" "$route" || return
+            done
         fi
     else # if the map file does not exist, fails
         echo 'missing map file' >&2
