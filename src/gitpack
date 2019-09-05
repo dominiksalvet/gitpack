@@ -145,6 +145,7 @@ init_configuration() {
     COMMAND="$0 $*" # the complete current GitPack command
     LOG_LINES_KEPT=1000 # when shortening the log file, keep those last lines
     SCRIPT_TIMEOUT=3600 # timeout in seconds used when calling custom scripts
+    MAX_DEP_DEPTH=100 # max depth of dependencies, prevent cyclic dependencies
 }
 
 #-------------------------------------------------------------------------------
@@ -271,15 +272,11 @@ init_global_vars() {
     else
         access=local
     fi &&
+    system="$(uname)" && # get the current system name
 
-    # get the current system name
-    system="$(uname)" &&
-
-    # the state of the processed project
-    state= &&
-
-    # prefix of the report of processed projects
-    report_prefix=
+    state= && # the state of the processed project
+    report_prefix= && # prefix of the report of processed projects
+    dep_depth=0 # current dependency depth
 }
 
 # DESCRIPTION:
@@ -535,24 +532,24 @@ repo_cd() {
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   Processes given dependencies considering the given action. Dependencies are
-#   obtained from a repository file of the given project URL.
+#   Processes all dependencies of a given project considering the given action.
+#   It also checks whether a defined dependency depth was not exceeded.
 # PARAMETERS:
 #   $1 - action
 #   $2 - URL
 #   $3 - commit
 process_deps() {
-    # early return in the uninstall case
     if [ "$1" = "$ACTION_UNINSTALL" ]; then
-        return 0
+        return 0 # early return in the uninstall case
     fi
 
     deps="$(get_deps "$2" "$3")" && # get all dependencies
     if [ "$deps" ]; then # if there are any
         # run the given action recursively for each dependency reference
-        echo "$deps" | while read -r dep; do
-            # run each action in a separate subshell
-            ( report_prefix='+ ' process_action "$1" "$dep" ) || return
+        echo "$deps" | while read -r dep; do # run them in separate subshells
+            (   next_dep_depth && # register a new dependency depth level
+                process_action "$1" "$dep"
+            ) || return
         done
     fi
 }
@@ -585,6 +582,20 @@ grepe() {
         grep_status=0
     fi
     return "$grep_status" # return the modified exit status
+}
+
+# DESCRIPTION:
+#   Prepares the environment for a new dependency depth level. It also checks
+#   whether it is possible to continue processing dependencies.
+next_dep_depth() {
+    report_prefix='+ '
+    dep_depth=$((dep_depth + 1)) # increment dependency depth
+
+    # check whether the new dependency depth value is valid
+    if [ "$dep_depth" -gt "$MAX_DEP_DEPTH" ]; then
+        echo 'maximum dependency depth exceeded' >&2
+        return 1
+    fi
 }
 
 #-------------------------------------------------------------------------------
