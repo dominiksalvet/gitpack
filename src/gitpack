@@ -563,7 +563,7 @@ get_deps() { (
     repo_cd "$1" "$2" &&
     # if there is a file describing dependencies
     if [ -r .gitpack/deps ]; then
-        log "$LOGTYPE_DEPS" "$2" "$3" &&
+        log "$LOGTYPE_DEPS" "$1" "$2" &&
         grepe '^[^#]' .gitpack/deps # remove empty and comment lines
     fi
 ) }
