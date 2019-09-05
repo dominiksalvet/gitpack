@@ -593,7 +593,7 @@ next_dep_depth() {
 
     # check whether the new dependency depth value is valid
     if [ "$dep_depth" -gt "$MAX_DEP_DEPTH" ]; then
-        echo 'maximum dependency depth exceeded' >&2
+        echo 'maximum dependency depth reached' >&2
         return 1
     fi
 }
