@@ -361,13 +361,13 @@ log() {
 }
 
 # DESCRIPTION:
-#   Logs the exact output of the echo based on the given parameters as a fail to
-#   the GitPack log file and prints them as well to the standard error stream.
+#   Prints given echo arguments to standard error stream and logs the same into
+#   the GitPack log file as a fail.
 # PARAMETERS:
-#   $@ - echo parameters
+#   $@ - echo arguments
 echof() {
-    log "$LOGTYPE_FAIL" "$@" && # log the fail
     echo "$@" >&2 # print the fail
+    log "$LOGTYPE_FAIL" "$@" # log the fail
 }
 
 #-------------------------------------------------------------------------------
