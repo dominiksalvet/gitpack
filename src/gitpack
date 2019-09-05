@@ -275,7 +275,7 @@ init_global_vars() {
     system="$(uname)" && # get the current system name
 
     state= && # the state of the processed project
-    report_prefix= && # prefix of the report of processed projects
+    dep_prefix= && # prefix for processing dependencies
     dep_depth=0 # current dependency depth
 }
 
@@ -386,7 +386,7 @@ process_action() {
     } || {
         # all possible errors during action processing are caught here
         action_status="$?" # store the action exit status
-        echo "${report_prefix}<ERROR> $1 $2" >&2 # report GitPack information
+        echo "${dep_prefix}<ERROR> $1 $2" >&2 # report GitPack information
         return "$action_status" # propagate the status further
     }
 }
@@ -588,7 +588,7 @@ grepe() {
 #   Prepares the environment for a new dependency depth level. It also checks
 #   whether it is possible to continue processing dependencies.
 next_dep_depth() {
-    report_prefix='+ '
+    dep_prefix='+ ' # set up the prefix to make the GitPack report more clear
     dep_depth=$((dep_depth + 1)) # increment dependency depth
 
     # check whether the new dependency depth value is valid
@@ -919,7 +919,7 @@ remove_files() {
 #   $4 - target commit
 print_report() {
     # prepare given arguments
-    prefix="${report_prefix}[$1] $2" &&
+    prefix="${dep_prefix}[$1] $2" &&
     src_version="$(beautify_hash "$2" "$3")" &&
     tar_version="$(beautify_hash "$2" "$4")" &&
 
