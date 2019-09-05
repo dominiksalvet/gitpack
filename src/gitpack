@@ -144,8 +144,8 @@ https://github.com/dominiksalvet/gitpack'
 init_configuration() {
     COMMAND="$0 $*" # the complete current GitPack command
     LOG_LINES_KEPT=1000 # when shortening the log file, keep those last lines
-    SCRIPT_TIMEOUT=3600 # timeout in seconds used when calling custom scripts
-    MAX_DEP_DEPTH=100 # max depth of dependencies, prevent cyclic dependencies
+    SCRIPT_TIMEOUT=900 # timeout in seconds used when calling custom scripts
+    MAX_DEP_DEPTH=20 # max depth of dependencies, prevent cyclic dependencies
 }
 
 #-------------------------------------------------------------------------------
