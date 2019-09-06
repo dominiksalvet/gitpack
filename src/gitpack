@@ -272,7 +272,11 @@ init_runtime() {
 init_global_vars() {
     id_out="$(id -u)" && # check if running as root, not a global variable
     # based on previous result, set up the access level
-    { test "$id_out" -eq 0 && access=global || access=local; } &&
+    if [ "$id_out" -eq 0 ]; then
+        access=global
+    else
+        access=local
+    fi &&
     system="$(uname)" && # get the current system name
 
     state= && # the state of the processed project
