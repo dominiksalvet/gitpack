@@ -818,9 +818,9 @@ run_control_script() {
     if [ "$timeout_status" -gt 128 ]; then # if SIGCHLD exit status
         echof "$(basename "$1") script timed out"
     else # if a failed script execution exit status
-        echof "$(basename "$1") script execution failed"
+        echof "$(basename "$1") script execution failed with $timeout_status"
     fi
-    return "$timeout_status" # propagate the error further
+    return 1 # indicate error but do not propagate the exit status further
 }
 
 # DESCRIPTION:
