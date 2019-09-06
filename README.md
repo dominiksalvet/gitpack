@@ -7,11 +7,11 @@
 
 <p align="center">
     <a href="https://github.com/dominiksalvet/gitpack">
-        <img src="https://img.shields.io/badge/Git-Pack-571997.svg" alt="GitPack"></a>
+        <img src="https://img.shields.io/badge/Git-Pack-571997" alt="GitPack"></a>
     <a href="https://reuse.software">
         <img src="https://reuse.software/badge/reuse-compliant.svg" alt="reuse compliant"></a>
     <a href="https://github.com/RichardLitt/standard-readme">
-        <img src="https://img.shields.io/badge/readme_style-standard-brightgreen.svg" alt="standard-readme compliant"></a>
+        <img src="https://img.shields.io/badge/readme_style-standard-brightgreen" alt="standard-readme compliant"></a>
     <a href="https://travis-ci.com/dominiksalvet/gitpack">
         <img src="https://travis-ci.com/dominiksalvet/gitpack.svg?branch=master" alt="Build Status"></a>
     <a href="https://discord.gg/BE45Y4j">
@@ -121,12 +121,12 @@ Not sure? Take a look at [*.gitpack*](.gitpack) directory of GitPack itself. It 
 
 GitPack projects work best with the following badge:
 
-[![GitPack](https://img.shields.io/badge/Git-Pack-571997.svg)](https://github.com/dominiksalvet/gitpack)
+[![GitPack](https://img.shields.io/badge/Git-Pack-571997)](https://github.com/dominiksalvet/gitpack)
 
 Markdown:
 
 ```markdown
-[![GitPack](https://img.shields.io/badge/Git-Pack-571997.svg)](https://github.com/dominiksalvet/gitpack)
+[![GitPack](https://img.shields.io/badge/Git-Pack-571997)](https://github.com/dominiksalvet/gitpack)
 ```
 
 ## Thanks
