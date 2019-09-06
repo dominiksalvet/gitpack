@@ -107,6 +107,9 @@ init_constants() {
     LOGTYPE_PRERM=prerm # prerm script execution
     LOGTYPE_RM=rm # remove files using map
     LOGTYPE_POSTRM=postrm # postrm script execution
+
+    # other constants
+    SIGCHLD_EXIT_STATUS=145 # SIGCHLD number is 17, signals exit with 128+n
 }
 
 # DESCRIPTION:
@@ -807,7 +810,7 @@ install_method_to_path() {
 
 # DESCRIPTION:
 #   Runs a given control script of a GitPack project with a timeout. In case of
-#   timed out or a script fail, it prints an error report.
+#   a timeout or a script fail, it prints an error report.
 # PARAMETERS:
 #   $1 - control script path
 run_control_script() {
@@ -815,9 +818,10 @@ run_control_script() {
     return # return early if the script returned successfully and not timed out
 
     timeout_status="$?" # store the failed exit status of the timeout
-    if [ "$timeout_status" -gt 128 ]; then # if SIGCHLD exit status
+    # exit status of the SIGCHLD signal indicates a timeout
+    if [ "$timeout_status" -eq "$SIGCHLD_EXIT_STATUS" ]; then
         echof "$(basename "$1") script timed out"
-    else # if a failed script execution exit status
+    else # otherwise, script execution failed with the given exit status
         echof "$(basename "$1") script execution failed with $timeout_status"
     fi
     return 1 # indicate error but do not propagate the exit status further
