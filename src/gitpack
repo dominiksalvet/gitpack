@@ -147,6 +147,7 @@ https://github.com/dominiksalvet/gitpack'
 #   $@ - GitPack arguments
 init_configuration() {
     COMMAND="$0 $*" # the complete current GitPack command
+
     LOG_LINES_KEPT=1000 # when shortening the log file, keep those last lines
     SCRIPT_TIMEOUT=900 # timeout in seconds used when calling custom scripts
     MAX_DEP_DEPTH=20 # max depth of dependencies, prevent cyclic dependencies
@@ -269,13 +270,9 @@ init_runtime() {
 #   Initializes global variables. If there is a global variable, it must be
 #   stated here even though its value is going to be overwritten.
 init_global_vars() {
-    # check if running as root and set up access level
-    id_out="$(id -u)" && # not a global variable
-    if [ "$id_out" -eq 0 ]; then
-        access=global
-    else
-        access=local
-    fi &&
+    id_out="$(id -u)" && # check if running as root, not a global variable
+    # based on previous result, set up the access level
+    { test "$id_out" -eq 0 && access=global || access=local; } &&
     system="$(uname)" && # get the current system name
 
     state= && # the state of the processed project
