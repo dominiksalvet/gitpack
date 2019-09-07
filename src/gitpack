@@ -25,8 +25,7 @@ main() {
     init_constants &&
     init_strings &&
     init_configuration "$@" &&
-    process_args "$@" && # process all given GitPack arguments
-    backup_database # if success, back up the GitPack database
+    process_args "$@" # process all given GitPack arguments
 }
 
 #-------------------------------------------------------------------------------
@@ -166,20 +165,17 @@ init_configuration() {
 process_args() {
     case "$1" in # process arguments based on the first argument
         "$ACTION_INSTALL" | "$ACTION_UNINSTALL" | "$ACTION_STATUS")
-            if [ "$#" -eq 1 ]; then # check if there is any reference argument
-                echo 'no URL provided' >&2
-                return 1
-            fi
-            init_runtime && # initialize runtime
             process_action_args "$@" # process action-based arguments
             ;;
         list) init_runtime && list_installed ;;
         clean) init_runtime && clean_cache ;;
-        help) echo "$HELP_MESSAGE" ;;
-        about) echo "$ABOUT_MESSAGE" ;;
+        help) echo "$HELP_MESSAGE"; return ;;
+        about) echo "$ABOUT_MESSAGE"; return ;;
         '') echo 'no argument provided' >&2; return 1 ;;
         *) echo "unrecognized argument $1" >&2; return 1 ;;
-    esac
+    esac &&
+
+    backup_database # if success, back up the GitPack database
 }
 
 # DESCRIPTION:
@@ -188,6 +184,12 @@ process_args() {
 #   $1 - action
 #   $2.. - references
 process_action_args() {
+    if [ "$#" -eq 1 ]; then # check if there is any reference argument
+        echo 'no URL provided' >&2
+        return 1
+    fi
+
+    init_runtime && # initialize runtime
     action="$1" && # use the given action
     shift && # shift arguments to references
     for ref in "$@"; do # process each reference individually with common action
