@@ -11,6 +11,7 @@ The changes not yet present in any release are listed in this section.
 ### Added
 
 * A simple mechanism for cyclic dependencies prevention has been added.
+* GitPack now keeps one backup copy of *status* file and recovers from it when *status* file does not exist.
 
 ### Changed
 

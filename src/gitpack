@@ -25,7 +25,8 @@ main() {
     init_constants &&
     init_strings &&
     init_configuration "$@" &&
-    process_args "$@"
+    process_args "$@" && # process all given GitPack arguments
+    backup_database # if success, back up the GitPack database
 }
 
 #-------------------------------------------------------------------------------
@@ -83,6 +84,7 @@ init_constants() {
 
     # global log types
     LOGTYPE_INIT=init # logging initialization
+    LOGTYPE_BACKUP=backup # backup status file
     LOGTYPE_FAIL=fail # any recorder fail
     LOGTYPE_SIGNAL=signal # a handled signal
     LOGTYPE_EXIT=exit # exit the program
@@ -289,16 +291,16 @@ init_global_vars() {
 #   not be changed later.
 init_paths() {
     if [ "$access" = global ]; then
+        LOG_PATH=/var/log/gitpack.log
         CACHE_DIR=/var/cache/gitpack
         DB_DIR=/var/lib/gitpack
-        LOG_PATH=/var/log/gitpack.log
+        STATUS_BAK_PATH=/var/backups/gitpack/status.bak
     else
+        LOG_PATH="$HOME"/.local/share/gitpack.log
         CACHE_DIR="${HOME:?}"/.cache/gitpack
         DB_DIR="$HOME"/.local/share/gitpack
-        LOG_PATH="$HOME"/.local/share/gitpack.log
+        STATUS_BAK_PATH="$HOME"/.local/share/gitpack/status.bak
     fi
-
-    # derived paths
     CACHE_REPO_DIR="$CACHE_DIR"/repo # cache for Git repositories
     STATUS_PATH="$DB_DIR"/status # database of installed projects
 }
@@ -327,8 +329,12 @@ init_database() {
     # create GitPack status file if it does not exist
     if [ ! -e "$STATUS_PATH" ]; then
         dirname_out="$(dirname "$STATUS_PATH")" &&
-        mkdir -p "$dirname_out"/ &&
-        touch "$STATUS_PATH"
+        mkdir -p "$dirname_out"/ && # make sure that the target directory exits
+        if [ -r "$STATUS_BAK_PATH" ]; then # if there is a status file backup
+            cp "$STATUS_BAK_PATH" "$STATUS_PATH" # recover from the backup
+        else
+            touch "$STATUS_PATH" # create a new status file
+        fi
     fi &&
 
     # check access to GitPack status file
@@ -969,6 +975,19 @@ beautify_hash() { (
         echo "$2" | cut -c 1-7
     fi
 ) }
+
+#-------------------------------------------------------------------------------
+# STATUS FILE BACKUP
+#-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Backs up the GitPack database by copying it to a different path.
+backup_database() {
+    log "$LOGTYPE_BACKUP" "$STATUS_PATH" "$STATUS_BAK_PATH" &&
+    dirname_out="$(dirname "$STATUS_BAK_PATH")" &&
+    mkdir -p "$dirname_out"/ && # make sure that the target directory exits
+    cp "$STATUS_PATH" "$STATUS_BAK_PATH"
+}
 
 #-------------------------------------------------------------------------------
 # ENTRY POINT CALLING
