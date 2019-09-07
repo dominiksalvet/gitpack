@@ -28,10 +28,6 @@ main() {
     process_args "$@" # process all given GitPack arguments
 }
 
-#-------------------------------------------------------------------------------
-# SOFTWARE DEPENDENCIES
-#-------------------------------------------------------------------------------
-
 # DESCRIPTION:
 #   Checks whether all software dependencies are satisfied.
 check_sw_deps() {
@@ -198,59 +194,13 @@ process_action_args() {
 }
 
 # DESCRIPTION:
-#   Outputs all installed Git projects and their version or commit hash.
-list_installed() {
-    log "$LOGTYPE_LIST" "$STATUS_PATH" &&
-    while read -r db_record; do
-        url="${db_record%% *}" # extract URL
-        version="${db_record#* }" # extract commit hash
-        version="$(beautify_hash "$url" "$version")" && # try to beautify it
-        echo "$url $version" || return
-    done < "$STATUS_PATH"
+#   Backs up the GitPack database by copying it to a different path.
+backup_database() {
+    log "$LOGTYPE_BACKUP" "$STATUS_PATH" "$STATUS_BAK_PATH" &&
+    dirname_out="$(dirname "$STATUS_BAK_PATH")" &&
+    mkdir -p "$dirname_out"/ && # make sure that the target directory exits
+    cp "$STATUS_PATH" "$STATUS_BAK_PATH"
 }
-
-# DESCRIPTION:
-#   Cleans the GitPack cache and log performing checks for unintended removal.
-clean_cache() {
-    # log clean operation, creates a log file if it does not exit
-    log "$LOGTYPE_CLEAN" "$CACHE_REPO_DIR"/ &&
-
-    # clean log shortening it to a defined number of last lines
-    tail_out="$(tail -n "$LOG_LINES_KEPT" "$LOG_PATH")" &&
-    echo "$tail_out" > "$LOG_PATH" && # write changes back to the log file
-
-    # clean Git repository cache
-    if [ -d "${CACHE_REPO_DIR:?}"/ ]; then # check if cache exists
-        if rm_rf_dir_check "$CACHE_REPO_DIR"; then
-            rm -rf -- "${CACHE_REPO_DIR:?}"/
-        else
-            echof 'prevent removing the root directory'
-            return 1
-        fi
-    fi
-}
-
-# DESCRIPTION:
-#   Checks whether it is possible to recursively remove a given directory. It
-#   prevents from removing the root and home directories. This function uses
-#   only the first parameter due to possible unintended globbing.
-# PARAMETERS:
-#   $1 - directory
-rm_rf_dir_check() { (
-    test "$1" && # the directory path must not be empty
-    cd -- "$1"/ 2>/dev/null && # fails if the given directory doesn't exist
-    pwd_out="$(pwd -P)" && # store physical path of the current directory
-
-    # check for the root directory
-    test "$PWD" != / &&
-    test "$pwd_out" != / &&
-    test "$PWD" != // && # two slashes may not be shortened to a single slash
-    test "$pwd_out" != // &&
-
-    # check for home directory
-    test "$PWD" != "$HOME" &&
-    test "$pwd_out" != "$HOME"
-) }
 
 #-------------------------------------------------------------------------------
 # DYNAMIC INITIALIZATION
@@ -381,6 +331,65 @@ echof() {
     echo "$@" >&2 # print the fail
     log "$LOGTYPE_FAIL" "$@" # log the fail
 }
+
+#-------------------------------------------------------------------------------
+# COMMAND PROCESSING
+#-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Outputs all installed Git projects and their version or commit hash.
+list_installed() {
+    log "$LOGTYPE_LIST" "$STATUS_PATH" &&
+    while read -r db_record; do
+        url="${db_record%% *}" # extract URL
+        version="${db_record#* }" # extract commit hash
+        version="$(beautify_hash "$url" "$version")" && # try to beautify it
+        echo "$url $version" || return
+    done < "$STATUS_PATH"
+}
+
+# DESCRIPTION:
+#   Cleans the GitPack cache and log performing checks for unintended removal.
+clean_cache() {
+    # log clean operation, creates a log file if it does not exit
+    log "$LOGTYPE_CLEAN" "$CACHE_REPO_DIR"/ &&
+
+    # clean log shortening it to a defined number of last lines
+    tail_out="$(tail -n "$LOG_LINES_KEPT" "$LOG_PATH")" &&
+    echo "$tail_out" > "$LOG_PATH" && # write changes back to the log file
+
+    # clean Git repository cache
+    if [ -d "${CACHE_REPO_DIR:?}"/ ]; then # check if cache exists
+        if rm_rf_dir_check "$CACHE_REPO_DIR"; then
+            rm -rf -- "${CACHE_REPO_DIR:?}"/
+        else
+            echof 'prevent removing the root directory'
+            return 1
+        fi
+    fi
+}
+
+# DESCRIPTION:
+#   Checks whether it is possible to recursively remove a given directory. It
+#   prevents from removing the root and home directories. This function uses
+#   only the first parameter due to possible unintended globbing.
+# PARAMETERS:
+#   $1 - directory
+rm_rf_dir_check() { (
+    test "$1" && # the directory path must not be empty
+    cd -- "$1"/ 2>/dev/null && # fails if the given directory doesn't exist
+    pwd_out="$(pwd -P)" && # store physical path of the current directory
+
+    # check for the root directory
+    test "$PWD" != / &&
+    test "$pwd_out" != / &&
+    test "$PWD" != // && # two slashes may not be shortened to a single slash
+    test "$pwd_out" != // &&
+
+    # check for home directory
+    test "$PWD" != "$HOME" &&
+    test "$pwd_out" != "$HOME"
+) }
 
 #-------------------------------------------------------------------------------
 # ACTION PROCESSING
@@ -706,40 +715,6 @@ is_ancestor_commit() { (
 ) }
 
 #-------------------------------------------------------------------------------
-# DATABASE OPERATIONS
-#-------------------------------------------------------------------------------
-
-# DESCRIPTION:
-#   Selects the first record matching the given URL from the GitPack database.
-# PARAMETERS:
-#   $1 - URL
-get_db_record() {
-    log "$LOGTYPE_GET" "$1" "$STATUS_PATH" &&
-    grepe_out="$(grepe -F "$1" "$STATUS_PATH")" &&
-    echo "$grepe_out" | head -n 1
-}
-
-# DESCRIPTION:
-#   Inserts a given installation record into the GitPack database.
-# PARAMETERS:
-#   $1 - URL
-#   $2 - commit hash
-insert_db_record() {
-    log "$LOGTYPE_INSERT" "$1" "$2" "$STATUS_PATH" &&
-    echo "$1 $2" >> "$STATUS_PATH"
-}
-
-# DESCRIPTION:
-#   Deletes all installation records with given URL from the GitPack database.
-# PARAMETERS:
-#   $1 - URL
-delete_db_records() {
-    log "$LOGTYPE_DELETE" "$1" "$STATUS_PATH" &&
-    grepe_out="$(grepe -F -v "$1" "$STATUS_PATH")" &&
-    echo "$grepe_out" > "$STATUS_PATH"
-}
-
-#-------------------------------------------------------------------------------
 # INSTALLATION AND UNINSTALLATION
 #-------------------------------------------------------------------------------
 
@@ -931,6 +906,40 @@ remove_files() {
 }
 
 #-------------------------------------------------------------------------------
+# DATABASE OPERATIONS
+#-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Selects the first record matching the given URL from the GitPack database.
+# PARAMETERS:
+#   $1 - URL
+get_db_record() {
+    log "$LOGTYPE_GET" "$1" "$STATUS_PATH" &&
+    grepe_out="$(grepe -F "$1" "$STATUS_PATH")" &&
+    echo "$grepe_out" | head -n 1
+}
+
+# DESCRIPTION:
+#   Inserts a given installation record into the GitPack database.
+# PARAMETERS:
+#   $1 - URL
+#   $2 - commit hash
+insert_db_record() {
+    log "$LOGTYPE_INSERT" "$1" "$2" "$STATUS_PATH" &&
+    echo "$1 $2" >> "$STATUS_PATH"
+}
+
+# DESCRIPTION:
+#   Deletes all installation records with given URL from the GitPack database.
+# PARAMETERS:
+#   $1 - URL
+delete_db_records() {
+    log "$LOGTYPE_DELETE" "$1" "$STATUS_PATH" &&
+    grepe_out="$(grepe -F -v "$1" "$STATUS_PATH")" &&
+    echo "$grepe_out" > "$STATUS_PATH"
+}
+
+#-------------------------------------------------------------------------------
 # STATE REPORT
 #-------------------------------------------------------------------------------
 
@@ -977,19 +986,6 @@ beautify_hash() { (
         echo "$2" | cut -c 1-7
     fi
 ) }
-
-#-------------------------------------------------------------------------------
-# STATUS FILE BACKUP
-#-------------------------------------------------------------------------------
-
-# DESCRIPTION:
-#   Backs up the GitPack database by copying it to a different path.
-backup_database() {
-    log "$LOGTYPE_BACKUP" "$STATUS_PATH" "$STATUS_BAK_PATH" &&
-    dirname_out="$(dirname "$STATUS_BAK_PATH")" &&
-    mkdir -p "$dirname_out"/ && # make sure that the target directory exits
-    cp "$STATUS_PATH" "$STATUS_BAK_PATH"
-}
 
 #-------------------------------------------------------------------------------
 # ENTRY POINT CALLING
