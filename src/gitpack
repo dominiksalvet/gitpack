@@ -243,12 +243,12 @@ init_global_vars() {
 #   not be changed later.
 init_paths() {
     if [ "$access" = global ]; then
-        LOG_PATH=/var/log/gitpack.log
+        LOG_PATH=/var/log/gitpack/gitpack.log
         CACHE_DIR=/var/cache/gitpack
         DB_DIR=/var/lib/gitpack
         STATUS_BAK_PATH=/var/backups/gitpack/status.bak
     else
-        LOG_PATH="$HOME"/.local/share/gitpack.log
+        LOG_PATH="$HOME"/.local/share/gitpack/gitpack.log
         CACHE_DIR="${HOME:?}"/.cache/gitpack
         DB_DIR="$HOME"/.local/share/gitpack
         STATUS_BAK_PATH="$HOME"/.local/share/gitpack/status.bak
