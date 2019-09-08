@@ -13,7 +13,7 @@ jobs:
     - stage: Initialization
       name: Scripts
       before_script: shellcheck --version
-      script: shellcheck .travis/*.sh
+      script: shellcheck .ci/*.sh
 
     - stage: Checks
       name: Static analysis
@@ -21,7 +21,7 @@ jobs:
       script: shellcheck src/gitpack
 
     - name: Code style
-      script: .travis/checks-code-style.sh
+      script: .ci/checks-code-style.sh
 
     - name: Licensing
       services: docker
@@ -31,20 +31,20 @@ jobs:
 
     - stage: Installation
       name: Global
-      script: .travis/installation-global.sh
+      script: .ci/installation-global.sh
 
     - name: Local
-      script: .travis/installation-local.sh
+      script: .ci/installation-local.sh
 
     - stage: Tests
       name: Execution
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: .travis/tests-execution.sh
+      script: .ci/tests-execution.sh
 
     - name: Usage
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: .travis/tests-usage.sh
+      script: .ci/tests-usage.sh
 
     - name: Logging
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: .travis/tests-logging.sh
+      script: .ci/tests-logging.sh
