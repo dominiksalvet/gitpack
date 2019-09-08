@@ -242,19 +242,24 @@ init_global_vars() {
 #   Initializes all GitPack-specific paths. They must start with '/' and must
 #   not be changed later.
 init_paths() {
+    # initialize directory paths
     if [ "$access" = global ]; then
-        LOG_PATH=/var/log/gitpack/gitpack.log
+        LOG_DIR=/var/log/gitpack
         CACHE_DIR=/var/cache/gitpack
         DB_DIR=/var/lib/gitpack
-        STATUS_BAK_PATH=/var/backups/gitpack/status.bak
+        BACKUP_DIR=/var/backups/gitpack
     else
-        LOG_PATH="$HOME"/.local/share/gitpack/gitpack.log
-        CACHE_DIR="${HOME:?}"/.cache/gitpack
+        LOG_DIR="${HOME:?}"/.local/share/gitpack
+        CACHE_DIR="$HOME"/.cache/gitpack
         DB_DIR="$HOME"/.local/share/gitpack
-        STATUS_BAK_PATH="$HOME"/.local/share/gitpack/status.bak
+        BACKUP_DIR="$HOME"/.local/share/gitpack
     fi
+
+    # initialize derived paths
+    LOG_PATH="$LOG_DIR"/gitpack.log # the execution log file
     CACHE_REPO_DIR="$CACHE_DIR"/repo # cache for Git repositories
     STATUS_PATH="$DB_DIR"/status # database of installed projects
+    STATUS_BAK_PATH="$BACKUP_DIR"/status.back # the database backup
 }
 
 # DESCRIPTION:
