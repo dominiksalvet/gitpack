@@ -32,9 +32,8 @@ main() {
 #   Checks whether all software dependencies are satisfied.
 check_sw_deps() {
     # a list of required software
-    sw_deps='command echo [ cd test pwd rm id mkdir touch dirname grep git ls
-             uname read cp head cut true basename find rmdir tr date tail kill
-             sleep wait'
+    sw_deps='command echo [ cd test pwd rm id mkdir touch grep git ls uname read
+             cp head cut true basename find rmdir tr date tail kill sleep wait'
 
     # check if any piece of software is missing
     for sw_dep in $sw_deps; do
@@ -197,8 +196,6 @@ process_action_args() {
 #   Backs up the GitPack database by copying it to a different path.
 backup_database() {
     log "$LOGTYPE_BACKUP" "$STATUS_PATH" "$STATUS_BAK_PATH" &&
-    dirname_out="$(dirname "$STATUS_BAK_PATH")" &&
-    mkdir -p "$dirname_out"/ && # make sure that the target directory exits
     cp "$STATUS_PATH" "$STATUS_BAK_PATH"
 }
 
@@ -215,6 +212,8 @@ backup_database() {
 init_runtime() {
     init_global_vars &&
     init_paths &&
+    # create directories based on the initialized paths
+    mkdir -p "$LOG_DIR"/ "$CACHE_DIR"/ "$DB_DIR"/ "$BACKUP_DIR"/ &&
     log "$LOGTYPE_INIT" "$COMMAND" && # initialize logging
     init_traps &&
     init_database
@@ -279,14 +278,12 @@ term_action() {
 }
 
 # DESCRIPTION:
-#   Initializes GitPack's file structure including the check of its database
-#   based on prepared global variables. It fails if it cannot create a file or
-#   a directory or if GitPack does not have read or write permissions.
+#   Initializes GitPack database file structure based on prepared global
+#   variables. It fails if it cannot create a file or if GitPack does not have
+#   read or write permissions.
 init_database() {
     # create GitPack status file if it does not exist
     if [ ! -e "$STATUS_PATH" ]; then
-        dirname_out="$(dirname "$STATUS_PATH")" &&
-        mkdir -p "$dirname_out"/ && # make sure that the target directory exits
         if [ -r "$STATUS_BAK_PATH" ]; then # if there is a status file backup
             cp "$STATUS_BAK_PATH" "$STATUS_PATH" # recover from the backup
         else
@@ -356,7 +353,7 @@ list_installed() {
 # DESCRIPTION:
 #   Cleans the GitPack cache and log performing checks for unintended removal.
 clean_cache() {
-    # log clean operation, creates a log file if it does not exit
+    # log clean operation, also creates a log file if it does not exit
     log "$LOGTYPE_CLEAN" "$CACHE_REPO_DIR"/ &&
 
     # clean log shortening it to a defined number of last lines
