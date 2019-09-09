@@ -109,7 +109,7 @@ echo test67 >&2 && test "$(grep -c '\[delete\]' "$HOME"/.local/share/gitpack/git
 echo test68 >&2 && test "$(wc -l < "$HOME"/.local/share/gitpack/gitpack.log)" -eq 148 &&
 
 # intentionally bad URL
-echo test69 >&2 && ! gitpack status github.com 2>&1 &&
+echo test69 >&2 && ! gitpack status github.com/a/b/c 2>&1 &&
 # check logging
 echo test70 >&2 && test "$(grep -c '\[init\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 20 &&
 echo test71 >&2 && test "$(grep -c '\[clean\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 1 &&

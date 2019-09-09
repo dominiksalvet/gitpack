@@ -64,7 +64,7 @@ echo test26 >&2 && gitpack_out="$(gitpack status github.com/dominiksalvet/vhdlde
 echo "$gitpack_out" | grep '^\[nothing\]' &&
 
 # intentionally bad URL
-echo test27 >&2 && gitpack_out="$(! gitpack status github.com 2>&1)" &&
+echo test27 >&2 && gitpack_out="$(! gitpack status github.com/a/b/c 2>&1)" &&
 echo "$gitpack_out" | grep '^<ERROR>' &&
 
 # clean cache again
