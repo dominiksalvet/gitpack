@@ -14,7 +14,7 @@
 # install GitPack from the current commit globally
 gitpack_out="$(sudo src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
 echo "$gitpack_out" | grep '^\[install\]' &&
-false &&
+return 65
 
 # check whether installed globally
 gitpack_out="$(sudo gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
