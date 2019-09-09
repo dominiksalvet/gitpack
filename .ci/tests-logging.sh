@@ -108,15 +108,15 @@ echo test66 >&2 && test "$(grep -c '\[rm\]' "$HOME"/.local/share/gitpack/gitpack
 echo test67 >&2 && test "$(grep -c '\[delete\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
 echo test68 >&2 && test "$(wc -l < "$HOME"/.local/share/gitpack/gitpack.log)" -eq 148 &&
 
-# clean cache again
-echo test69 >&2 && gitpack clean &&
+# intentionally bad URL
+echo test69 >&2 && ! gitpack status github.com &&
 # check logging
 echo test70 >&2 && test "$(grep -c '\[init\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 20 &&
-echo test71 >&2 && test "$(grep -c '\[clean\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 2 &&
-echo test72 >&2 && test "$(grep -c '\[backup\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 20 &&
+echo test71 >&2 && test "$(grep -c '\[clean\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 1 &&
+echo test72 >&2 && test "$(grep -c '\[backup\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 19 &&
 echo test73 >&2 && test "$(grep -c '\[exit\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 20 &&
-echo test74 >&2 && test "$(grep -c '\[action\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
-echo test75 >&2 && test "$(grep -c '\[url\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
+echo test74 >&2 && test "$(grep -c '\[action\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 16 &&
+echo test75 >&2 && test "$(grep -c '\[url\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 16 &&
 echo test76 >&2 && test "$(grep -c '\[clone\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
 echo test77 >&2 && test "$(grep -c '\[execute\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
 echo test78 >&2 && test "$(grep -c '\[get\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
@@ -125,4 +125,24 @@ echo test80 >&2 && test "$(grep -c '\[insert\]' "$HOME"/.local/share/gitpack/git
 echo test81 >&2 && test "$(grep -c '\[list\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
 echo test82 >&2 && test "$(grep -c '\[rm\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
 echo test83 >&2 && test "$(grep -c '\[delete\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
-echo test84 >&2 && test "$(wc -l < "$HOME"/.local/share/gitpack/gitpack.log)" -eq 152
+echo test84 >&2 && test "$(grep -c '\[fail\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 1 &&
+echo test85 >&2 && test "$(wc -l < "$HOME"/.local/share/gitpack/gitpack.log)" -eq 153 &&
+
+# clean cache again
+echo test86 >&2 && gitpack clean &&
+# check logging
+echo test87 >&2 && test "$(grep -c '\[init\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 21 &&
+echo test88 >&2 && test "$(grep -c '\[clean\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 2 &&
+echo test89 >&2 && test "$(grep -c '\[backup\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 20 &&
+echo test90 >&2 && test "$(grep -c '\[exit\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 21 &&
+echo test91 >&2 && test "$(grep -c '\[action\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
+echo test92 >&2 && test "$(grep -c '\[url\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
+echo test93 >&2 && test "$(grep -c '\[clone\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
+echo test94 >&2 && test "$(grep -c '\[execute\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
+echo test95 >&2 && test "$(grep -c '\[get\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
+echo test96 >&2 && test "$(grep -c '\[cp\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo test97 >&2 && test "$(grep -c '\[insert\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo test98 >&2 && test "$(grep -c '\[list\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo test99 >&2 && test "$(grep -c '\[rm\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo test100 >&2 && test "$(grep -c '\[delete\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo test101 >&2 && test "$(wc -l < "$HOME"/.local/share/gitpack/gitpack.log)" -eq 157
