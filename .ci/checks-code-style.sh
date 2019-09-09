@@ -21,21 +21,23 @@ IGNORED_FUNCTIONS='init_constants init_strings' # function length exceptions
 # LINE LENGTH
 #-------------------------------------------------------------------------------
 
+echo test1 >&2
 lineno=0 # initialize line counter
-# shellcheck disable=SC2016
 while IFS= read -r line; do
     lineno=$((lineno + 1)) # increment line counter
     if [ "${#line}" -gt "$MAX_LINE_LENGTH" ]; then # check line length
         echo "src/gitpack:$lineno line has more than $MAX_LINE_LENGTH characters" >&2
         return 1
     fi
-done < src/gitpack &&
+done < src/gitpack
 
 #-------------------------------------------------------------------------------
 # FUNCTION LENGTH
 #-------------------------------------------------------------------------------
 
+echo test2 >&2
 # transforms a given shell script into '<function> <lines>' per line output
+# shellcheck disable=SC2016
 AWK_PROGRAM='{ if (/\(\)/) {
     printf NR" "$1" "
     lines=1
@@ -43,7 +45,7 @@ AWK_PROGRAM='{ if (/\(\)/) {
     print lines
 } else {
     lines++
-} }' &&
+} }'
 
 # use '(' as a field separator to make creating the final output easier
 awk_out="$(awk -F '(' "$AWK_PROGRAM" src/gitpack)" &&

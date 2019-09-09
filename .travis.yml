@@ -31,20 +31,20 @@ jobs:
 
     - stage: Installation
       name: Global
-      script: .ci/installation-global.sh || .ci/dump.sh global "$?"
+      script: .ci/installation-global.sh > /dev/null || .ci/dump.sh global "$?"
 
     - name: Local
-      script: .ci/installation-local.sh || .ci/dump.sh local "$?"
+      script: .ci/installation-local.sh > /dev/null || .ci/dump.sh local "$?"
 
     - stage: Tests
       name: Execution
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: .ci/tests-execution.sh || .ci/dump.sh local "$?"
+      script: .ci/tests-execution.sh > /dev/null || .ci/dump.sh local "$?"
 
     - name: Usage
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: .ci/tests-usage.sh || .ci/dump.sh local "$?"
+      script: .ci/tests-usage.sh > /dev/null || .ci/dump.sh local "$?"
 
     - name: Logging
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: .ci/tests-logging.sh || .ci/dump.sh local "$?"
+      script: .ci/tests-logging.sh > /dev/null || .ci/dump.sh local "$?"

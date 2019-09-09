@@ -15,11 +15,11 @@
 
 # dump the GitPack data
 if [ "$1" = global ]; then
-    cat /var/log/gitpack/gitpack.log
-    cat /var/lib/gitpack/status
+    cat /var/log/gitpack/gitpack.log >&2
+    cat /var/lib/gitpack/status >&2
 else
-    cat "$HOME"/.local/share/gitpack/gitpack.log
-    cat "$HOME"/.local/share/gitpack/status
+    cat "$HOME"/.local/share/gitpack/gitpack.log >&2
+    cat "$HOME"/.local/share/gitpack/status >&2
 fi
 
 return "$2" # return the expected exit status
