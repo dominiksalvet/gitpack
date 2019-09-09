@@ -566,8 +566,8 @@ repo_cd() {
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   Processes all dependencies of a given project considering the given action.
-#   It also checks whether a defined dependency depth was not exceeded.
+#   Processes all dependencies of a given project considering a given action. It
+#   also checks whether a defined dependency depth was not exceeded.
 # PARAMETERS:
 #   $1 - action
 #   $2 - URL
@@ -683,7 +683,7 @@ execute_uninstall() {
 }
 
 # DESCRIPTION:
-#   Checks the given repository considering given source and target commits. It
+#   Checks a given repository considering given source and target commits. It
 #   always succeeds.
 # PARAMETERS:
 #   $1 - URL
@@ -815,7 +815,7 @@ run_control_script() {
 
 # DESCRIPTION:
 #   Runs a given script with a given timeout. Returns a SIGCHLD exit status when
-#   timed out. Otherwise, returns the exit status of the given script execution.
+#   timed out. Otherwise, returns the exit status of a given script execution.
 # PARAMETERS:
 #   $1 - duration in seconds
 #   $2 - script path
@@ -912,7 +912,7 @@ remove_files() {
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   Selects the first record matching the given URL from the GitPack database.
+#   Selects the first record matching a given URL from the GitPack database.
 # PARAMETERS:
 #   $1 - URL
 get_db_record() {
@@ -973,7 +973,7 @@ print_report() {
 }
 
 # DESCRIPTION:
-#   Beautifies the given commit hash prepared for a use in a report. If there is
+#   Beautifies a given commit hash prepared for a use in a report. If there is
 #   a tag associated with a given hash, uses this tag. Otherwise, it makes the
 #   given hash shorter. Always succeeds.
 # PARAMETERS:
