@@ -145,4 +145,5 @@ echo test97 >&2 && test "$(grep -c '\[insert\]' "$HOME"/.local/share/gitpack/git
 echo test98 >&2 && test "$(grep -c '\[list\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
 echo test99 >&2 && test "$(grep -c '\[rm\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
 echo test100 >&2 && test "$(grep -c '\[delete\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
-echo test101 >&2 && test "$(wc -l < "$HOME"/.local/share/gitpack/gitpack.log)" -eq 157
+echo test101 >&2 && test "$(grep -c '\[fail\]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 1 &&
+echo test102 >&2 && test "$(wc -l < "$HOME"/.local/share/gitpack/gitpack.log)" -eq 157
