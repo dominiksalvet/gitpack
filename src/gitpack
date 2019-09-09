@@ -258,7 +258,7 @@ init_paths() {
     LOG_PATH="$LOG_DIR"/gitpack.log # the execution log file
     CACHE_REPO_DIR="$CACHE_DIR"/repo # cache for Git repositories
     STATUS_PATH="$DB_DIR"/status # database of installed projects
-    STATUS_BAK_PATH="$BACKUP_DIR"/status.back # the database backup
+    STATUS_BAK_PATH="$BACKUP_DIR"/status.bak # the database backup
 }
 
 # DESCRIPTION:
