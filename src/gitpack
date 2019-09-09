@@ -213,7 +213,7 @@ init_runtime() {
     init_global_vars &&
     init_paths &&
     # create directories based on the initialized paths
-    mkdir -p "$LOG_DIR"/ "$CACHE_DIR"/ "$DB_DIR"/ "$BACKUP_DIR"/ &&
+    mkdir -p "$LOG_DIR"/ "$CACHE_DIR"/ "$STATE_DIR"/ &&
     log "$LOGTYPE_INIT" "$COMMAND" && # initialize logging
     init_traps &&
     init_database
@@ -242,23 +242,21 @@ init_global_vars() {
 #   not be changed later.
 init_paths() {
     # initialize directory paths
-    if [ "$access" = global ]; then
+    if [ "$access" = global ]; then # respect FHS
         LOG_DIR=/var/log/gitpack
         CACHE_DIR=/var/cache/gitpack
-        DB_DIR=/var/lib/gitpack
-        BACKUP_DIR=/var/backups/gitpack
-    else
+        STATE_DIR=/var/lib/gitpack
+    else # respect XDG
         LOG_DIR="${HOME:?}"/.local/share/gitpack
         CACHE_DIR="$HOME"/.cache/gitpack
-        DB_DIR="$HOME"/.local/share/gitpack
-        BACKUP_DIR="$HOME"/.local/share/gitpack
+        STATE_DIR="$HOME"/.local/share/gitpack
     fi
 
     # initialize derived paths
     LOG_PATH="$LOG_DIR"/gitpack.log # the execution log file
-    CACHE_REPO_DIR="$CACHE_DIR"/repo # cache for Git repositories
-    STATUS_PATH="$DB_DIR"/status # database of installed projects
-    STATUS_BAK_PATH="$BACKUP_DIR"/status.bak # the database backup
+    CACHE_REPO_DIR="$CACHE_DIR"/repo # the cache for local Git repositories
+    STATUS_PATH="$STATE_DIR"/status # the database of installed projects
+    STATUS_BAK_PATH="$STATE_DIR"/status.bak # the database backup
 }
 
 # DESCRIPTION:
