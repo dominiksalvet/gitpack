@@ -14,7 +14,6 @@
 # install GitPack from the current commit locally
 gitpack_out="$(src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
 echo "$gitpack_out" | grep '^\[install\]' &&
-false &&
 
 # check whether installed locally
 gitpack_out="$(gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
