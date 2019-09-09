@@ -63,5 +63,9 @@ echo "$gitpack_out" | grep '^\[uninstalled\]' &&
 echo test26 >&2 && gitpack_out="$(gitpack status github.com/dominiksalvet/vhdldep)" &&
 echo "$gitpack_out" | grep '^\[nothing\]' &&
 
+# intentionally bad URL
+echo test27 >&2 && gitpack_out="$(! gitpack status github.com 2>&1)" &&
+echo "$gitpack_out" | grep '^<ERROR>' &&
+
 # clean cache again
-echo test27 >&2 && gitpack clean
+echo test28 >&2 && gitpack clean
