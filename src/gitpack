@@ -137,8 +137,8 @@ https://github.com/dominiksalvet/gitpack'
 
 # DESCRIPTION:
 #   Stores a copy of a complete command, which invoked this GitPack instance
-#   based on given GitPack arguments and initializes other constants used as
-#   a part of the GitPack configuration. None of them may be changed later.
+#   based on given GitPack arguments and initializes other constants used as a
+#   part of the GitPack configuration. None of them may be changed later.
 # PARAMETERS:
 #   $@ - GitPack arguments
 init_configuration() {
@@ -973,8 +973,8 @@ print_report() {
 }
 
 # DESCRIPTION:
-#   Beautifies a given commit hash prepared for a use in a report. If there is
-#   a tag associated with a given hash, uses this tag. Otherwise, it makes the
+#   Beautifies a given commit hash prepared for a use in a report. If there is a
+#   tag associated with a given hash, uses this tag. Otherwise, it makes the
 #   given hash shorter. Always succeeds.
 # PARAMETERS:
 #   $1 - URL
