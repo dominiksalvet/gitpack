@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 The changes not yet present in any release are listed in this section.
 
+## 0.4.0 (2019-09-11)
+
 ### Added
 
 * A simple mechanism for cyclic dependencies prevention has been added.
