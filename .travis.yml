@@ -37,13 +37,13 @@ jobs:
       script: .ci/installation-local.sh > /dev/null || .ci/dump.sh local "$?"
 
     - stage: Tests
-      name: Execution
-      install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: .ci/tests-execution.sh > /dev/null || .ci/dump.sh local "$?"
-
-    - name: Usage
+      name: Usage
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
       script: .ci/tests-usage.sh > /dev/null || .ci/dump.sh local "$?"
+
+    - name: Files
+      install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
+      script: .ci/tests-files.sh > /dev/null || .ci/dump.sh local "$?"
 
     - name: Logging
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
