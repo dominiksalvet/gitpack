@@ -258,13 +258,6 @@ init_paths() {
 }
 
 # DESCRIPTION:
-#   Creates logging file structure and logs the initialization log item.
-init_logging() {
-    mkdir -p "$LOG_DIR"/ && # create the log directory
-    log "$LOGTYPE_INIT" "$COMMAND"
-}
-
-# DESCRIPTION:
 #   Initializes traps of all handled signals in GitPack.
 init_traps() {
     trap 'log "$LOGTYPE_EXIT" "$?"' EXIT && # log GitPack exit status on exit
@@ -305,6 +298,13 @@ init_database() {
 #-------------------------------------------------------------------------------
 # LOGGING
 #-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Creates logging file structure and logs the initialization log item.
+init_logging() {
+    mkdir -p "$LOG_DIR"/ && # create the log directory
+    log "$LOGTYPE_INIT" "$COMMAND"
+}
 
 # DESCRIPTION:
 #   Creates a new log item in the predefined log file with current date and time
