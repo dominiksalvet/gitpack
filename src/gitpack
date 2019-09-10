@@ -212,9 +212,7 @@ backup_database() {
 init_runtime() {
     init_global_vars &&
     init_paths &&
-    # create directories based on the initialized paths
-    mkdir -p "$LOG_DIR"/ "$CACHE_DIR"/ "$STATE_DIR"/ &&
-    log "$LOGTYPE_INIT" "$COMMAND" && # initialize logging
+    init_logging && # logging starts from here
     init_traps &&
     init_database
 }
@@ -260,6 +258,13 @@ init_paths() {
 }
 
 # DESCRIPTION:
+#   Creates logging file structure and logs the initialization log item.
+init_logging() {
+    mkdir -p "$LOG_DIR"/ && # create the log directory
+    log "$LOGTYPE_INIT" "$COMMAND"
+}
+
+# DESCRIPTION:
 #   Initializes traps of all handled signals in GitPack.
 init_traps() {
     trap 'log "$LOGTYPE_EXIT" "$?"' EXIT && # log GitPack exit status on exit
@@ -280,6 +285,7 @@ term_action() {
 #   variables. It fails if it cannot create a file or if GitPack does not have
 #   read or write permissions.
 init_database() {
+    mkdir -p "$STATE_DIR"/ && # create the state directory
     # create GitPack status file if it does not exist
     if [ ! -e "$STATUS_PATH" ]; then
         if [ -r "$STATUS_BAK_PATH" ]; then # if there is a status file backup
@@ -352,16 +358,16 @@ list_installed() {
 #   Cleans the GitPack cache and log performing checks for unintended removal.
 clean_cache() {
     # log clean operation, also creates a log file if it does not exit
-    log "$LOGTYPE_CLEAN" "$CACHE_REPO_DIR"/ &&
+    log "$LOGTYPE_CLEAN" "$CACHE_DIR"/ &&
 
     # clean log shortening it to a defined number of last lines
     tail_out="$(tail -n "$LOG_LINES_KEPT" "$LOG_PATH")" &&
     echo "$tail_out" > "$LOG_PATH" && # write changes back to the log file
 
-    # clean Git repository cache
-    if [ -d "${CACHE_REPO_DIR:?}"/ ]; then # check if cache exists
-        if rm_rf_dir_check "$CACHE_REPO_DIR"; then
-            rm -rf -- "${CACHE_REPO_DIR:?}"/
+    # clean Git cache
+    if [ -d "${CACHE_DIR:?}"/ ]; then # check if cache exists
+        if rm_rf_dir_check "$CACHE_DIR"; then
+            rm -rf -- "${CACHE_DIR:?}"/
         else
             echof 'prevent removing the root directory'
             return 1
