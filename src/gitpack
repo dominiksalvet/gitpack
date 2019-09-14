@@ -799,7 +799,7 @@ run_control_script() {
     "$1" && return # run the script and return early if it exited successfully
 
     script_status="$?" # store the exit status of the failed script
-    echof "$(basename "$1") script execution failed with $script_status"
+    echof "$(basename "$1") script failed with $script_status"
     return 1 # indicate error but do not propagate the exit status further
 }
 
