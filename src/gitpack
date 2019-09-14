@@ -732,7 +732,7 @@ install() { (
 
     if [ -x "$install_dir"/precp ]; then # before files copy
         log "$LOGTYPE_PRECP" "$1" "$2" "$install_method" &&
-        run_control_script "$install_dir"/precp
+        run_script "$install_dir"/precp
     fi &&
 
     # copy all files by defined routes
@@ -741,7 +741,7 @@ install() { (
 
     if [ -x "$install_dir"/postcp ]; then # after files copy
         log "$LOGTYPE_POSTCP" "$1" "$2" "$install_method" &&
-        run_control_script "$install_dir"/postcp
+        run_script "$install_dir"/postcp
     fi
 ) }
 
@@ -757,7 +757,7 @@ uninstall() { (
 
     if [ -x "$install_dir"/prerm ]; then # before files removal
         log "$LOGTYPE_PRERM" "$1" "$2" "$install_method" &&
-        run_control_script "$install_dir"/prerm
+        run_script "$install_dir"/prerm
     fi &&
 
     # remove all files by defined routes
@@ -766,7 +766,7 @@ uninstall() { (
 
     if [ -x "$install_dir"/postrm ]; then # after files removal
         log "$LOGTYPE_POSTRM" "$1" "$2" "$install_method" &&
-        run_control_script "$install_dir"/postrm
+        run_script "$install_dir"/postrm
     fi
 ) }
 
@@ -791,11 +791,10 @@ install_method_to_path() {
 }
 
 # DESCRIPTION:
-#   Runs a given control script of a GitPack project. In case the script fails,
-#   it prints and logs an error report.
+#   Runs a given script. In case of an error, prints and logs a fail report.
 # PARAMETERS:
-#   $1 - control script path
-run_control_script() {
+#   $1 - script path
+run_script() {
     "$1" && return # run the script and return early if it exited successfully
 
     script_status="$?" # store the exit status of the failed script
