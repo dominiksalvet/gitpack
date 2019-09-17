@@ -12,6 +12,10 @@ The changes not yet present in any release are listed in this section.
 
 * Stop following REUSE Specification - Version 3.0.
 
+### Fixed
+
+* There is no empty line created in *status* file during the last item deletion.
+
 ### Removed
 
 * The custom script timeout has been removed.

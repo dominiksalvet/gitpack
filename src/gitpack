@@ -576,14 +576,12 @@ process_deps() {
     fi
 
     deps="$(get_deps "$2" "$3")" && # get all dependencies
-    if [ "$deps" ]; then # if there are any
-        # run the given action recursively for each dependency reference
-        echo "$deps" | while read -r dep; do # run them in separate subshells
-            (   next_dep_depth && # register a new dependency depth level
-                process_action "$1" "$dep"
-            ) || return
-        done
-    fi
+    # run the given action recursively for each dependency reference
+    echon "$deps" | while read -r dep; do # run them in separate subshells
+        (   next_dep_depth && # register a new dependency depth level
+            process_action "$1" "$dep"
+        ) || return
+    done
 }
 
 # DESCRIPTION:
@@ -614,6 +612,16 @@ grepe() {
         grep_status=0
     fi
     return "$grep_status" # return the modified exit status
+}
+
+# DESCRIPTION:
+#   An echo wrapper. It does not print a new line if the final string is empty.
+# PARAMETERS:
+#   $@ - echo arguments
+echon() {
+    if [ "$@" ]; then
+        echo "$@"
+    fi
 }
 
 # DESCRIPTION:
@@ -669,7 +677,7 @@ execute_install() {
 #   GitPack database.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - commit
+#   $2 - commit (optional)
 execute_uninstall() {
     if [ "$2" ]; then # if installed
         state="$STATE_UNINSTALL" && # uninstallation
@@ -685,7 +693,7 @@ execute_uninstall() {
 #   always succeeds.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - source commit
+#   $2 - source commit (optional)
 #   $3 - target commit
 execute_status() {
     if [ ! "$2" ]; then
@@ -814,12 +822,10 @@ run_script() {
 for_each_route() {
     if [ -r "$1" ]; then # check whether the map file exists
         grepe_out="$(grepe '^[^#]' "$1")" && # remove empty and comment lines
-        if [ "$grepe_out" ]; then # if there are any routes in the path file
-            # call a given function for each route
-            echo "$grepe_out" | while read -r route; do
-                eval "$2" "$route" || return
-            done
-        fi
+        # call a given function for each route
+        echon "$grepe_out" | while read -r route; do
+            eval "$2" "$route" || return
+        done
     else # if the map file does not exist, fails
         echof 'missing map file'
         return 1
@@ -876,7 +882,7 @@ remove_files() {
 get_db_record() {
     log "$LOGTYPE_GET" "$1" "$STATUS_PATH" &&
     grepe_out="$(grepe -F "$1" "$STATUS_PATH")" &&
-    echo "$grepe_out" | head -n 1
+    echon "$grepe_out" | head -n 1
 }
 
 # DESCRIPTION:
@@ -896,7 +902,7 @@ insert_db_record() {
 delete_db_records() {
     log "$LOGTYPE_DELETE" "$1" "$STATUS_PATH" &&
     grepe_out="$(grepe -F -v "$1" "$STATUS_PATH")" &&
-    echo "$grepe_out" > "$STATUS_PATH"
+    echon "$grepe_out" > "$STATUS_PATH"
 }
 
 #-------------------------------------------------------------------------------
