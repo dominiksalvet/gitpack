@@ -2,8 +2,7 @@
 
 #-------------------------------------------------------------------------------
 # Copyright 2019 Dominik Salvet
-# SPDX-License-Identifier: MIT
-# https://github.com/dominiksalvet/gitpack
+# github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
 #   Dumps useful GitPack data stored on the disk based on a given access level.

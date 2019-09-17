@@ -2,8 +2,7 @@
 
 #-------------------------------------------------------------------------------
 # Copyright 2019 Dominik Salvet
-# SPDX-License-Identifier: MIT
-# https://github.com/dominiksalvet/gitpack
+# github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
 #   This is the main file of GitPack - Git-based package manager.
@@ -127,9 +126,8 @@ COMMAND:
     ABOUT_MESSAGE="GitPack $VERSION
 The simplest Git-based package manager.
 
-Copy"'right 2019 Dominik Salvet
-SPDX License Identifier: MIT
-https://github.com/dominiksalvet/gitpack'
+Copyright 2019 Dominik Salvet
+github.com/dominiksalvet/gitpack"
 }
 
 # DESCRIPTION:
