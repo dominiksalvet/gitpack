@@ -87,7 +87,7 @@ init_constants() {
     # action log types
     LOGTYPE_ACTION=action # action processing
     LOGTYPE_URL=url # URL check
-    LOGTYPE_CLONE=clone # clone repository
+    LOGTYPE_REFRESH=refresh # refresh repository
     LOGTYPE_EXECUTE=execute # action executing
     LOGTYPE_DEPS=deps # processing dependencies
     # database log types
@@ -411,7 +411,7 @@ process_action() {
         check_url "$url" &&
 
         # prepare Git repository
-        clone_repo "$url" &&
+        refresh_repo "$url" &&
 
         # execute the action itself
         execute_action "$1" "$url" "$version"
@@ -466,17 +466,17 @@ check_url() {
 # DESCRIPTION:
 #   Refreshes a Git repository from given URL. In case an associated directory
 #   does not exist, it is created and the repository is cloned. Otherwise, the
-#   repository is refreshed by fetching and merging changes.
+#   repository is refreshed.
 # PARAMETERS:
 #   $1 - URL
-clone_repo() { (
+refresh_repo() { (
     repo_dir="$(url_to_path "$1")" && # get the repository directory path
-    log "$LOGTYPE_CLONE" "$1" "$repo_dir"/ &&
+    log "$LOGTYPE_REFRESH" "$1" "$repo_dir"/ &&
     mkdir -p "$repo_dir"/ &&
     cd "$repo_dir"/ &&
 
     if [ ! "$(ls -A)" ]; then # if cached project directory is empty
-        # clone Git repository master branch, it may ask a user for a password
+        # clone Git repository master branch, it may ask the user for a password
         git clone -q --branch master https://"$1".git .
     else
         # checkout the master branch (also discard any changes)
