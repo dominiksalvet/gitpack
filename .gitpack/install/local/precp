@@ -5,6 +5,7 @@
 # github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
+# if there is no Bash completion file in home directory, create one
 if [ ! -e "$HOME"/.bash_completion ]; then
     cp .gitpack/data/.bash_completion "$HOME"/
 fi
