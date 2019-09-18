@@ -16,7 +16,7 @@ jobs:
 
     - name: Source code
       before_script: shellcheck --version
-      script: shellcheck src/gitpack
+      script: shellcheck src/*
 
     - stage: Checks
       name: Code style
