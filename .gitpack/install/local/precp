@@ -1,0 +1,10 @@
+#!/bin/sh
+
+#-------------------------------------------------------------------------------
+# Copyright 2019 Dominik Salvet
+# github.com/dominiksalvet/gitpack
+#-------------------------------------------------------------------------------
+
+if [ ! -e "$HOME"/.bash_completion ]; then
+    cp .gitpack/data/.bash_completion "$HOME"/
+fi
