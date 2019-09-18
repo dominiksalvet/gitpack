@@ -31,8 +31,8 @@ main() {
 #   Checks whether all software dependencies are satisfied.
 check_sw_deps() {
     # a list of required software
-    sw_deps='command echo [ cd test pwd rm id mkdir touch grep git ls uname read
-             cp head cut true basename find rmdir tr date tail kill'
+    sw_deps='command echo [ cd test pwd rm id mkdir touch grep git uname read cp
+             head cut true basename find rmdir tr date tail kill'
 
     # check if any piece of software is missing
     for sw_dep in $sw_deps; do
@@ -475,14 +475,12 @@ refresh_repo() { (
     mkdir -p "$repo_dir"/ &&
     cd "$repo_dir"/ &&
 
-    if [ ! "$(ls -A)" ]; then # if cached project directory is empty
+    if [ ! -d .git/ ]; then # if the directory does not contain a Git directory
         # clone Git repository master branch, it may ask the user for a password
         git clone -q --branch master https://"$1".git .
     else
-        # checkout the master branch (also discard any changes)
-        git checkout -qf master &&
-        # fetch changes from master and merge them into local master branch
-        git pull -q
+        git checkout -qf master && # checkout the master discarding any changes
+        git pull -q # pull changes from remote master into local master
     fi
 ) }
 
