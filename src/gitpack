@@ -102,6 +102,9 @@ init_constants() {
     LOGTYPE_PRERM=prerm # prerm script execution
     LOGTYPE_RM=rm # remove files using map
     LOGTYPE_POSTRM=postrm # postrm script execution
+
+    # other constants
+    DEP_PREFIX='+ ' # prefix for processing dependencies
 }
 
 # DESCRIPTION:
@@ -225,7 +228,6 @@ init_global_vars() {
     system="$(uname)" && # get the current system name
 
     state= && # the state of the processed project
-    dep_prefix= && # prefix for processing dependencies
     dep_depth=0 # current dependency depth
 }
 
@@ -418,7 +420,7 @@ process_action() {
     } || {
         # all possible errors during action processing are caught here
         action_status="$?" # store the action exit status
-        echo "${dep_prefix}<ERROR> $1 $2" >&2 # report GitPack information
+        echo "$(get_dep_prefix)<ERROR> $1 $2" >&2 # report GitPack information
         return "$action_status" # propagate the status further
     }
 }
@@ -456,6 +458,15 @@ check_url() {
     if ! echo "$1" | grep -q -E "$url_regex"; then
         echof 'unsupported URL delivered'
         return 1
+    fi
+}
+
+# DESCRIPTION:
+#   Prints the current prefix for dependency reports considering the current
+#   dependency depth value.
+get_dep_prefix() {
+    if [ "$dep_depth" -gt 0 ]; then
+        echo "$DEP_PREFIX"
     fi
 }
 
@@ -626,7 +637,6 @@ echon() {
 #   Prepares the environment for a new dependency depth level. It also checks
 #   whether it is possible to continue processing dependencies.
 next_dep_depth() {
-    dep_prefix='+ ' # set up the prefix to make the GitPack report more clear
     dep_depth=$((dep_depth + 1)) # increment dependency depth
 
     # check whether the new dependency depth value is valid
@@ -916,7 +926,7 @@ delete_db_records() {
 #   $4 - target commit
 print_report() {
     # prepare given arguments
-    prefix="${dep_prefix}[$1] $2" &&
+    prefix="$(get_dep_prefix)[$1] $2" &&
     src_version="$(beautify_hash "$2" "$3")" &&
     tar_version="$(beautify_hash "$2" "$4")" &&
 
