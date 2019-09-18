@@ -464,7 +464,7 @@ check_url() {
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   Refreshes a Git repository from given URL. In case an associated directory
+#   Refreshes a Git repository from a given URL. In case an associated directory
 #   does not exist, it is created and the repository is cloned. Otherwise, the
 #   repository is refreshed.
 # PARAMETERS:
