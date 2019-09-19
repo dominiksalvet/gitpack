@@ -1,2 +1,2 @@
-src/gitpack "$HOME"/.local/bin
-src/gitpack-completion.bash "$HOME"/.bash_completion.d
+src/gitpack ~/.local/bin
+src/gitpack-completion.bash ~/.bash_completion.d

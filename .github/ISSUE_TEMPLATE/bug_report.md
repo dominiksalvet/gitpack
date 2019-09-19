@@ -24,7 +24,7 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 **Execution log**
-State the used log file: global - */var/log/gitpack.log*, or local - *"$HOME"/.local/share/gitpack.log*.
+State the used log file: global - */var/log/gitpack.log*, or local - *~/.local/share/gitpack.log*.
 
 <details>
     <summary>gitpack.log</summary>

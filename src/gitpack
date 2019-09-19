@@ -241,9 +241,9 @@ init_paths() {
         CACHE_DIR=/var/cache/gitpack
         STATE_DIR=/var/lib/gitpack
     else # respect XDG
-        LOG_DIR="${HOME:?}"/.local/share/gitpack
-        CACHE_DIR="$HOME"/.cache/gitpack
-        STATE_DIR="$HOME"/.local/share/gitpack
+        LOG_DIR=~/.local/share/gitpack
+        CACHE_DIR=~/.cache/gitpack
+        STATE_DIR=~/.local/share/gitpack
     fi
 
     # initialize derived paths
@@ -389,8 +389,8 @@ rm_rf_dir_check() { (
     test "$pwd_out" != // &&
 
     # check for home directory
-    test "$PWD" != "$HOME" &&
-    test "$pwd_out" != "$HOME"
+    test "$PWD" != ~ &&
+    test "$pwd_out" != ~
 ) }
 
 #-------------------------------------------------------------------------------

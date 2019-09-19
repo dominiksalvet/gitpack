@@ -6,6 +6,6 @@
 #-------------------------------------------------------------------------------
 
 # if there is no Bash completion file in home directory, create one
-if [ ! -e "$HOME"/.bash_completion ]; then
-    cp .gitpack/data/.bash_completion "$HOME"/
+if [ ! -e ~/.bash_completion ]; then
+    cp .gitpack/data/.bash_completion ~/
 fi
