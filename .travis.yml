@@ -3,14 +3,9 @@
 # github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-matrix:
-  include:
-    - os: linux
-      dist: xenial
-      language: shell
-    - os: linux
-      dist: trusty
-      language: shell
+os: linux
+dist: xenial
+language: shell
 
 jobs:
   include:
