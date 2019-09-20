@@ -4,7 +4,6 @@
 #-------------------------------------------------------------------------------
 
 os: linux
-dist: xenial
 language: shell
 
 jobs:
@@ -20,23 +19,23 @@ jobs:
 
     - stage: Checks
       name: Code style
-      script: .ci/checks-code-style.sh
+      script: .ci/code-style.sh
 
     - name: Global installation
-      script: .ci/installation-global.sh > /dev/null || .ci/dump.sh global "$?"
+      script: .ci/global-install.sh > /dev/null || .ci/dump.sh global "$?"
 
     - name: Local installation
-      script: .ci/installation-local.sh > /dev/null || .ci/dump.sh local "$?"
+      script: .ci/local-install.sh > /dev/null || .ci/dump.sh local "$?"
 
     - stage: Tests
       name: Usage
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: .ci/tests-usage.sh > /dev/null || .ci/dump.sh local "$?"
+      script: .ci/usage.sh > /dev/null || .ci/dump.sh local "$?"
 
     - name: Files
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: .ci/tests-files.sh > /dev/null || .ci/dump.sh local "$?"
+      script: .ci/files.sh > /dev/null || .ci/dump.sh local "$?"
 
     - name: Logging
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: .ci/tests-logging.sh > /dev/null || .ci/dump.sh local "$?"
+      script: .ci/logging.sh > /dev/null || .ci/dump.sh local "$?"
