@@ -14,6 +14,17 @@ jobs:
 
     - stage: Installation
       name: Global
+      os: linux
+      script: .ci/global-install.sh > /dev/null || .ci/dump.sh global "$?"
+
+    - stage: Installation
+      name: Global
+      os: osx
+      script: .ci/global-install.sh > /dev/null || .ci/dump.sh global "$?"
+
+    - stage: Installation
+      name: Global
+      os: windows
       script: .ci/global-install.sh > /dev/null || .ci/dump.sh global "$?"
 
     - name: Local
