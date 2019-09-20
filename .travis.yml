@@ -3,20 +3,16 @@
 # github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-os: linux
 language: shell
 
 jobs:
   include:
     - stage: Checks
-      name: Static analysis
+      name: Analysis
       before_script: shellcheck --version
-      script: - shellcheck src/* &&
-              - shellcheck .ci/*sh &&
-              - false &&
-              - .ci/code-style.sh
+      script: .ci/analysis.sh
 
-    - stage: installation
+    - stage: Installation
       name: Global
       script: .ci/global-install.sh > /dev/null || .ci/dump.sh global "$?"
 
