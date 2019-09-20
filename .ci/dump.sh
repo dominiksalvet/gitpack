@@ -21,4 +21,4 @@ else
     cat ~/.local/share/gitpack/status >&2
 fi
 
-return "$2" # return the expected exit status
+exit "$2" # exit with the expected exit status
