@@ -32,7 +32,8 @@ echo global12 >&2 && sudo rmdir /var/cache/gitpack/repo/ &&
 echo global13 >&2 && sudo rmdir /var/cache/gitpack/ &&
 echo global14 >&2 && sudo test ! "$(cat /var/lib/gitpack/status)" &&
 echo global15 >&2 && sudo rm /var/lib/gitpack/status &&
-echo global16 >&2 && sudo rmdir /var/lib/gitpack/ &&
+echo global16 >&2 && sudo rm /var/lib/gitpack/status.bak &&
+echo global17 >&2 && sudo rmdir /var/lib/gitpack/ &&
 
 #-------------------------------------------------------------------------------
 # LOCAL INSTALLATION
@@ -57,4 +58,5 @@ echo local11 >&2 && rmdir ~/.cache/gitpack/repo/ &&
 echo local12 >&2 && rmdir ~/.cache/gitpack/ &&
 echo local13 >&2 && test ! "$(cat ~/.local/share/gitpack/status)" &&
 echo local14 >&2 && rm ~/.local/share/gitpack/status &&
-echo local15 >&2 && rmdir ~/.local/share/gitpack/
+echo local15 >&2 && rm ~/.local/share/gitpack/status.bak &&
+echo local16 >&2 && rmdir ~/.local/share/gitpack/
