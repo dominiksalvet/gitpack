@@ -965,4 +965,4 @@ beautify_hash() { (
 # ENTRY POINT CALLING
 #-------------------------------------------------------------------------------
 
-main "$@"
+main "$@" # call the main function, having all functions above already defined
