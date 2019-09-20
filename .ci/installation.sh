@@ -23,16 +23,16 @@ echo global5 >&2 && gitpack_out="$(sudo gitpack uninstall github.com/dominiksalv
 echo global6 >&2 && echo "$gitpack_out" | grep '^\[uninstall\]' &&
 
 # clean created files
-echo global7 >&2 && rm /var/log/gitpack/gitpack.log &&
-echo global8 >&2 && rmdir /var/log/gitpack/ &&
-echo global9 >&2 && rm -rf /var/cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-echo global10 >&2 && rmdir /var/cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo global11 >&2 && rmdir /var/cache/gitpack/repo/github.com/ &&
-echo global12 >&2 && rmdir /var/cache/gitpack/repo/ &&
-echo global13 >&2 && rmdir /var/cache/gitpack/ &&
-echo global14 >&2 && test ! "$(cat /var/lib/gitpack/status)" &&
-echo global15 >&2 && rm /var/lib/gitpack/status &&
-echo global16 >&2 && rmdir /var/lib/gitpack/ &&
+echo global7 >&2 && sudo rm /var/log/gitpack/gitpack.log &&
+echo global8 >&2 && sudo rmdir /var/log/gitpack/ &&
+echo global9 >&2 && sudo rm -rf /var/cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
+echo global10 >&2 && sudo rmdir /var/cache/gitpack/repo/github.com/dominiksalvet/ &&
+echo global11 >&2 && sudo rmdir /var/cache/gitpack/repo/github.com/ &&
+echo global12 >&2 && sudo rmdir /var/cache/gitpack/repo/ &&
+echo global13 >&2 && sudo rmdir /var/cache/gitpack/ &&
+echo global14 >&2 && sudo test ! "$(cat /var/lib/gitpack/status)" &&
+echo global15 >&2 && sudo rm /var/lib/gitpack/status &&
+echo global16 >&2 && sudo rmdir /var/lib/gitpack/ &&
 
 #-------------------------------------------------------------------------------
 # LOCAL INSTALLATION
