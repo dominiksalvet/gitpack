@@ -5,20 +5,18 @@
 # github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
-#   Dumps useful GitPack data stored on the disk based on a given access level.
-#   Exits with a given expected exit status to make error propagation possible.
+#   Dumps useful GitPack data stored on the disk. Prefers the local installation
+#   data to the global installation data. Exits with a given expected exit
+#   status to make error propagation easier.
 # PARAMETERS:
-#   $1 - access level
-#   $2 - expected exit status
+#   $1 - expected exit status
 #-------------------------------------------------------------------------------
 
-# dump the GitPack data
-if [ "$1" = global ]; then
-    cat /var/log/gitpack/gitpack.log >&2
-    cat /var/lib/gitpack/status >&2
-else
+# dump the preferred log
+if [ -r ~/.local/share/gitpack/gitpack.log ]; then
     cat ~/.local/share/gitpack/gitpack.log >&2
-    cat ~/.local/share/gitpack/status >&2
+elif [ -r /var/log/gitpack/gitpack.log ]; then
+    cat /var/log/gitpack/gitpack.log >&2
 fi
 
-exit "$2" # exit with the expected exit status
+exit "$1" # exit with the expected exit status

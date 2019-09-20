@@ -7,28 +7,19 @@ language: shell
 
 jobs:
   include:
-    - stage: Checks
-      name: Analysis
+    - stage: Analysis
       before_script: shellcheck --version
       script: .ci/analysis.sh
 
     - stage: Installation
-      name: Global
       os: linux
-      script: .ci/global-install.sh > /dev/null || .ci/dump.sh global "$?"
+      script: .ci/installation.sh > /dev/null || .ci/dump.sh "$?"
 
-    - stage: Installation
-      name: Global
-      os: osx
-      script: .ci/global-install.sh > /dev/null || .ci/dump.sh global "$?"
+    - os: osx
+      script: .ci/installation.sh > /dev/null || .ci/dump.sh "$?"
 
-    - stage: Installation
-      name: Global
-      os: windows
-      script: .ci/global-install.sh > /dev/null || .ci/dump.sh global "$?"
-
-    - name: Local
-      script: .ci/local-install.sh > /dev/null || .ci/dump.sh local "$?"
+    - os: windows
+      script: .ci/installation.sh > /dev/null || .ci/dump.sh "$?"
 
     - stage: Tests
       name: Usage
