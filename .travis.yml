@@ -8,23 +8,19 @@ language: shell
 
 jobs:
   include:
-    - stage: Shellcheck
-      name: Continuous integration
-      before_script: shellcheck --version
-      script: shellcheck .ci/*.sh
-
-    - name: Source code
-      before_script: shellcheck --version
-      script: shellcheck src/*
-
     - stage: Checks
-      name: Code style
-      script: .ci/code-style.sh
+      name: Static analysis
+      before_script: shellcheck --version
+      script: - shellcheck src/* &&
+              - shellcheck .ci/*sh &&
+              - false &&
+              - .ci/code-style.sh
 
-    - name: Global installation
+    - stage: installation
+      name: Global
       script: .ci/global-install.sh > /dev/null || .ci/dump.sh global "$?"
 
-    - name: Local installation
+    - name: Local
       script: .ci/local-install.sh > /dev/null || .ci/dump.sh local "$?"
 
     - stage: Tests
