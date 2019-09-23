@@ -18,9 +18,6 @@ jobs:
     - os: osx
       script: .ci/installation.sh > /dev/null || .ci/dump.sh "$?"
 
-    - os: windows
-      script: .ci/installation.sh > /dev/null || .ci/dump.sh "$?"
-
     - stage: Tests
       name: Usage
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
