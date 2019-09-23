@@ -7,26 +7,22 @@ language: shell
 
 jobs:
   include:
-    - stage: Analysis
+    - stage: analysis
       before_script: shellcheck --version
       script: .ci/analysis.sh
 
-    - stage: Installation
+    - stage: installation
       os: linux
       script: .ci/installation.sh > /dev/null || .ci/dump.sh "$?"
 
     - os: osx
       script: .ci/installation.sh > /dev/null || .ci/dump.sh "$?"
 
-    - stage: Tests
-      name: Usage
+    - stage: tests
+      os: linux
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: .ci/usage.sh > /dev/null || .ci/dump.sh local "$?"
+      script: .ci/tests.sh > /dev/null || .ci/dump.sh "$?"
 
-    - name: Files
+    - os: osx
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: .ci/files.sh > /dev/null || .ci/dump.sh local "$?"
-
-    - name: Logging
-      install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: .ci/logging.sh > /dev/null || .ci/dump.sh local "$?"
+      script: .ci/tests.sh > /dev/null || .ci/dump.sh "$?"

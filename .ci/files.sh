@@ -8,117 +8,124 @@
 #   This test checks the correct existence of GitPack files.
 #-------------------------------------------------------------------------------
 
-# clean cache
-echo test1 >&2 && gitpack clean &&
+# basic functions
+echo files1 >&2 && gitpack about &&
+gitpack help &&
+gitpack clean && # clean cache
 # check files
-echo test3 >&2 && test -d ~/.local/share/gitpack/ &&
-echo test4 >&2 && test -r ~/.local/share/gitpack/gitpack.log &&
-echo test5 >&2 && test -w ~/.local/share/gitpack/gitpack.log &&
-echo test6 >&2 && test -r ~/.local/share/gitpack/status &&
-echo test7 >&2 && test -w ~/.local/share/gitpack/status &&
-echo test8 >&2 && test -r ~/.local/share/gitpack/status.bak &&
-echo test9 >&2 && test -w ~/.local/share/gitpack/status.bak &&
-echo test10 >&2 && test ! -d ~/.cache/gitpack/ &&
+echo files3 >&2 && test -d ~/.local/share/gitpack/ &&
+echo files4 >&2 && test -r ~/.local/share/gitpack/gitpack.log &&
+echo files5 >&2 && test -w ~/.local/share/gitpack/gitpack.log &&
+echo files6 >&2 && test -r ~/.local/share/gitpack/status &&
+echo files7 >&2 && test -w ~/.local/share/gitpack/status &&
+echo files8 >&2 && test -r ~/.local/share/gitpack/status.bak &&
+echo files9 >&2 && test -w ~/.local/share/gitpack/status.bak &&
+echo files10 >&2 && test ! -d ~/.cache/gitpack/ &&
 
 # install an example project, vhdldep, in version 2.1.0 (not the latest release)
-echo test11 >&2 && gitpack status github.com/dominiksalvet/vhdldep=2.1.0 &&
+echo files11 >&2 && gitpack status github.com/dominiksalvet/vhdldep=2.1.0 &&
 gitpack install github.com/dominiksalvet/vhdldep=2.1.0 &&
 gitpack install github.com/dominiksalvet/vhdldep=2.1.0 &&
 gitpack status github.com/dominiksalvet/vhdldep=2.1.0 &&
 gitpack list &&
 # check files
-echo test12 >&2 && test -d ~/.local/share/gitpack/ &&
-echo test13 >&2 && test -r ~/.local/share/gitpack/gitpack.log &&
-echo test14 >&2 && test -w ~/.local/share/gitpack/gitpack.log &&
-echo test15 >&2 && test -r ~/.local/share/gitpack/status &&
-echo test16 >&2 && test -w ~/.local/share/gitpack/status &&
-echo test17 >&2 && test -r ~/.local/share/gitpack/status.bak &&
-echo test18 >&2 && test -w ~/.local/share/gitpack/status.bak &&
-echo test19 >&2 && test -d ~/.cache/gitpack/ &&
-echo test20 >&2 && test -d ~/.cache/gitpack/repo/ &&
-echo test21 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo test22 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/vhdldep/ &&
+echo files12 >&2 && test -d ~/.local/share/gitpack/ &&
+echo files13 >&2 && test -r ~/.local/share/gitpack/gitpack.log &&
+echo files14 >&2 && test -w ~/.local/share/gitpack/gitpack.log &&
+echo files15 >&2 && test -r ~/.local/share/gitpack/status &&
+echo files16 >&2 && test -w ~/.local/share/gitpack/status &&
+echo files17 >&2 && test -r ~/.local/share/gitpack/status.bak &&
+echo files18 >&2 && test -w ~/.local/share/gitpack/status.bak &&
+echo files19 >&2 && test -d ~/.cache/gitpack/ &&
+echo files20 >&2 && test -d ~/.cache/gitpack/repo/ &&
+echo files21 >&2 && test -d ~/.cache/gitpack/repo/github.com/ &&
+echo files22 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/ &&
+echo files23 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/vhdldep/ &&
 
 # update to the latest version
-echo test23 >&2 && gitpack status github.com/dominiksalvet/vhdldep &&
+echo files24 >&2 && gitpack status github.com/dominiksalvet/vhdldep &&
 gitpack install github.com/dominiksalvet/vhdldep &&
 gitpack install github.com/dominiksalvet/vhdldep &&
 gitpack status github.com/dominiksalvet/vhdldep &&
 gitpack list &&
 # check files
-echo test24 >&2 && test -d ~/.local/share/gitpack/ &&
-echo test25 >&2 && test -r ~/.local/share/gitpack/gitpack.log &&
-echo test26 >&2 && test -w ~/.local/share/gitpack/gitpack.log &&
-echo test27 >&2 && test -r ~/.local/share/gitpack/status &&
-echo test28 >&2 && test -w ~/.local/share/gitpack/status &&
-echo test29 >&2 && test -r ~/.local/share/gitpack/status.bak &&
-echo test30 >&2 && test -w ~/.local/share/gitpack/status.bak &&
-echo test31 >&2 && test -d ~/.cache/gitpack/ &&
-echo test32 >&2 && test -d ~/.cache/gitpack/repo/ &&
-echo test33 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo test34 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/vhdldep/ &&
+echo files25 >&2 && test -d ~/.local/share/gitpack/ &&
+echo files26 >&2 && test -r ~/.local/share/gitpack/gitpack.log &&
+echo files27 >&2 && test -w ~/.local/share/gitpack/gitpack.log &&
+echo files28 >&2 && test -r ~/.local/share/gitpack/status &&
+echo files29 >&2 && test -w ~/.local/share/gitpack/status &&
+echo files30 >&2 && test -r ~/.local/share/gitpack/status.bak &&
+echo files31 >&2 && test -w ~/.local/share/gitpack/status.bak &&
+echo files32 >&2 && test -d ~/.cache/gitpack/ &&
+echo files33 >&2 && test -d ~/.cache/gitpack/repo/ &&
+echo files34 >&2 && test -d ~/.cache/gitpack/repo/github.com/ &&
+echo files35 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/ &&
+echo files36 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/vhdldep/ &&
 
 # downgrade back to 2.1.0
-echo test35 >&2 && gitpack status github.com/dominiksalvet/vhdldep=2.1.0 &&
+echo files37 >&2 && gitpack status github.com/dominiksalvet/vhdldep=2.1.0 &&
 gitpack install github.com/dominiksalvet/vhdldep=2.1.0 &&
 gitpack install github.com/dominiksalvet/vhdldep=2.1.0 &&
 gitpack status github.com/dominiksalvet/vhdldep=2.1.0 &&
 gitpack list &&
 # check files
-echo test36 >&2 && test -d ~/.local/share/gitpack/ &&
-echo test37 >&2 && test -r ~/.local/share/gitpack/gitpack.log &&
-echo test38 >&2 && test -w ~/.local/share/gitpack/gitpack.log &&
-echo test39 >&2 && test -r ~/.local/share/gitpack/status &&
-echo test40 >&2 && test -w ~/.local/share/gitpack/status &&
-echo test41 >&2 && test -r ~/.local/share/gitpack/status.bak &&
-echo test42 >&2 && test -w ~/.local/share/gitpack/status.bak &&
-echo test43 >&2 && test -d ~/.cache/gitpack/ &&
-echo test44 >&2 && test -d ~/.cache/gitpack/repo/ &&
-echo test45 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo test46 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/vhdldep/ &&
+echo files38 >&2 && test -d ~/.local/share/gitpack/ &&
+echo files39 >&2 && test -r ~/.local/share/gitpack/gitpack.log &&
+echo files40 >&2 && test -w ~/.local/share/gitpack/gitpack.log &&
+echo files41 >&2 && test -r ~/.local/share/gitpack/status &&
+echo files42 >&2 && test -w ~/.local/share/gitpack/status &&
+echo files43 >&2 && test -r ~/.local/share/gitpack/status.bak &&
+echo files44 >&2 && test -w ~/.local/share/gitpack/status.bak &&
+echo files45 >&2 && test -d ~/.cache/gitpack/ &&
+echo files46 >&2 && test -d ~/.cache/gitpack/repo/ &&
+echo files47 >&2 && test -d ~/.cache/gitpack/repo/github.com/ &&
+echo files48 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/ &&
+echo files49 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/vhdldep/ &&
 
 # uninstall vhdldep
-echo test47 >&2 && gitpack uninstall github.com/dominiksalvet/vhdldep &&
+echo files50 >&2 && gitpack uninstall github.com/dominiksalvet/vhdldep &&
 gitpack uninstall github.com/dominiksalvet/vhdldep &&
 gitpack status github.com/dominiksalvet/vhdldep &&
 # check files
-echo test48 >&2 && test -d ~/.local/share/gitpack/ &&
-echo test49 >&2 && test -r ~/.local/share/gitpack/gitpack.log &&
-echo test50 >&2 && test -w ~/.local/share/gitpack/gitpack.log &&
-echo test51 >&2 && test -r ~/.local/share/gitpack/status &&
-echo test52 >&2 && test -w ~/.local/share/gitpack/status &&
-echo test53 >&2 && test -r ~/.local/share/gitpack/status.bak &&
-echo test54 >&2 && test -w ~/.local/share/gitpack/status.bak &&
-echo test55 >&2 && test -d ~/.cache/gitpack/ &&
-echo test56 >&2 && test -d ~/.cache/gitpack/repo/ &&
-echo test57 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo test58 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/vhdldep/ &&
+echo files51 >&2 && test -d ~/.local/share/gitpack/ &&
+echo files52 >&2 && test -r ~/.local/share/gitpack/gitpack.log &&
+echo files53 >&2 && test -w ~/.local/share/gitpack/gitpack.log &&
+echo files54 >&2 && test -r ~/.local/share/gitpack/status &&
+echo files55 >&2 && test -w ~/.local/share/gitpack/status &&
+echo files56 >&2 && test -r ~/.local/share/gitpack/status.bak &&
+echo files57 >&2 && test -w ~/.local/share/gitpack/status.bak &&
+echo files58 >&2 && test -d ~/.cache/gitpack/ &&
+echo files59 >&2 && test -d ~/.cache/gitpack/repo/ &&
+echo files60 >&2 && test -d ~/.cache/gitpack/repo/github.com/ &&
+echo files61 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/ &&
+echo files62 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/vhdldep/ &&
 
 # intentionally bad URL
-echo test59 >&2 && ! gitpack status github.com/a/b/c 2>&1 &&
+echo files63 >&2 && ! gitpack status github.com/a/b/c 2>&1 &&
 # check files
-echo test60 >&2 && test -d ~/.local/share/gitpack/ &&
-echo test61 >&2 && test -r ~/.local/share/gitpack/gitpack.log &&
-echo test62 >&2 && test -w ~/.local/share/gitpack/gitpack.log &&
-echo test63 >&2 && test -r ~/.local/share/gitpack/status &&
-echo test64 >&2 && test -w ~/.local/share/gitpack/status &&
-echo test65 >&2 && test -r ~/.local/share/gitpack/status.bak &&
-echo test66 >&2 && test -w ~/.local/share/gitpack/status.bak &&
-echo test67 >&2 && test -d ~/.cache/gitpack/ &&
-echo test68 >&2 && test -d ~/.cache/gitpack/repo/ &&
-echo test69 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo test70 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/vhdldep/ &&
-echo test71 >&2 && test ! -d ~/.cache/gitpack/repo/a/ &&
+echo files64 >&2 && test -d ~/.local/share/gitpack/ &&
+echo files65 >&2 && test -r ~/.local/share/gitpack/gitpack.log &&
+echo files66 >&2 && test -w ~/.local/share/gitpack/gitpack.log &&
+echo files67 >&2 && test -r ~/.local/share/gitpack/status &&
+echo files68 >&2 && test -w ~/.local/share/gitpack/status &&
+echo files69 >&2 && test -r ~/.local/share/gitpack/status.bak &&
+echo files70 >&2 && test -w ~/.local/share/gitpack/status.bak &&
+echo files71 >&2 && test -d ~/.cache/gitpack/ &&
+echo files72 >&2 && test -d ~/.cache/gitpack/repo/ &&
+echo files73 >&2 && test -d ~/.cache/gitpack/repo/github.com/ &&
+echo files74 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/ &&
+echo files75 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/vhdldep/ &&
+echo files76 >&2 && test ! -d ~/.cache/gitpack/repo/a/ &&
 
 # clean cache again
-echo test72 >&2 && rm ~/.local/share/gitpack/status && # should be recovered from a backup
-echo test73 >&2 && gitpack clean &&
+echo files77 >&2 && rm ~/.local/share/gitpack/status && # should be recovered from a backup
+echo files78 >&2 && gitpack clean &&
 # check files
-echo test74 >&2 && test -d ~/.local/share/gitpack/ &&
-echo test75 >&2 && test -r ~/.local/share/gitpack/gitpack.log &&
-echo test76 >&2 && test -w ~/.local/share/gitpack/gitpack.log &&
-echo test77 >&2 && test -r ~/.local/share/gitpack/status &&
-echo test78 >&2 && test -w ~/.local/share/gitpack/status &&
-echo test79 >&2 && test -r ~/.local/share/gitpack/status.bak &&
-echo test80 >&2 && test -w ~/.local/share/gitpack/status.bak &&
-echo test81 >&2 && test ! -d ~/.cache/gitpack/
+echo files79 >&2 && test -d ~/.local/share/gitpack/ &&
+echo files80 >&2 && test -r ~/.local/share/gitpack/gitpack.log &&
+echo files81 >&2 && test -w ~/.local/share/gitpack/gitpack.log &&
+echo files82 >&2 && test -r ~/.local/share/gitpack/status &&
+echo files83 >&2 && test -w ~/.local/share/gitpack/status &&
+echo files84 >&2 && test -r ~/.local/share/gitpack/status.bak &&
+echo files85 >&2 && test -w ~/.local/share/gitpack/status.bak &&
+echo files86 >&2 && test ! -d ~/.cache/gitpack/
