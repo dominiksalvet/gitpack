@@ -369,7 +369,8 @@ clean() {
 
 # DESCRIPTION:
 #   Removes a given directory recursively if it exists. It also prevents from
-#   removing the root and home directories.
+#   removing the root and home directories and there are performed additional
+#   checks related to safety of the whole process.
 # PARAMETERS:
 #   $1 - directory
 remove_dir() {
@@ -385,7 +386,7 @@ remove_dir() {
             # check for a home directory
             test "$PWD" != ~ && test "$pwd_out" != ~
         ) &&
-        rm -rf -- "${1:?}"/ # remove recursively the directory itself
+        rm -rf -- "${1:?}"/ # remove the directory itself recursively
     fi
 }
 
