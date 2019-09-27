@@ -159,8 +159,8 @@ process_args() {
         "$ACTION_INSTALL" | "$ACTION_UNINSTALL" | "$ACTION_STATUS")
             process_action_args "$@" # process action-based arguments
             ;;
-        list) init_runtime && list_installed ;;
-        clean) init_runtime && clean_cache ;;
+        list) init_runtime && list ;;
+        clean) init_runtime && clean ;;
         help) echo "$HELP_MESSAGE"; return ;;
         about) echo "$ABOUT_MESSAGE"; return ;;
         '') echo 'no argument provided' >&2; return 1 ;;
@@ -339,8 +339,8 @@ echof() {
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   Outputs all installed Git projects and their version or commit hash.
-list_installed() {
+#   Prints all installed Git projects and their versions or commit hashes.
+list() {
     log "$LOGTYPE_LIST" "$STATUS_PATH" &&
     while read -r db_record; do
         url="${db_record%% *}" # extract URL
@@ -352,7 +352,7 @@ list_installed() {
 
 # DESCRIPTION:
 #   Cleans the GitPack cache and log performing checks for unintended removal.
-clean_cache() {
+clean() {
     # log clean operation, also creates a log file if it does not exit
     log "$LOGTYPE_CLEAN" "$CACHE_DIR"/ &&
 
@@ -361,37 +361,33 @@ clean_cache() {
     echo "$tail_out" > "$LOG_PATH" && # write changes back to the log file
 
     # clean Git cache
-    if [ -d "${CACHE_DIR:?}"/ ]; then # check if cache exists
-        if rm_rf_dir_check "$CACHE_DIR"; then
-            rm -rf -- "${CACHE_DIR:?}"/
-        else
-            echof 'prevent removing the root directory'
-            return 1
-        fi
+    if ! remove_dir "$CACHE_DIR"; then # in case of fail
+        echof "prevent removing $CACHE_DIR directory"
+        return 1
     fi
 }
 
 # DESCRIPTION:
-#   Checks whether it is possible to recursively remove a given directory. It
-#   prevents from removing the root and home directories. This function uses
-#   only the first parameter due to possible unintended globbing.
+#   Removes a given directory recursively if it exists. It also prevents from
+#   removing the root and home directories.
 # PARAMETERS:
 #   $1 - directory
-rm_rf_dir_check() { (
+remove_dir() {
     test "$1" && # the directory path must not be empty
-    cd -- "$1"/ 2>/dev/null && # fails if the given directory doesn't exist
-    pwd_out="$(pwd -P)" && # store physical path of the current directory
+    if [ -d "${1:?}"/ ]; then # check if the directory exists
+        (   # store physical path of the given directory
+            cd -- "$1"/ && pwd_out="$(pwd -P)" &&
 
-    # check for the root directory
-    test "$PWD" != / &&
-    test "$pwd_out" != / &&
-    test "$PWD" != // && # two slashes may not be shortened to a single slash
-    test "$pwd_out" != // &&
-
-    # check for home directory
-    test "$PWD" != ~ &&
-    test "$pwd_out" != ~
-) }
+            # check for the root directory
+            test "$PWD" != / && test "$pwd_out" != / &&
+            # check for the root directory (with two slashes)
+            test "$PWD" != // && test "$pwd_out" != // &&
+            # check for a home directory
+            test "$PWD" != ~ && test "$pwd_out" != ~
+        ) &&
+        rm -rf -- "${1:?}"/ # remove recursively the directory itself
+    fi
+}
 
 #-------------------------------------------------------------------------------
 # ACTION PROCESSING
