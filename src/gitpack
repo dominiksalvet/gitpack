@@ -887,7 +887,7 @@ remove_files_from_dir() {
     target_dir="$(get_last_arg "$@")" &&
     test "$target_dir" &&
 
-    while "$#" -gt 1; do # for each file path argument
+    while [ "$#" -gt 1 ]; do # for each file path argument
         test "$1" &&
         remove_file_from_dir "$1" "$target_dir" && # remove the file
         rmdirf -p -- "${target_dir:?}"/ && # remove empty pathname directories
