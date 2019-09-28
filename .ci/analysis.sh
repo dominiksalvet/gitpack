@@ -56,7 +56,7 @@ init_code_style() {
 check_line_length() {
     lineno=0 # initialize line counter
     while IFS= read -r line; do
-        lineno=$((lineno + 1)) # increment line counter
+        lineno="$((lineno + 1))" # increment line counter
         if [ "${#line}" -gt "$2" ]; then # check line length
             echo "$1:$lineno line has more than $2 characters" >&2
             return 1

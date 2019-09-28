@@ -634,7 +634,7 @@ echon() {
 #   Prepares the environment for a new dependency depth level. It also checks
 #   whether it is possible to continue processing dependencies.
 next_dep_depth() {
-    dep_depth=$((dep_depth + 1)) # increment dependency depth
+    dep_depth="$((dep_depth + 1))" # increment dependency depth
 
     # check whether the new dependency depth value is valid
     if [ "$dep_depth" -gt "$MAX_DEP_DEPTH" ]; then
@@ -851,7 +851,7 @@ copy_files_to_dir() {
 # PARAMETERS:
 #   $@ - arguments
 get_last_arg() {
-    shift $(($# - 1)) && # shift to the last argument
+    shift "$(($# - 1))" && # shift to the last argument
     echo "$1" # print it
 }
 
