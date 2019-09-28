@@ -11,12 +11,12 @@ GitPack works with the master branch of Git projects. It uses either latest tag 
 GitPack works with the *.gitpack* directory of Git repositories matching the following structure:
 
 * *.gitpack/install/*`<method>` is a directory:
-  * **Its name starts with** either `global` or `local` based on installation type.
-  * To target a particular system only, append its name as `-<system>`.
-  * E.g., `local-Darwin` represents local installation for macOS-only.
+  * Its name starts with either `global` or `local` based on **installation type**.
+  * To target a particular system, append its name as `-<system>`.
+  * E.g., `local-Darwin` represents local installation for macOS.
 * *.gitpack/install/\<method\>/*`map` is a file:
-  * Describes which project files are copied and where during installation.
-  * **Has one source path** and one target directory path per line.
+  * Describes **how project files are copied/removed** during installation/uninstallation.
+  * Has file paths to be copied and a target directory per line.
   * E.g., line `bin/vhdldep /usr/local/bin` copies *vhdldep* file to */usr/local/bin* directory.
 
 ## Optional files
@@ -37,4 +37,4 @@ GitPack also works with optional files located in the *.gitpack* directory as fo
 
 ## Examples
 
-If you are interested in examples of projects using GitPack, take a look at the [gitpack topic](https://github.com/topics/gitpack).
+If you are interested in **examples of projects using GitPack**, take a look at the [gitpack topic](https://github.com/topics/gitpack).
