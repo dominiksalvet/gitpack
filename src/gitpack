@@ -32,7 +32,7 @@ main() {
 check_sw_deps() {
     # a list of required software
     sw_deps='command echo [ cd test pwd rm id mkdir touch grep git uname read cp
-             head cut true basename find rmdir tr date tail kill'
+             head cut true basename find rmdir tr date tail kill sort'
 
     # check if any piece of software is missing
     for sw_dep in $sw_deps; do
@@ -174,7 +174,7 @@ process_args() {
 #   Processes a given action over all given repository references.
 # PARAMETERS:
 #   $1 - action
-#   $2.. - references
+#   $@ - references
 process_action_args() {
     if [ "$#" -eq 1 ]; then # check if there is any reference argument
         echo 'no URL provided' >&2
@@ -307,7 +307,7 @@ init_logging() {
 #   based on a given type and details.
 # PARAMETERS:
 #   $1 - type
-#   $2.. - details (optional)
+#   $@ - details (optional)
 log() {
     date_out="$(date '+%Y-%m-%d %H:%M:%S')" && # catch time immediately
     logtype="$1" && # use the given log type
@@ -375,7 +375,7 @@ clean() {
 #   $1 - directory
 remove_dir() {
     test "$1" && # the directory path must not be empty
-    if [ -d "${1:?}"/ ]; then # check if the directory exists
+    if [ -d "$1"/ ]; then # check if the directory exists
         (   # store physical path of the given directory
             cd -- "$1"/ && pwd_out="$(pwd -P)" &&
 
@@ -404,7 +404,7 @@ remove_dir() {
 process_action() {
     {   # log current action processing
         log "$LOGTYPE_ACTION" "$1" "$2" &&
-        # process given reference - URL + version (optional)
+        # process given reference - URL + optional version
         url="$(ref_to_url "$2")" &&
         version="$(ref_to_version "$2")" &&
         check_url "$url" &&
@@ -746,9 +746,9 @@ install() { (
         run_script "$install_dir"/precp
     fi &&
 
-    # copy all files by defined routes
+    # copy all files using the preferred map
     log "$LOGTYPE_CP" "$1" "$2" "$install_method" &&
-    for_each_route "$install_dir"/map copy_files &&
+    copy_files "$install_dir"/map &&
 
     if [ -x "$install_dir"/postcp ]; then # after files copy
         log "$LOGTYPE_POSTCP" "$1" "$2" "$install_method" &&
@@ -771,9 +771,9 @@ uninstall() { (
         run_script "$install_dir"/prerm
     fi &&
 
-    # remove all files by defined routes
+    # remove all files using the preferred map
     log "$LOGTYPE_RM" "$1" "$2" "$install_method" &&
-    for_each_route "$install_dir"/map remove_files &&
+    remove_files "$install_dir"/map &&
 
     if [ -x "$install_dir"/postrm ]; then # after files removal
         log "$LOGTYPE_POSTRM" "$1" "$2" "$install_method" &&
@@ -814,66 +814,133 @@ run_script() {
 }
 
 #-------------------------------------------------------------------------------
-# COPY AND REMOVE FILES
+# COPY FILES
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   For each given map route, it calls a given function. It also prepares the
-#   map by removing comments and empty lines before calling any function so that
-#   it contains only required routes.
+#   Copies files based on a given GitPack map file.
 # PARAMETERS:
 #   $1 - map path
-#   $2 - function name
-for_each_route() {
+copy_files() { (
     if [ -r "$1" ]; then # check whether the map file exists
         grepe_out="$(grepe '^[^#]' "$1")" && # remove empty and comment lines
-        # call a given function for each route
+        # copy files for each route of the map
         echon "$grepe_out" | while read -r route; do
-            eval "$2" "$route" || return
+            eval copy_files_to_dir "$route" || return
         done
     else # if the map file does not exist, fails
         echof 'missing map file'
         return 1
     fi
+) }
+
+# DESCRIPTION:
+#   Copies given files recursively to a given target directory. It also creates
+#   all intermediate directories necessary.
+# PARAMETERS:
+#   $@ - file paths
+#   -$1 - target directory
+copy_files_to_dir() {
+    target_dir="$(get_last_arg "$@")" &&
+    mkdir -p -- "$target_dir" &&
+    cp -R -- "$@"
 }
 
 # DESCRIPTION:
-#   Copies files recursively based on given source and target paths. It also
-#   creates the target directory if it does not exist before copying.
-# PARAMAETERS:
-#   $1 - source path
-#   $2 - target directory
-copy_files() {
-    : "${1:?}" "${2:?}" && # parameters must be set up
-    mkdir -p -- "$2"/ && # create target directory
-    cp -R -- "$1" "$2"/ # copy the files recursively
+#   Prints the last argument of all given arguments.
+# PARAMETERS:
+#   $@ - arguments
+get_last_arg() {
+    shift $(($# - 1)) &&
+    echo "$1"
+}
+
+#-------------------------------------------------------------------------------
+# REMOVE FILES
+#-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Removes files based on a given GitPack map file.
+# PARAMETERS:
+#   $1 - map path
+remove_files() { (
+    if [ -r "$1" ]; then # check whether the map file exists
+        grepe_out="$(grepe '^[^#]' "$1")" && # remove empty and comment lines
+        # copy files for each route of the map
+        echon "$grepe_out" | while read -r route; do
+            eval remove_files_from_dir "$route" || return
+        done
+    else # if the map file does not exist, fails
+        echof 'missing map file'
+        return 1
+    fi
+) }
+
+# DESCRIPTION:
+#   Removes the copies of given files from a given target directory. Then, also
+#   removes all empty directories in the target directory pathname.
+# PARAMETERS:
+#   $@ - file paths
+#   -$1 - target directory
+remove_files_from_dir() {
+    target_dir="$(get_last_arg "$@")" &&
+    test "$target_dir" &&
+
+    while "$#" -gt 1; do
+        test "$1" &&
+        remove_file_from_dir "$1" "$target_dir" &&
+        rmdirf -p -- "${target_dir:?}"/ &&
+        shift || return
+    done
 }
 
 # DESCRIPTION:
-#   Removes files based on given source and target paths.
-# PARAMAETERS:
-#   $1 - source path
+#   This function is a rmdir wrapper. It succeeds even in case the target
+#   directories do not exist.
+# PARAMETERS:
+#   $@ - rmdir arguments
+rmdirf() {
+    rmdir "$@" 2>/dev/null; true
+}
+
+# DESCRIPTION:
+#   Removes the copy of a given file from a given target directory. In case of a
+#   directory, its content is removed in accordance with the original directory.
+# PARAMETERS:
+#   $1 - file path
 #   $2 - target directory
-remove_files() {
-    : "${1:?}" "${2:?}" && # parameters must be set up
-    basename_out="$(basename -- "$1")" && # get the last part of the source path
+remove_file_from_dir() {
+    test "$1" && test "$2" &&
+
     if [ -d "$1"/ ]; then
-        # scan source path to obtain files mask
-        files="$(cd -- "$1"/ && find . ! -type d)" &&
-        dirs="$(cd -- "$1"/ && find . ! -path . -type d)" &&
-
-        (   # remove files and then directories by the files mask
-            cd -- "$2"/ &&
-            for file in $files; do
-                rm -f -- "${basename_out:?}"/"${file:?}" || return
-            done &&
-            for dir in $dirs; do
-                rmdir -p -- "${basename_out:?}"/"${dir:?}"/ 2>/dev/null; true
-            done
-        )
-    else # remove the file as a regular file
+        remove_dir_from_dir "$1" "$2"
+    else
+        basename_out="$(basename -- "$1")" &&
         rm -f -- "${2:?}"/"${basename_out:?}"
     fi
+}
+
+# DESCRIPTION:
+#   Removes the copy of a given directory from a given target directory. It uses
+#   the contents of the given directory as a file mask controlling the process
+#   of file removing in the target directory.
+# PARAMETERS:
+#   $1 - directory
+#   $2 - target directory
+remove_dir_from_dir() {
+    test "$1" && test "$2" &&
+    basename_out="$(basename -- "$1")" &&
+
+    files="$(cd -- "$1"/ && find . ! -type d)" &&
+    dirs="$(cd -- "$1"/ && find . -type d ! -path . | sort -r)" &&
+
+    for file in $files; do
+        rm -f -- "${2:?}"/"${basename_out:?}"/"${file:?}" || return
+    done &&
+    for dir in $dirs; do
+        rmdirf -- "${2:?}"/"${basename_out:?}"/"${dir:?}"/ || return
+    done &&
+    rmdirf -- "${2:?}"/"${basename_out:?}"/
 }
 
 #-------------------------------------------------------------------------------
