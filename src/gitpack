@@ -842,8 +842,8 @@ copy_files() { (
 #   -$1 - target directory
 copy_files_to_dir() {
     target_dir="$(get_last_arg "$@")" &&
-    mkdir -p -- "$target_dir" &&
-    cp -R -- "$@"
+    mkdir -p -- "$target_dir" && # create target directory
+    cp -R -- "$@" # copy files recursively into to
 }
 
 # DESCRIPTION:
@@ -851,8 +851,8 @@ copy_files_to_dir() {
 # PARAMETERS:
 #   $@ - arguments
 get_last_arg() {
-    shift $(($# - 1)) &&
-    echo "$1"
+    shift $(($# - 1)) && # shift to the last argument
+    echo "$1" # print it
 }
 
 #-------------------------------------------------------------------------------
@@ -883,14 +883,15 @@ remove_files() { (
 #   $@ - file paths
 #   -$1 - target directory
 remove_files_from_dir() {
+    # get the target directory to remove files from
     target_dir="$(get_last_arg "$@")" &&
     test "$target_dir" &&
 
-    while "$#" -gt 1; do
+    while "$#" -gt 1; do # for each file path argument
         test "$1" &&
-        remove_file_from_dir "$1" "$target_dir" &&
-        rmdirf -p -- "${target_dir:?}"/ &&
-        shift || return
+        remove_file_from_dir "$1" "$target_dir" && # remove the file
+        rmdirf -p -- "${target_dir:?}"/ && # remove empty pathname directories
+        shift || return # shift to next argument
     done
 }
 
@@ -900,6 +901,7 @@ remove_files_from_dir() {
 # PARAMETERS:
 #   $@ - rmdir arguments
 rmdirf() {
+    # suppress error output and always succeeds
     rmdir "$@" 2>/dev/null; true
 }
 
@@ -915,7 +917,8 @@ remove_file_from_dir() {
     if [ -d "$1"/ ]; then
         remove_dir_from_dir "$1" "$2"
     else
-        basename_out="$(basename -- "$1")" &&
+        basename_out="$(basename -- "$1")" && # name of the file to be removed
+        # remove the file from the target directory
         rm -f -- "${2:?}"/"${basename_out:?}"
     fi
 }
@@ -929,18 +932,19 @@ remove_file_from_dir() {
 #   $2 - target directory
 remove_dir_from_dir() {
     test "$1" && test "$2" &&
-    basename_out="$(basename -- "$1")" &&
+    basename_out="$(basename -- "$1")" && # name of the directory to be removed
 
-    files="$(cd -- "$1"/ && find . ! -type d)" &&
-    dirs="$(cd -- "$1"/ && find . -type d ! -path . | sort -r)" &&
+    # scan the target directory to obtain a file mask
+    files="$(cd -- "$1"/ && find . ! -type d)" && # files
+    dirs="$(cd -- "$1"/ && find . -type d ! -path . | sort -r)" && # directories
 
-    for file in $files; do
+    for file in $files; do # remove files using the file mask
         rm -f -- "${2:?}"/"${basename_out:?}"/"${file:?}" || return
     done &&
-    for dir in $dirs; do
+    for dir in $dirs; do # remove directories using the file mask
         rmdirf -- "${2:?}"/"${basename_out:?}"/"${dir:?}"/ || return
     done &&
-    rmdirf -- "${2:?}"/"${basename_out:?}"/
+    rmdirf -- "${2:?}"/"${basename_out:?}"/ # remove the copied directory itself
 }
 
 #-------------------------------------------------------------------------------
