@@ -6,17 +6,12 @@
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
 #   Dumps useful GitPack data stored on the disk. Prefers the local installation
-#   data to the global installation data. Exits with a given expected exit
-#   status to make error propagation easier.
-# PARAMETERS:
-#   $1 - expected exit status
+#   data to the global installation data.
 #-------------------------------------------------------------------------------
 
 # dump the preferred log
 if [ -r ~/.local/share/gitpack/gitpack.log ]; then
-    cat ~/.local/share/gitpack/gitpack.log >&2
+    cat ~/.local/share/gitpack/gitpack.log
 elif [ -r /var/log/gitpack/gitpack.log ]; then
-    cat /var/log/gitpack/gitpack.log >&2
+    cat /var/log/gitpack/gitpack.log
 fi
-
-exit "$1" # exit with the expected exit status

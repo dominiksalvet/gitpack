@@ -13,16 +13,20 @@ jobs:
 
     - stage: installation
       os: linux
-      script: .ci/installation.sh > /dev/null || .ci/dump.sh "$?"
+      script: .ci/installation.sh
+      after_failure: .ci/dump.sh
 
     - os: osx
-      script: .ci/installation.sh > /dev/null || .ci/dump.sh "$?"
+      script: .ci/installation.sh
+      after_failure: .ci/dump.sh
 
     - stage: tests
       os: linux
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: .ci/tests.sh > /dev/null || .ci/dump.sh "$?"
+      script: .ci/tests.sh
+      after_failure: .ci/dump.sh
 
     - os: osx
       install: src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT"
-      script: .ci/tests.sh > /dev/null || .ci/dump.sh "$?"
+      script: .ci/tests.sh
+      after_failure: .ci/dump.sh
