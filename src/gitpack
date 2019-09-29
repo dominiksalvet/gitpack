@@ -452,7 +452,7 @@ check_url() {
     log "$LOGTYPE_URL" "$1" || return
     url_regex='^[[:alnum:]_][[:alnum:]_\.-]*(/[[:alnum:]_][[:alnum:]_\.-]*){2}$'
 
-    if ! echo "$1" | grep -q -E "$url_regex"; then
+    if ! echo "$1" | grep -qE "$url_regex"; then
         echof 'unsupported URL delivered'
         return 1
     fi
@@ -977,7 +977,7 @@ insert_db_record() {
 #   $1 - URL
 delete_db_records() {
     log "$LOGTYPE_DELETE" "$1" "$STATUS_PATH" &&
-    grepe_out="$(grepe -F -v "$1" "$STATUS_PATH")" &&
+    grepe_out="$(grepe -Fv "$1" "$STATUS_PATH")" &&
     echon "$grepe_out" > "$STATUS_PATH"
 }
 
