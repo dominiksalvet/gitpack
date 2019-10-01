@@ -287,7 +287,7 @@ init_database() {
 
     # check access to GitPack status file
     if [ ! -r "$STATUS_PATH" ] || [ ! -w "$STATUS_PATH" ]; then
-        echof "cannot access $STATUS_PATH file"
+        echof "cannot access status file $STATUS_PATH"
         return 1
     fi
 }
@@ -363,7 +363,7 @@ clean() {
 
     # clean Git cache
     if ! remove_dir "$CACHE_DIR"; then # in case of fail
-        echof "prevent removing $CACHE_DIR directory"
+        echof "cannot remove cache directory $CACHE_DIR"
         return 1
     fi
 }
@@ -827,7 +827,7 @@ run_script() {
     "$1" && return # run the script and return early if it exited successfully
 
     script_status="$?" # store the exit status of the failed script
-    echof "$(basename "$1") script failed with $script_status"
+    echof "$(basename -- "$1") script failed with $script_status"
     return 1 # indicate error but do not propagate the exit status further
 }
 
