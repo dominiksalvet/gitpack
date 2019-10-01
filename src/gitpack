@@ -65,6 +65,7 @@ init_constants() {
     STATE_INSTALL=install # just installed
     STATE_UPDATE=update # just updated
     STATE_DOWNGRADE=downgrade # just downgraded
+    STATE_CHANGE=change # just changed
     STATE_INSTALLED=installed # already installed
     # project states of uninstall action
     STATE_UNINSTALL=uninstall # just uninstalled
@@ -73,6 +74,7 @@ init_constants() {
     STATE_NOTHING=nothing # project is not installed
     STATE_OLDER=older # current version is older than target version
     STATE_NEWER=newer # current version is newer than target version
+    STATE_DIFF=diff # current version is incomparable to target version
     STATE_OK=ok # current version is equal to target version
 
     # global log types
@@ -157,8 +159,7 @@ init_configuration() {
 process_args() {
     case "$1" in # process arguments based on the first argument
         "$ACTION_INSTALL" | "$ACTION_UNINSTALL" | "$ACTION_STATUS")
-            process_action_args "$@" # process action-based arguments
-            ;;
+            process_action_args "$@" ;; # process action-based arguments
         list) init_runtime && list ;;
         clean) init_runtime && clean ;;
         help) echo "$HELP_MESSAGE"; return ;;
@@ -653,7 +654,7 @@ next_dep_depth() {
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   Decides whether install, update, or do nothing with a given project. If any
+#   Decides whether install, change, or do nothing with a given project. If any
 #   operation is done, it will use only given commits and also updates the
 #   GitPack database.
 # PARAMETERS:
@@ -661,24 +662,37 @@ next_dep_depth() {
 #   $2 - source commit (optional)
 #   $3 - target commit
 execute_install() {
-    if [ ! "$2" ]; then
-        state="$STATE_INSTALL" && # installation
+    if [ ! "$2" ]; then # no source version
+        state="$STATE_INSTALL" &&
         install "$1" "$3" && # install target commit
         insert_db_record "$1" "$3" # update GitPack database
-    elif [ "$2" = "$3" ]; then
-        state="$STATE_INSTALLED" # already installed
-    else
-        # check if installed version is older than the target
-        if is_ancestor_commit "$1" "$2" "$3"; then
-            state="$STATE_UPDATE" # update
-        else
-            state="$STATE_DOWNGRADE" # downgrade
-        fi &&
-        uninstall "$1" "$2" && # uninstall source commit
-        delete_db_records "$1" && # update GitPack database
-        install "$1" "$3" && # install target commit
-        insert_db_record "$1" "$3" # update GitPack database
+    elif [ "$2" = "$3" ]; then # given versions are equal
+        state="$STATE_INSTALLED"
+    else # given version are different
+        execute_change "$1" "$2" "$3"
     fi
+}
+
+# DESCRIPTION:
+#   Changes version of a given project from a given source commit to a given
+#   target commit and updates the GitPack database.
+# PARAMETERS:
+#   $1 - URL
+#   $2 - source commit
+#   $3 - target commit
+execute_change() {
+    if is_ancestor_commit "$1" "$2" "$3"; then # source version is older
+        state="$STATE_UPDATE"
+    elif is_ancestor_commit "$1" "$3" "$2"; then # source version is newer
+        state="$STATE_DOWNGRADE"
+    else # given versions are not comparable (different branches)
+        state="$STATE_CHANGE"
+    fi &&
+
+    uninstall "$1" "$2" && # uninstall source commit
+    delete_db_records "$1" && # update GitPack database
+    install "$1" "$3" && # install target commit
+    insert_db_record "$1" "$3" # update GitPack database
 }
 
 # DESCRIPTION:
@@ -690,11 +704,11 @@ execute_install() {
 #   $2 - commit (optional)
 execute_uninstall() {
     if [ "$2" ]; then # if installed
-        state="$STATE_UNINSTALL" && # uninstallation
+        state="$STATE_UNINSTALL" &&
         uninstall "$1" "$2" && # uninstall given commit
         delete_db_records "$1" # update GitPack database
-    else
-        state="$STATE_UNINSTALLED" # already uninstalled
+    else # no source version
+        state="$STATE_UNINSTALLED"
     fi
 }
 
@@ -706,17 +720,16 @@ execute_uninstall() {
 #   $2 - source commit (optional)
 #   $3 - target commit
 execute_status() {
-    if [ ! "$2" ]; then
-        state="$STATE_NOTHING" # nothing installed from the URL
-    elif [ "$2" = "$3" ]; then
-        state="$STATE_OK" # the same as latest version
-    else
-        # check if installed version is older than the target
-        if is_ancestor_commit "$1" "$2" "$3"; then
-            state="$STATE_OLDER" # older than latest version
-        else
-            state="$STATE_NEWER" # newer than latest version
-        fi
+    if [ ! "$2" ]; then # no source version
+        state="$STATE_NOTHING"
+    elif [ "$2" = "$3" ]; then # given versions are equal
+        state="$STATE_OK"
+    elif is_ancestor_commit "$1" "$2" "$3"; then # source version is older
+        state="$STATE_OLDER"
+    elif is_ancestor_commit "$1" "$3" "$2"; then # source version is newer
+        state="$STATE_NEWER"
+    else # given versions are not comparable (different branches)
+        state="$STATE_DIFF"
     fi
 }
 
@@ -1005,14 +1018,14 @@ print_report() {
 
     case "$1" in
         "$STATE_INSTALL") echo "$prefix $tar_version" ;;
-        "$STATE_UPDATE") echo "$prefix $tar_version <- $src_version" ;;
-        "$STATE_DOWNGRADE") echo "$prefix $tar_version <- $src_version" ;;
+        "$STATE_UPDATE" | "$STATE_DOWNGRADE" | "$STATE_CHANGE")
+            echo "$prefix $tar_version <- $src_version" ;;
         "$STATE_INSTALLED") echo "$prefix $src_version" ;;
         "$STATE_UNINSTALL") echo "$prefix $src_version" ;;
         "$STATE_UNINSTALLED") echo "$prefix" ;;
         "$STATE_NOTHING") echo "$prefix -> $tar_version" ;;
-        "$STATE_OLDER") echo "$prefix $src_version -> $tar_version" ;;
-        "$STATE_NEWER") echo "$prefix $src_version -> $tar_version" ;;
+        "$STATE_OLDER" | "$STATE_NEWER" | "$STATE_DIFF")
+            echo "$prefix $src_version -> $tar_version" ;;
         "$STATE_OK") echo "$prefix $src_version" ;;
     esac
 }
