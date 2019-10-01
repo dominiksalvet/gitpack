@@ -488,7 +488,7 @@ refresh_repo() { (
         # clone Git repository, it may ask the user for a password
         git clone -q --no-checkout https://"$1".git ./
     else
-        git remote update > /dev/null # fetch remote updates
+        git fetch -q origin # fetch remote updates
     fi
 ) }
 
