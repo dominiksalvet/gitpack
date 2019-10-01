@@ -766,7 +766,7 @@ install() { (
 
     # copy all files using the preferred map
     log "$LOGTYPE_CP" "$1" "$2" "$install_method" &&
-    copy_files "$install_dir"/map &&
+    for_each_route "$install_dir"/map copy_files_to_dir &&
 
     if [ -x "$install_dir"/postcp ]; then # after files copy
         log "$LOGTYPE_POSTCP" "$1" "$2" "$install_method" &&
@@ -791,7 +791,7 @@ uninstall() { (
 
     # remove all files using the preferred map
     log "$LOGTYPE_RM" "$1" "$2" "$install_method" &&
-    remove_files "$install_dir"/map &&
+    for_each_route "$install_dir"/map remove_files_from_dir &&
 
     if [ -x "$install_dir"/postrm ]; then # after files removal
         log "$LOGTYPE_POSTRM" "$1" "$2" "$install_method" &&
@@ -836,15 +836,18 @@ run_script() {
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   Copies files based on a given GitPack map file.
+#   For each given map route, it calls a given function. It also prepares the
+#   map by removing comments and empty lines before calling any function so that
+#   it contains only required routes.
 # PARAMETERS:
 #   $1 - map path
-copy_files() { (
+#   $2 - function name
+for_each_route() { (
     if [ -r "$1" ]; then # check whether the map file exists
         grepe_out="$(grepe '^[^#]' "$1")" && # remove empty and comment lines
-        # copy files for each route of the map
+        # call a given function for each route
         echon "$grepe_out" | while read -r route; do
-            eval copy_files_to_dir "$route" || return
+            eval "$2" "$route" || return
         done
     else # if the map file does not exist, fails
         echof 'missing map file'
@@ -876,23 +879,6 @@ get_last_arg() {
 #-------------------------------------------------------------------------------
 # REMOVE FILES
 #-------------------------------------------------------------------------------
-
-# DESCRIPTION:
-#   Removes files based on a given GitPack map file.
-# PARAMETERS:
-#   $1 - map path
-remove_files() { (
-    if [ -r "$1" ]; then # check whether the map file exists
-        grepe_out="$(grepe '^[^#]' "$1")" && # remove empty and comment lines
-        # copy files for each route of the map
-        echon "$grepe_out" | while read -r route; do
-            eval remove_files_from_dir "$route" || return
-        done
-    else # if the map file does not exist, fails
-        echof 'missing map file'
-        return 1
-    fi
-) }
 
 # DESCRIPTION:
 #   Removes the copies of given files from a given target directory. Then, also
