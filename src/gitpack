@@ -363,7 +363,7 @@ clean() {
 
     # clean Git cache
     if ! remove_dir "$CACHE_DIR"; then # in case of fail
-        echof "cannot remove cache directory $CACHE_DIR"
+        echof 'failed to remove cache directory'
         return 1
     fi
 }
@@ -756,8 +756,8 @@ is_ancestor_commit() { (
 #   $2 - commit
 install() { (
     repo_cd "$1" "$2" &&
-    install_method="$(get_install_method)" && # choose the installation method
-    install_dir="$(install_method_to_path "$install_method")" &&
+    install_dir="$(get_install_dir)" && # get preferred installation directory
+    install_method="$(basename -- "$install_dir"/)" && # installation method
 
     if [ -x "$install_dir"/precp ]; then # before files copy
         log "$LOGTYPE_PRECP" "$1" "$2" "$install_method" &&
@@ -781,8 +781,8 @@ install() { (
 #   $2 - commit
 uninstall() { (
     repo_cd "$1" "$2" &&
-    install_method="$(get_install_method)" && # choose the uninstallation method
-    install_dir="$(install_method_to_path "$install_method")" &&
+    install_dir="$(get_install_dir)" && # get preferred installation directory
+    install_method="$(basename -- "$install_dir"/)" && # uninstallation method
 
     if [ -x "$install_dir"/prerm ]; then # before files removal
         log "$LOGTYPE_PRERM" "$1" "$2" "$install_method" &&
@@ -800,23 +800,14 @@ uninstall() { (
 ) }
 
 # DESCRIPTION:
-#   Prints the appropriate GitPack installation method based on the current
-#   runtime and system information.
-get_install_method() {
+#   Prints the relative path of the appropriate GitPack installation directory
+#   based on the current runtime and system information.
+get_install_dir() {
     if [ -d .gitpack/install/"${access}-$system"/ ]; then
-        echo "${access}-$system" # system-specific directory
+        echo .gitpack/install/"${access}-$system" # system-specific directory
     else
-        echo "$access" # system-independent directory
+        echo .gitpack/install/"$access" # system-independent directory
     fi
-}
-
-# DESCRIPTION:
-#   Transforms a given installation method to an actual relative path where the
-#   instructions are stored.
-# PARAMETERS:
-#   $1 - installation method
-install_method_to_path() {
-    echo .gitpack/install/"$1"
 }
 
 # DESCRIPTION:
