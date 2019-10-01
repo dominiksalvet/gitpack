@@ -485,10 +485,9 @@ refresh_repo() { (
 
     if [ ! -d .git/ ]; then # if the directory does not contain a Git directory
         # clone Git repository, it may ask the user for a password
-        git clone -qb master https://"$1".git ./
+        git clone -q --no-checkout https://"$1".git ./
     else
-        git checkout -qf master && # checkout the master discarding any changes
-        git pull -q # pull changes from remote master into local master
+        git remote update > /dev/null # fetch remote updates
     fi
 ) }
 
@@ -543,12 +542,18 @@ execute_action() {
 get_repo_hash() { (
     repo_cd "$1" &&
 
-    if [ "$2" ]; then
-        git rev-parse "$2"'^{}' # transform delivered version to commit hash
-    elif tag_name="$(git describe --tags --abbrev=0 master 2>/dev/null)"; then
-        git rev-parse "$tag_name"'^{}' # transform latest tag to commit hash
+    if [ "$2" ]; then # if any version has been provided
+        # print a given version if it is a valid Git commit object reference
+        if ! git rev-parse --verify -q origin/"$2"'^{commit}' && # remote branch
+           ! git rev-parse --verify -q "$2"'^{commit}'; then # tag or commit
+            echof "version $2 does not exist"
+            return 1
+        fi
+    # get latest tag of the default branch (if any tag exists)
+    elif tag="$(git describe --tags --abbrev=0 origin/master 2>/dev/null)"; then
+        git rev-parse --verify "$tag"'^{commit}' # transform the tag to a hash
     else
-        git rev-parse master # get latest commit hash
+        git rev-parse --verify origin/master'^{commit}' # get latest commit hash
     fi
 ) }
 
@@ -561,7 +566,7 @@ get_repo_hash() { (
 repo_cd() {
     cd "$(url_to_path "$1")"/ && # transform the given URL to path
     if [ "$2" ]; then
-        git checkout -q "$2"
+        git checkout -qf "$2"
     fi
 }
 
@@ -1022,8 +1027,8 @@ print_report() {
 beautify_hash() { (
     # check if given hash is associated with any tag
     if repo_cd "$1" 2>/dev/null &&
-       tag_name="$(git describe --tags --exact-match "$2" 2>/dev/null)"; then
-        echo "$tag_name"
+       tag="$(git describe --tags --exact-match "$2" 2>/dev/null)"; then
+        echo "$tag"
     else # if no tag found, return short hash
         echo "$2" | cut -c 1-7
     fi
