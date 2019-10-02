@@ -119,14 +119,14 @@ init_strings() {
   gitpack COMMAND
 
 ACTION:
-  $ACTION_INSTALL    install/update Git projects
-  $ACTION_UNINSTALL  uninstall Git projects
-  $ACTION_STATUS     show status of Git projects
+  $ACTION_INSTALL    install/update projects
+  $ACTION_UNINSTALL  uninstall projects
+  $ACTION_STATUS     get status of projects
 
 COMMAND:
-  list   list installed Git projects
-  clean  clean cache and log
-  help   show this help
+  list   list installed projects
+  clean  clean files
+  help   show help
   about  show information"
 
     ABOUT_MESSAGE="GitPack $VERSION
