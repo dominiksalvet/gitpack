@@ -114,13 +114,16 @@ init_constants() {
 #   not be changed later. Constants must be already initialized.
 init_strings() {
     HELP_MESSAGE="USAGE:
-  gitpack ACTION URL[=VERSION]...
+  gitpack ACTION [OPTION...] URL[=VERSION]...
   gitpack COMMAND
 
 ACTION:
   $ACTION_INSTALL    install/update projects
   $ACTION_UNINSTALL  uninstall projects
   $ACTION_STATUS     get status of projects
+
+OPTION:
+  -o  offline mode
 
 COMMAND:
   list   list installed projects
@@ -199,8 +202,8 @@ backup_database() {
 #-------------------------------------------------------------------------------
 # DYNAMIC INITIALIZATION
 #-------------------------------------------------------------------------------
-# All constants of this section can be read in other code. All global variables
-# of this section can be accessed in other code.
+# All constants of this section can be read in other code. All global and
+# environment variables of this section can be accessed in other code.
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
@@ -208,6 +211,7 @@ backup_database() {
 #   GitPack's environment, logging and file structure will be prepared.
 init_runtime() {
     init_global_vars &&
+    init_environment_vars &&
     init_paths &&
     init_logging && # logging starts from here
     init_traps &&
@@ -215,7 +219,7 @@ init_runtime() {
 }
 
 # DESCRIPTION:
-#   Initializes global variables. If there is a global variable, it must be
+#   Initializes all global variables. If there is a global variable, it must be
 #   stated here even though its value is going to be overwritten.
 init_global_vars() {
     id_out="$(id -u)" && # check if running as root, not a global variable
@@ -229,6 +233,12 @@ init_global_vars() {
 
     state= && # the state of the processed project
     dep_depth=0 # current dependency depth
+}
+
+# DESCRIPTION:
+#   Initializes all environment variables. They can be read in called scripts.
+init_environment_vars() {
+    export OFFLINE_MODE=false # GitPack offline mode
 }
 
 # DESCRIPTION:
@@ -478,14 +488,16 @@ get_dep_prefix() {
 refresh_repo() { (
     repo_dir="$(url_to_path "$1")" && # get the repository directory path
     log "$LOGTYPE_REFRESH" "$1" "$repo_dir"/ &&
-    mkdir -p "$repo_dir"/ &&
-    cd "$repo_dir"/ &&
 
-    if [ ! -d .git/ ]; then # if the directory does not contain a Git directory
-        # clone Git repository, it may ask the user for a password
-        git clone -q --no-checkout https://"$1".git ./
-    else
+    if [ "$OFFLINE_MODE" = true ]; then # offline
+        test -d "$repo_dir"/ # fail if local repository does not exist
+    elif [ -d "$repo_dir"/ ]; then # refresh
+        cd "$repo_dir"/ &&
         git fetch -q origin # fetch remote updates
+    else # clone
+        mkdir -p "$repo_dir"/ && cd "$repo_dir"/ && # create directory
+        # create local repository by cloning, it may ask the user for a password
+        git clone -q --no-checkout https://"$1".git ./
     fi
 ) }
 
