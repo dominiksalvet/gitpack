@@ -78,7 +78,8 @@ init_constants() {
     STATE_OK=ok # current version is equal to target version
 
     # global log types
-    LOGTYPE_INIT=init # logging initialization
+    LOGTYPE_LOG=log # logging initialization
+    LOGTYPE_DB=db # database initialization
     LOGTYPE_BACKUP=backup # backup status file
     LOGTYPE_FAIL=fail # any recorder fail
     LOGTYPE_SIGNAL=signal # a handled signal
@@ -272,9 +273,10 @@ term_action() {
 
 # DESCRIPTION:
 #   Initializes GitPack database file structure based on prepared global
-#   variables. It fails if it cannot create a file or if GitPack does not have
-#   read or write permissions.
+#   variables. It fails if it cannot create a file or GitPack does not have read
+#   or write permissions.
 init_database() {
+    log "$LOGTYPE_DB" "$STATUS_PATH" &&
     mkdir -p "$STATE_DIR"/ && # create the state directory
     # create GitPack status file if it does not exist
     if [ ! -e "$STATUS_PATH" ]; then
@@ -287,7 +289,7 @@ init_database() {
 
     # check access to GitPack status file
     if [ ! -r "$STATUS_PATH" ] || [ ! -w "$STATUS_PATH" ]; then
-        echof "cannot access status file $STATUS_PATH"
+        echof 'cannot access status file'
         return 1
     fi
 }
@@ -300,7 +302,7 @@ init_database() {
 #   Creates logging file structure and logs the initialization log item.
 init_logging() {
     mkdir -p "$LOG_DIR"/ && # create the log directory
-    log "$LOGTYPE_INIT" "$COMMAND"
+    log "$LOGTYPE_LOG" "$COMMAND"
 }
 
 # DESCRIPTION:
