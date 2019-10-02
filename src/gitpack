@@ -37,8 +37,7 @@ check_sw_deps() {
     # check if any piece of software is missing
     for sw_dep in $sw_deps; do
         if ! command -v "$sw_dep" > /dev/null; then
-            echo "missing $sw_dep software" >&2
-            return 1
+            echo "missing $sw_dep software" >&2; return 1
         fi
     done
 }
@@ -179,8 +178,7 @@ process_args() {
 #   $@ - references
 process_action_args() {
     if [ "$#" -eq 1 ]; then # check if there is any reference argument
-        echo 'no URL provided' >&2
-        return 1
+        echo 'no URL provided' >&2; return 1
     fi
 
     init_runtime && # initialize runtime
@@ -289,8 +287,7 @@ init_database() {
 
     # check access to GitPack status file
     if [ ! -r "$STATUS_PATH" ] || [ ! -w "$STATUS_PATH" ]; then
-        echof 'cannot access status file'
-        return 1
+        echof 'cannot access status file'; return 1
     fi
 }
 
@@ -365,8 +362,7 @@ clean() {
 
     # clean Git cache
     if ! remove_dir "$CACHE_DIR"; then # in case of fail
-        echof 'failed to remove cache directory'
-        return 1
+        echof 'failed to remove cache directory'; return 1
     fi
 }
 
@@ -456,8 +452,7 @@ check_url() {
     url_regex='^[[:alnum:]_][[:alnum:]_\.-]*(/[[:alnum:]_][[:alnum:]_\.-]*){2}$'
 
     if ! echo "$1" | grep -qE "$url_regex"; then
-        echof 'unsupported URL delivered'
-        return 1
+        echof 'unsupported URL delivered'; return 1
     fi
 }
 
@@ -549,8 +544,7 @@ get_repo_hash() { (
         # print a given version if it is a valid Git commit object reference
         if ! git rev-parse --verify -q origin/"$2"'^{commit}' && # remote branch
            ! git rev-parse --verify -q "$2"'^{commit}'; then # tag or commit
-            echof "version $2 does not exist"
-            return 1
+            echof "version $2 does not exist"; return 1
         fi
     # get latest tag of the default branch (if any tag exists)
     elif tag="$(git describe --tags --abbrev=0 origin/master 2>/dev/null)"; then
@@ -646,8 +640,7 @@ next_dep_depth() {
 
     # check whether the new dependency depth value is valid
     if [ "$dep_depth" -gt "$MAX_DEP_DEPTH" ]; then
-        echof 'maximum dependency depth reached'
-        return 1
+        echof 'maximum dependency depth reached'; return 1
     fi
 }
 
@@ -843,8 +836,7 @@ for_each_route() { (
             eval "$2" "$route" || return
         done
     else # if the map file does not exist, fails
-        echof 'missing map file'
-        return 1
+        echof 'missing map file'; return 1
     fi
 ) }
 
