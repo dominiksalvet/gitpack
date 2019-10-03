@@ -507,7 +507,9 @@ refresh_repo() { (
     log "$LOGTYPE_REFRESH" "$1" "$repo_dir"/ &&
 
     if [ "$OFFLINE_MODE" = true ]; then # offline
-        test -d "$repo_dir"/ # fail if local repository does not exist
+        if [ ! -d "$repo_dir"/ ]; then # fail if local repository does not exist
+            echof 'project is not downloaded'; return 1
+        fi
     elif [ -d "$repo_dir"/ ]; then # refresh
         cd "$repo_dir"/ &&
         git fetch -q origin # fetch remote updates
