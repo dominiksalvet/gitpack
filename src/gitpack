@@ -32,7 +32,7 @@ main() {
 check_sw_deps() {
     # a list of required software
     sw_deps='command echo [ cd test pwd rm id mkdir touch grep git uname read cp
-             head cut true basename find rmdir tr date tail kill sort'
+             head cut true basename find rmdir tr date tail kill sort getopts'
 
     # check if any piece of software is missing
     for sw_dep in $sw_deps; do
@@ -168,27 +168,44 @@ process_args() {
         help) echo "$HELP_MESSAGE"; return ;;
         about) echo "$ABOUT_MESSAGE"; return ;;
         '') echo 'no argument provided' >&2; return 1 ;;
-        *) echo "unrecognized argument $1" >&2; return 1 ;;
+        *) echo "invalid argument $1" >&2; return 1 ;;
     esac &&
 
     backup_database # if success, back up the GitPack database
 }
 
 # DESCRIPTION:
-#   Processes a given action over all given repository references.
+#   Processes a given action and its arguments.
 # PARAMETERS:
 #   $1 - action
-#   $@ - references
+#   $@ - action arguments
 process_action_args() {
-    if [ "$#" -eq 1 ]; then # check if there is any reference argument
-        echo 'no URL provided' >&2; return 1
-    fi
-
     init_runtime && # initialize runtime
     action="$1" && # use the given action
-    shift && # shift arguments to references
+    shift && # shift to action arguments
+
+    process_action_opts "$@" && # action options (sets the OPTIND variable)
+    shift "$((OPTIND - 1))" && # shift to reference arguments
+    if [ "$#" -eq 0 ]; then # check if there is any reference argument
+        echof 'no URL provided'; return 1
+    fi &&
+
     for ref in "$@"; do # process each reference individually with common action
         process_action "$action" "$ref" || return
+    done
+}
+
+# DESCRIPTION:
+#   Processes given arguments as action options. It sets the OPTIND variable
+#   holding the position of the following argument.
+# PARAMETERS:
+#   $@ - action arguments
+process_action_opts() {
+    while getopts :o opt; do # for each option argument
+        case "$opt" in
+            o)  OFFLINE_MODE=true ;;
+            \?) echof "illegal option -$OPTARG"; return 1 ;;
+        esac
     done
 }
 

@@ -11,6 +11,7 @@ The changes not yet present in any release are listed in this section.
 ### Added
 
 * The support for GitPack to work with any Git branch has been added.
+* Offline mode option `-o` has been introduced.
 
 ### Changed
 
