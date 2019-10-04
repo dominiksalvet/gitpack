@@ -231,4 +231,20 @@ test "$(grep -Fc '[postcp]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
 test "$(grep -Fc '[prerm]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
 test "$(grep -Fc '[rm]' ~/.local/share/gitpack/gitpack.log)" -eq 3 &&
 test "$(grep -Fc '[postrm]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
-test "$(wc -l < ~/.local/share/gitpack/gitpack.log)" -eq 203
+test "$(wc -l < ~/.local/share/gitpack/gitpack.log)" -eq 203 &&
+
+# clean files
+src/gitpack clean &&
+
+# existence of log files
+test -d ~/.local/share/gitpack/ &&
+test -r ~/.local/share/gitpack/ &&
+test -w ~/.local/share/gitpack/ &&
+test -x ~/.local/share/gitpack/ &&
+test -f ~/.local/share/gitpack/gitpack.log &&
+test -r ~/.local/share/gitpack/gitpack.log &&
+test -w ~/.local/share/gitpack/gitpack.log &&
+test ! -x ~/.local/share/gitpack/gitpack.log &&
+
+# existence of cache files
+test ! -d ~/.cache/gitpack/
