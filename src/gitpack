@@ -204,7 +204,7 @@ process_action_opts() {
     while getopts :o opt; do # for each option argument
         case "$opt" in
             o)  OFFLINE_MODE=true ;;
-            \?) echof "illegal option -$OPTARG"; return 1 ;;
+            \?) echof "invalid option -$OPTARG"; return 1 ;;
         esac
     done
 }
