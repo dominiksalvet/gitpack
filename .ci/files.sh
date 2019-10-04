@@ -25,9 +25,9 @@ echo files9 >&2 && test ! -d ~/.cache/gitpack/ &&
 
 # install an example project, vhdldep, in version 2.1.0 (not the latest release)
 echo files10 >&2 && gitpack status github.com/dominiksalvet/vhdldep=2.1.0 &&
-gitpack install github.com/dominiksalvet/vhdldep=2.1.0 &&
-gitpack install github.com/dominiksalvet/vhdldep=2.1.0 &&
-gitpack status github.com/dominiksalvet/vhdldep=2.1.0 &&
+gitpack install -o github.com/dominiksalvet/vhdldep=2.1.0 &&
+gitpack install -o github.com/dominiksalvet/vhdldep=2.1.0 &&
+gitpack status -o github.com/dominiksalvet/vhdldep=2.1.0 &&
 gitpack list &&
 # check files
 echo files11 >&2 && test -d ~/.local/share/gitpack/ &&
@@ -43,10 +43,10 @@ echo files19 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/vhdld
 echo files20 >&2 && test -e ~/.local/bin/vhdldep &&
 
 # update to the latest version
-echo files21 >&2 && gitpack status github.com/dominiksalvet/vhdldep &&
-gitpack install github.com/dominiksalvet/vhdldep &&
-gitpack install github.com/dominiksalvet/vhdldep &&
-gitpack status github.com/dominiksalvet/vhdldep &&
+echo files21 >&2 && gitpack status -o github.com/dominiksalvet/vhdldep &&
+gitpack install -o github.com/dominiksalvet/vhdldep &&
+gitpack install -o github.com/dominiksalvet/vhdldep &&
+gitpack status -o github.com/dominiksalvet/vhdldep &&
 gitpack list &&
 # check files
 echo files22 >&2 && test -d ~/.local/share/gitpack/ &&
@@ -62,10 +62,10 @@ echo files30 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/vhdld
 echo files31 >&2 && test -e ~/.local/bin/vhdldep &&
 
 # downgrade back to 2.1.0
-echo files32 >&2 && gitpack status github.com/dominiksalvet/vhdldep=2.1.0 &&
-gitpack install github.com/dominiksalvet/vhdldep=2.1.0 &&
-gitpack install github.com/dominiksalvet/vhdldep=2.1.0 &&
-gitpack status github.com/dominiksalvet/vhdldep=2.1.0 &&
+echo files32 >&2 && gitpack status -o github.com/dominiksalvet/vhdldep=2.1.0 &&
+gitpack install -o github.com/dominiksalvet/vhdldep=2.1.0 &&
+gitpack install -o github.com/dominiksalvet/vhdldep=2.1.0 &&
+gitpack status -o github.com/dominiksalvet/vhdldep=2.1.0 &&
 gitpack list &&
 # check files
 echo files33 >&2 && test -d ~/.local/share/gitpack/ &&
@@ -81,9 +81,9 @@ echo files41 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/vhdld
 echo files42 >&2 && test -e ~/.local/bin/vhdldep &&
 
 # uninstall vhdldep
-echo files43 >&2 && gitpack uninstall github.com/dominiksalvet/vhdldep &&
-gitpack uninstall github.com/dominiksalvet/vhdldep &&
-gitpack status github.com/dominiksalvet/vhdldep &&
+echo files43 >&2 && gitpack uninstall -o github.com/dominiksalvet/vhdldep &&
+gitpack uninstall -o github.com/dominiksalvet/vhdldep &&
+gitpack status -o github.com/dominiksalvet/vhdldep &&
 # check files
 echo files44 >&2 && test -d ~/.local/share/gitpack/ &&
 echo files45 >&2 && test -r ~/.local/share/gitpack/gitpack.log &&

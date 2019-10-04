@@ -17,10 +17,10 @@
 echo global1 >&2 && gitpack_out="$(sudo src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
 echo global2 >&2 && echo "$gitpack_out" | grep '^\[install\]' &&
 # check whether installed globally
-echo global3 >&2 && gitpack_out="$(sudo gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
+echo global3 >&2 && gitpack_out="$(sudo gitpack status -o github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
 echo global4 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
 # check whether uninstallation works
-echo global5 >&2 && gitpack_out="$(sudo gitpack uninstall github.com/dominiksalvet/gitpack)" &&
+echo global5 >&2 && gitpack_out="$(sudo gitpack uninstall -o github.com/dominiksalvet/gitpack)" &&
 echo global6 >&2 && echo "$gitpack_out" | grep '^\[uninstall\]' &&
 
 # clean created files
@@ -44,10 +44,10 @@ echo global17 >&2 && sudo rmdir /var/lib/gitpack/ &&
 echo local1 >&2 && gitpack_out="$(src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
 echo local2 >&2 && echo "$gitpack_out" | grep '^\[install\]' &&
 # check whether installed locally
-echo local3 >&2 && gitpack_out="$(gitpack status github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
+echo local3 >&2 && gitpack_out="$(gitpack status -o github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
 echo local4 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
 # check whether uninstallation works
-echo local5 >&2 && gitpack_out="$(gitpack uninstall github.com/dominiksalvet/gitpack)" &&
+echo local5 >&2 && gitpack_out="$(gitpack uninstall -o github.com/dominiksalvet/gitpack)" &&
 echo local6 >&2 && echo "$gitpack_out" | grep '^\[uninstall\]' &&
 
 # clean created files

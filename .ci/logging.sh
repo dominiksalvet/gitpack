@@ -26,9 +26,9 @@ echo logging8 >&2 && test "$(wc -l < ~/.local/share/gitpack/gitpack.log)" -eq 5 
 
 # install an example project, vhdldep, in version 2.1.0 (not the latest release)
 echo logging9 >&2 && gitpack status github.com/dominiksalvet/vhdldep=2.1.0 &&
-gitpack install github.com/dominiksalvet/vhdldep=2.1.0 &&
-gitpack install github.com/dominiksalvet/vhdldep=2.1.0 &&
-gitpack status github.com/dominiksalvet/vhdldep=2.1.0 &&
+gitpack install -o github.com/dominiksalvet/vhdldep=2.1.0 &&
+gitpack install -o github.com/dominiksalvet/vhdldep=2.1.0 &&
+gitpack status -o github.com/dominiksalvet/vhdldep=2.1.0 &&
 gitpack list &&
 # check affected log items
 echo logging10 >&2 && test "$(grep -Fc '[log]' ~/.local/share/gitpack/gitpack.log)" -eq 6 &&
@@ -46,10 +46,10 @@ echo logging21 >&2 && test "$(grep -Fc '[list]' ~/.local/share/gitpack/gitpack.l
 echo logging22 >&2 && test "$(wc -l < ~/.local/share/gitpack/gitpack.log)" -eq 48 &&
 
 # update to the latest version
-echo logging23 >&2 && gitpack status github.com/dominiksalvet/vhdldep &&
-gitpack install github.com/dominiksalvet/vhdldep &&
-gitpack install github.com/dominiksalvet/vhdldep &&
-gitpack status github.com/dominiksalvet/vhdldep &&
+echo logging23 >&2 && gitpack status -o github.com/dominiksalvet/vhdldep &&
+gitpack install -o github.com/dominiksalvet/vhdldep &&
+gitpack install -o github.com/dominiksalvet/vhdldep &&
+gitpack status -o github.com/dominiksalvet/vhdldep &&
 gitpack list &&
 # check affected log items
 echo logging24 >&2 && test "$(grep -Fc '[log]' ~/.local/share/gitpack/gitpack.log)" -eq 11 &&
@@ -69,10 +69,10 @@ echo logging37 >&2 && test "$(grep -Fc '[delete]' ~/.local/share/gitpack/gitpack
 echo logging38 >&2 && test "$(wc -l < ~/.local/share/gitpack/gitpack.log)" -eq 93 &&
 
 # downgrade back to 2.1.0
-echo logging39 >&2 && gitpack status github.com/dominiksalvet/vhdldep=2.1.0 &&
-gitpack install github.com/dominiksalvet/vhdldep=2.1.0 &&
-gitpack install github.com/dominiksalvet/vhdldep=2.1.0 &&
-gitpack status github.com/dominiksalvet/vhdldep=2.1.0 &&
+echo logging39 >&2 && gitpack status -o github.com/dominiksalvet/vhdldep=2.1.0 &&
+gitpack install -o github.com/dominiksalvet/vhdldep=2.1.0 &&
+gitpack install -o github.com/dominiksalvet/vhdldep=2.1.0 &&
+gitpack status -o github.com/dominiksalvet/vhdldep=2.1.0 &&
 gitpack list &&
 # check affected log items
 echo logging40 >&2 && test "$(grep -Fc '[log]' ~/.local/share/gitpack/gitpack.log)" -eq 16 &&
@@ -92,9 +92,9 @@ echo logging53 >&2 && test "$(grep -Fc '[delete]' ~/.local/share/gitpack/gitpack
 echo logging54 >&2 && test "$(wc -l < ~/.local/share/gitpack/gitpack.log)" -eq 138 &&
 
 # uninstall vhdldep
-echo logging55 >&2 && gitpack uninstall github.com/dominiksalvet/vhdldep &&
-gitpack uninstall github.com/dominiksalvet/vhdldep &&
-gitpack status github.com/dominiksalvet/vhdldep &&
+echo logging55 >&2 && gitpack uninstall -o github.com/dominiksalvet/vhdldep &&
+gitpack uninstall -o github.com/dominiksalvet/vhdldep &&
+gitpack status -o github.com/dominiksalvet/vhdldep &&
 # check affected log items
 echo logging56 >&2 && test "$(grep -Fc '[log]' ~/.local/share/gitpack/gitpack.log)" -eq 19 &&
 echo logging57 >&2 && test "$(grep -Fc '[db]' ~/.local/share/gitpack/gitpack.log)" -eq 19 &&
