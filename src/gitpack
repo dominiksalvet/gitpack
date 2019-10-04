@@ -569,12 +569,9 @@ execute_action() {
 #   $1 - URL
 #   $2 - version (optional)
 get_repo_hash() { (
-    echo 1 >&2 &&
     repo_cd "$1" &&
-    echo 2 >&2 &&
 
     if [ "$2" ]; then # if any version has been provided
-        echo 3 >&2 &&
         # print a given version if it is a valid Git commit object reference
         if ! git rev-parse --verify -q origin/"$2"'^{commit}' && # remote branch
            ! git rev-parse --verify -q "$2"'^{commit}'; then # tag or commit
@@ -582,10 +579,8 @@ get_repo_hash() { (
         fi
     # get latest tag of the default branch (if any tag exists)
     elif tag="$(git describe --tags --abbrev=0 origin/master 2>/dev/null)"; then
-        echo 4 >&2 &&
         git rev-parse --verify "$tag"'^{commit}' # transform the tag to a hash
     else
-        echo 5 >&2 &&
         git rev-parse --verify origin/master'^{commit}' # get latest commit hash
     fi
 ) }
