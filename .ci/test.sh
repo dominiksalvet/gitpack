@@ -15,12 +15,6 @@
 # Checks whether the current commit of GitPack can install itself globally.
 #-------------------------------------------------------------------------------
 
-# print variables
-echo "$TRAVIS_COMMIT" >&2
-git rev-parse FETCH_HEAD >&2
-git rev-parse origin/master >&2
-git rev-parse origin/offline-mode >&2
-
 # copy current repository to global GitPack cache
 echo global1 >&2 && sudo mkdir -p /var/cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
 echo global2 >&2 && sudo cp -R ./ /var/cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
