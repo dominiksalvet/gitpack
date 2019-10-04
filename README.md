@@ -129,7 +129,7 @@ Markdown:
 
 ## Thanks
 
-GitPack was born out of [gim](https://github.com/dominiksalvet/gim) from which it has learned a lot.
+GitPack was born out of [gim](https://github.com/dominiksalvet/gim) and has grown up a lot since then.
 
 ## Contributing
 

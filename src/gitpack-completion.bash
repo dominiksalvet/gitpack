@@ -6,7 +6,7 @@
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
 #   This file implements a prompting tab completion for GitPack in Bash shells.
-#   It is expected to be sourced.
+#   It works with all mandatory GitPack arguments. It is expected to be sourced.
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
