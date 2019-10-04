@@ -35,6 +35,14 @@ GitPack also works with optional files located in the *.gitpack* directory as fo
   * Has one dependency per line in the same format as the GitPack URL arguments.
   * E.g., line `github.com/dominiksalvet/ux430ua-jack-volume=2.4.0` is a valid dependency.
 
+## Environment variables
+
+GitPack provides the following environment variables to all called scripts:
+
+* `OFFLINE_MODE`
+  * Equals either `false` or `true`.
+  * Once set to `true`, online access must be avoided.
+
 ## Examples
 
 If you are interested in **examples of projects using GitPack**, take a look at the [gitpack topic](https://github.com/topics/gitpack).
