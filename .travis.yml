@@ -4,6 +4,7 @@
 #-------------------------------------------------------------------------------
 
 language: shell
+git: 'depth: 1'
 
 jobs:
   include:
@@ -12,12 +13,12 @@ jobs:
       script: .ci/analysis.sh
 
     - stage: test
-      git:
-        depth: false
       os: linux
+      git: 'depth: false'
       script: .ci/test.sh 2>&1 1>/dev/null
       after_failure: .ci/dump.sh
 
     - os: osx
+      git: 'depth: false'
       script: .ci/test.sh 2>&1 1>/dev/null
       after_failure: .ci/dump.sh
