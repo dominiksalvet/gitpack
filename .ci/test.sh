@@ -144,12 +144,12 @@ echo uninstall7 >&2 && test ! -e ~/.local/bin/gitpack &&
 echo uninstall8 >&2 && test ! -e ~/.bash_completion.d/gitpack-completion.bash &&
 
 # expected to fail
-echo xfail1 >&2 && ! gitpack_out="$(src/gitpack)" && # no argument
-echo xfail2 >&2 && ! gitpack_out="$(src/gitpack duck)" && # invalid argument
-echo xfail3 >&2 && ! gitpack_out="$(src/gitpack -o)" && # invalid argument
-echo xfail4 >&2 && ! gitpack_out="$(src/gitpack status)" && # no URL
-echo xfail5 >&2 && ! gitpack_out="$(src/gitpack status -o)" && # no URL
-echo xfail6 >&2 && ! gitpack_out="$(src/gitpack status -w github.com/dominiksalvet/gitpack)" && # invalid option
+echo xfail1 >&2 && ! src/gitpack 2>/dev/null && # no argument
+echo xfail2 >&2 && ! src/gitpack duck 2>/dev/null && # invalid argument
+echo xfail3 >&2 && ! src/gitpack -o 2>/dev/null && # invalid argument
+echo xfail4 >&2 && ! src/gitpack status 2>/dev/null && # no URL
+echo xfail5 >&2 && ! src/gitpack status -o 2>/dev/null && # no URL
+echo xfail6 >&2 && ! src/gitpack status -w github.com/dominiksalvet/gitpack 2>/dev/null && # invalid option
 # unsupported URL
 echo xfail7 >&2 && ! gitpack_out="$(src/gitpack status github.com 2>&1)" &&
 echo xfail8 >&2 && echo "$gitpack_out" | grep '^<ERROR>' &&
