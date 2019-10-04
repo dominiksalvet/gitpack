@@ -16,10 +16,10 @@
 #-------------------------------------------------------------------------------
 
 # print variables
-echo "$TRAVIS_COMMIT"
-git rev-parse FETCH_HEAD
-git rev-parse master
-git rev-parse origin/offline-mode
+echo "$TRAVIS_COMMIT" >&2
+git rev-parse FETCH_HEAD >&2
+git rev-parse origin/master >&2
+git rev-parse origin/offline-mode >&2
 
 # copy current repository to global GitPack cache
 echo global1 >&2 && sudo mkdir -p /var/cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
