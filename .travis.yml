@@ -12,6 +12,8 @@ jobs:
       script: .ci/analysis.sh
 
     - stage: test
+      git:
+        depth: false
       os: linux
       script: .ci/test.sh 2>&1 1>/dev/null
       after_failure: .ci/dump.sh
