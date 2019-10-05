@@ -20,6 +20,7 @@ echo global1 >&2 && sudo mkdir -p /var/cache/gitpack/repo/github.com/dominiksalv
 echo global2 >&2 && sudo cp -R ./ /var/cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
 
 # install, check status and uninstall it
+# global3 fails for a PR if there is a new commit to the PR before fetching the tested merge commit (a Travis CI bug)
 echo global3 >&2 && gitpack_out="$(sudo src/gitpack install -o github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
 echo global4 >&2 && echo "$gitpack_out" | grep '^\[install\]' &&
 echo global5 >&2 && gitpack_out="$(sudo src/gitpack status -o github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
