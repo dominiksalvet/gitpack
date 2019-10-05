@@ -14,14 +14,12 @@ jobs:
     - stage: test
       os: linux
       git:
-        clone: false
-      before_script: . .ci/clone.sh
+        depth: false
       script: .ci/test.sh 2>&1 1>/dev/null
       after_failure: .ci/dump.sh
 
     - os: osx
       git:
-        clone: false
-      before_script: . .ci/clone.sh
+        depth: false
       script: .ci/test.sh 2>&1 1>/dev/null
       after_failure: .ci/dump.sh
