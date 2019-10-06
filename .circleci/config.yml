@@ -6,10 +6,11 @@ orbs:
 jobs:
   build:
     docker:
-      - image: bash
+      - image: 'koalaman/shellcheck-alpine:v0.7.0'
     steps:
       - checkout
       - run: echo "$PWD"
+      - run: ls -al
 
 workflows:
   shellcheck:
