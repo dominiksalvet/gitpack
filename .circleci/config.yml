@@ -1,11 +1,9 @@
 version: 2.1
 
 orbs:
-  shellcheck: circleci/shellcheck@volatile
+  shellcheck: circleci/shellcheck@1.0.0
 
-jobs:
-  build:
-    docker:
-      - image: bash
-    steps:
+workflows:
+  shellcheck:
+    jobs:
       - shellcheck/check
