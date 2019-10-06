@@ -4,9 +4,7 @@ orbs:
   shellcheck: circleci/shellcheck@volatile
 
 jobs:
-  build:
-    docker:
-      - image: circleci/ruby:2.4.1
+  analysis:
+    executor: shellcheck
     steps:
-      - checkout
-      - run: shellcheck/check
+      - run: shellcheck --version
