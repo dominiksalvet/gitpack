@@ -15,6 +15,8 @@
 # Checks whether the current commit of GitPack can install itself globally.
 #-------------------------------------------------------------------------------
 
+echo $HOME &&
+
 # copy current repository to global GitPack cache
 echo global1 >&2 && sudo mkdir -p /var/cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
 echo global2 >&2 && sudo cp -R ./ /var/cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
