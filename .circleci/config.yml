@@ -1,9 +1,12 @@
 version: 2.1
 
 orbs:
-  shellcheck: circleci/shellcheck@1.0.0
+  shellcheck: circleci/shellcheck@volatile
 
-workflows:
-  analysis:
-    jobs:
-      - shellcheck/check
+jobs:
+  build:
+    docker:
+      - image: circleci/ruby:2.4.1
+    steps:
+      - checkout
+      - run: shellcheck/check
