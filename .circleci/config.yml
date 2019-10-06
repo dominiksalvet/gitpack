@@ -4,7 +4,7 @@ orbs:
   shellcheck: circleci/shellcheck@volatile
 
 jobs:
-  analysis:
+  build:
     executor: shellcheck
     steps:
       - run: shellcheck --version
