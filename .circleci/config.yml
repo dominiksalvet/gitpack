@@ -9,4 +9,4 @@ jobs:
       - image: bash
     steps:
       - checkout
-      - shellcheck/check
+      - run: shellcheck/check
