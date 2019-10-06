@@ -7,4 +7,4 @@ workflows:
   analysis:
     jobs:
       - shellcheck/check:
-          pattern: .ci/*.sh
+          pattern: .circleci/*.sh
