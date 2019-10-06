@@ -3,10 +3,7 @@ version: 2.1
 orbs:
   shellcheck: circleci/shellcheck@1.0.0
 
-jobs:
-  build:
-    docker:
-      - image: bash
-    steps:
-      - checkout
+workflows:
+  analysis:
+    jobs:
       - shellcheck/check
