@@ -4,7 +4,6 @@ orbs:
   shellcheck: circleci/shellcheck@volatile
 
 workflows:
-  analysis:
+  shellcheck:
     jobs:
-      - shellcheck/check:
-          pattern: src/gitpack
+      - shellcheck/check
