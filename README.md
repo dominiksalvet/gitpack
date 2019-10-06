@@ -10,6 +10,8 @@
         <img src="https://img.shields.io/badge/Git-Pack-571997" alt="GitPack"></a>
     <a href="https://github.com/RichardLitt/standard-readme">
         <img src="https://img.shields.io/badge/readme_style-standard-brightgreen" alt="standard-readme compliant"></a>
+    <a href="https://circleci.com/gh/dominiksalvet/gitpack">
+        <img src="https://circleci.com/gh/dominiksalvet/gitpack.svg?style=svg" alt="CircleCI"></a>
     <a href="https://discord.gg/BE45Y4j">
         <img src="https://img.shields.io/discord/588895022955495424" alt="Discord chat"></a>
 </p>
