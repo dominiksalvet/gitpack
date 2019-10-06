@@ -7,3 +7,4 @@ workflows:
   shellcheck:
     jobs:
       - shellcheck/check
+      - run: 'echo "$PWD"'
