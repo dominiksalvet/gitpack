@@ -6,7 +6,7 @@ orbs:
 jobs:
   build:
     docker:
-      - image: circleci/ruby:2.4.1
+      - image: bash
     steps:
       - checkout
       - shellcheck/check
