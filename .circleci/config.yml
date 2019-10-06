@@ -8,5 +8,4 @@ jobs:
     docker:
       - image: bash
     steps:
-      - checkout
       - shellcheck/check
