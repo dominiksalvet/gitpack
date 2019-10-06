@@ -13,4 +13,4 @@ workflows:
     jobs:
       - shellcheck/check:
         path: .circleci
-        pattern: *.sh
+        pattern: ./*.sh
