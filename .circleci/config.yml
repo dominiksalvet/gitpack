@@ -3,8 +3,8 @@ version: 2.1
 orbs:
   shellcheck: circleci/shellcheck@volatile
 
-jobs:
-  build:
-    executor: shellcheck
-    steps:
-      - run: shellcheck --version
+workflows:
+  analysis:
+    jobs:
+      - shellcheck/check:
+          pattern: .ci/*.sh src/* .gitpack/data/.bash_completion .gitpack/install/local/precp
