@@ -6,6 +6,5 @@ orbs:
 workflows:
   analysis:
     jobs:
-      - checkout
       - shellcheck/check:
-          pattern: .circleci/*.sh
+          pattern: '.circleci/*.sh'
