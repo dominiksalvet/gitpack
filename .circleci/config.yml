@@ -7,4 +7,4 @@ workflows:
   analysis:
     jobs:
       - shellcheck/check:
-          pattern: '.circleci/*.sh'
+          pattern: src/gitpack
