@@ -3,8 +3,19 @@ version: 2.1
 orbs:
   shellcheck: circleci/shellcheck@volatile
 
+jobs:
+  build:
+    docker:
+      - image: bash
+    steps:
+      - checkout
+      - run: echo "$PWD"
+
 workflows:
   shellcheck:
     jobs:
       - shellcheck/check
-      - run: echo "$PWD"
+  pwd:
+    jobs:
+      - build
+
