@@ -11,7 +11,7 @@ jobs:
     - image: koalaman/shellcheck-alpine
     steps:
     - checkout
-    - run: shellcheck jump.sh
+    - run: shellcheck .circleci/*.sh
     - run: shellcheck src/*
     - run: shellcheck .gitpack/data/.bash_completion .gitpack/install/local/precp
 
