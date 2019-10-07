@@ -8,8 +8,7 @@ version: 2.1
 jobs:
   analyse:
     docker:
-    - image: koalaman/shellcheck-alpine
-    - image: bash
+    - image: ubuntu
     steps:
     - checkout
     - run:
