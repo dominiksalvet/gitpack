@@ -10,6 +10,8 @@
         <img src="https://img.shields.io/badge/Git-Pack-571997" alt="GitPack"></a>
     <a href="https://github.com/RichardLitt/standard-readme">
         <img src="https://img.shields.io/badge/readme_style-standard-brightgreen" alt="standard-readme compliant"></a>
+    <a href="https://travis-ci.com/dominiksalvet/gitpack">
+        <img src="https://travis-ci.com/dominiksalvet/gitpack.svg?branch=master" alt="Build Status"></a>
     <a href="https://discord.gg/BE45Y4j">
         <img src="https://img.shields.io/discord/588895022955495424" alt="Discord chat"></a>
 </p>
