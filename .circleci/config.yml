@@ -11,11 +11,7 @@ jobs:
     - image: koalaman/shellcheck-alpine:v0.7.0
     steps:
     - checkout
-    - run: shellcheck .circleci/*.sh
-    - run: shellcheck src/*
-    - run: shellcheck .gitpack/data/.bash_completion
-    - run: shellcheck .gitpack/install/local/precp
-    - run: .circleci/codestyle.sh src/*
+    - run: .circleci/analysis.sh
 
 workflows:
   default:
