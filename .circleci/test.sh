@@ -33,7 +33,7 @@ echo install8 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
 echo install9 >&2 && gitpack_out="$(src/gitpack list)" &&
 echo install10 >&2 && echo "$gitpack_out" | grep -F 'github.com/dominiksalvet/gitpack' &&
 # check installed files
-echo install11 >&2 && test -x ~/.local/bin/gitpack &&
+echo install11 >&2 && test -x /usr/local/bin/gitpack &&
 
 # install current version + test status file recovery
 echo update1 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack)" &&

@@ -23,7 +23,6 @@ jobs:
   test:
     docker:
     - image: alpine/git:1.0.7
-      user: ci
     steps:
     - checkout
     - run: .circleci/test.sh
