@@ -11,7 +11,9 @@ jobs:
     - image: ubuntu
     steps:
     - checkout
-    - run: apt install -y shellcheck
+    - run: |
+        apt update &&
+        apt install -y shellcheck
     - run:
         shell: /bin/sh
         command: .circleci/analysis.sh
