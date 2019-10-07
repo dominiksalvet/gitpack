@@ -6,19 +6,16 @@
 version: 2.1
 
 jobs:
-  analyse:
+  shellcheck:
     docker:
-    - image: ubuntu
+    - image: koalaman/shellcheck-alpine
     steps:
     - checkout
-    - run: |
-        apt update &&
-        apt install -y shellcheck
-    - run:
-        shell: /bin/sh
-        command: .circleci/analysis.sh
+    - run: shellcheck .ci/*.sh
+    - run: shellcheck src/*
+    - run: shellcheck .gitpack/data/.bash_completion .gitpack/install/local/precp
 
 workflows:
   analysis:
     jobs:
-    - analyse
+      - shellcheck
