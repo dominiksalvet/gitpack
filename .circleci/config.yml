@@ -3,6 +3,8 @@
 # github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
+version: 2
+
 jobs:
   analysis:
     docker:
