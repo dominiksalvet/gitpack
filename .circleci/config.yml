@@ -8,7 +8,7 @@ version: 2.1
 jobs:
   shellcheck:
     docker:
-    - image: koalaman/shellcheck-alpine
+    - image: koalaman/shellcheck
     steps:
     - checkout
     - run: shellcheck .circleci/*.sh
@@ -16,6 +16,6 @@ jobs:
     - run: shellcheck .gitpack/data/.bash_completion .gitpack/install/local/precp
 
 workflows:
-  analysis:
+  default:
     jobs:
       - shellcheck
