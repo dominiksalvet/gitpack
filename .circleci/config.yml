@@ -17,12 +17,17 @@ jobs:
   analysis:
     docker:
     - image: koalaman/shellcheck-alpine:v0.7.0
+    parallelism: 4
     steps:
     - checkout
     - run: .circleci/analysis.sh
+    - run: sleep 5 && false
+    - run: sleep 10 && echo hi
+    - run: sleep 3 && true
+    - run: sleep 15 && echo done
   test:
-    macos:
-      xcode: "11.0.0"
+    machine:
+      image: ubuntu-1604:201903-01
     steps:
     - checkout
     - run: .circleci/test.sh 2>&1 1>/dev/null
