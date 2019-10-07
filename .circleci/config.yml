@@ -3,7 +3,13 @@
 # github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-version: 2.1
+version: 2
+
+workflows:
+  version: 2
+  push:
+    jobs:
+    - analysis
 
 jobs:
   analysis:
@@ -12,8 +18,3 @@ jobs:
     steps:
     - checkout
     - run: .circleci/analysis.sh
-
-workflows:
-  default:
-    jobs:
-    - analysis
