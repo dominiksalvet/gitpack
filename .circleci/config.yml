@@ -14,3 +14,12 @@ workflows:
       - shellcheck/check:
           path: .circleci
           pattern: '*.sh'
+      - shellcheck/check:
+          path: src
+          pattern: '*'
+      - shellcheck/check:
+          path: .gitpack/data
+          pattern: .bash_completion
+      - shellcheck/check:
+          path: .gitpack/install/local
+          pattern: precp
