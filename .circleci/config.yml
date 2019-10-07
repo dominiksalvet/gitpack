@@ -17,17 +17,15 @@ jobs:
   analysis:
     docker:
     - image: koalaman/shellcheck-alpine:v0.7.0
-    parallelism: 4
     steps:
     - checkout
     - run: .circleci/analysis.sh
-    - run: sleep 5 && false
-    - run: sleep 10 && echo hi
-    - run: sleep 3 && true
-    - run: sleep 15 && echo done
   test:
     machine:
       image: ubuntu-1604:201903-01
     steps:
     - checkout
-    - run: .circleci/test.sh 2>&1 1>/dev/null
+    - run: .circleci/test.sh 2>&1 1>/dev/null; false
+    - run:
+        command: .circleci/dump.sh
+        when: on_fail
