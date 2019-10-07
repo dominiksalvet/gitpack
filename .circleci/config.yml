@@ -8,7 +8,7 @@ version: 2.1
 jobs:
   analyse:
     docker:
-    - image: koalaman/shellcheck
+    - image: koalaman/shellcheck-alpine
     steps:
     - checkout
     - run: .circleci/analysis.sh
