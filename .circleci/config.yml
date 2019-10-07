@@ -11,7 +11,9 @@ jobs:
     - image: koalaman/shellcheck-alpine
     steps:
     - checkout
-    - run: .circleci/analysis.sh
+    - run:
+      shell: /bin/sh
+      command: .circleci/analysis.sh
 
 workflows:
   analysis:
