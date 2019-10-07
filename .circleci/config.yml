@@ -22,7 +22,7 @@ jobs:
     - run: .circleci/analysis.sh
   test:
     docker:
-    - image: bash:4.4
+    - image: alpine/git:1.0.7
     steps:
     - checkout
     - run: .circleci/test.sh
