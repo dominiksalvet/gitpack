@@ -25,7 +25,7 @@ jobs:
       image: ubuntu-1604:201903-01
     steps:
     - checkout
-    - run: .circleci/test.sh 2>&1 1>/dev/null; false
+    - run: .circleci/test.sh 2>&1 1>/dev/null
     - run:
         command: .circleci/dump.sh
         when: on_fail
