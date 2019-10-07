@@ -15,7 +15,7 @@ jobs:
       os: linux
       git:
         depth: false
-      script: .ci/test.sh 2>&1 1>/dev/null
+      script: .ci/test.sh 2>&1 1>/dev/null; true
       after_failure: .ci/dump.sh
 
     - os: osx
