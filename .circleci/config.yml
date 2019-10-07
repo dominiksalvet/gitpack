@@ -25,4 +25,4 @@ jobs:
     - image: alpine/git:1.0.7
     steps:
     - checkout
-    - run: .circleci/test.sh
+    - run: .circleci/test.sh 2>&1 1>/dev/null
