@@ -5,21 +5,15 @@
 
 version: 2.1
 
-orbs:
-  shellcheck: circleci/shellcheck@volatile
+jobs:
+  analyse:
+    docker:
+    - image: koalaman/shellcheck
+    steps:
+    - checkout
+    - run: .circleci/analysis.sh
 
 workflows:
   analysis:
     jobs:
-      - shellcheck/check:
-          path: .circleci
-          pattern: '*.sh'
-      - shellcheck/check:
-          path: src
-          pattern: '*'
-      - shellcheck/check:
-          path: .gitpack/data
-          pattern: .bash_completion
-      - shellcheck/check:
-          path: .gitpack/install/local
-          pattern: precp
+    - analyse
