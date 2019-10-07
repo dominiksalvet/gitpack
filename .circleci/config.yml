@@ -12,8 +12,8 @@ jobs:
     steps:
     - checkout
     - run:
-      shell: /bin/sh
-      command: .circleci/analysis.sh
+        shell: /bin/sh
+        command: .circleci/analysis.sh
 
 workflows:
   analysis:
