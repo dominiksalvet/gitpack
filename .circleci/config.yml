@@ -21,8 +21,8 @@ jobs:
     - checkout
     - run: .circleci/analysis.sh
   test:
-    docker:
-    - image: alpine/git:1.0.7
+    machine:
+    - image: ubuntu-1604:201903-01
     steps:
     - checkout
     - run: .circleci/test.sh 2>&1 1>/dev/null
