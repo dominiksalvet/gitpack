@@ -5,12 +5,11 @@
 # github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
-#   Checks whether GitPack source code files meet a defined code style using a
-#   static code analysis.
+#   Checks whether GitPack source code files meet a defined code style.
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
-# CODE STYLE
+# ENTRY POINT
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
@@ -92,10 +91,7 @@ check_func_length() {
 }
 
 #-------------------------------------------------------------------------------
-# ANALYZE
+# ENTRY POINT CALLING
 #-------------------------------------------------------------------------------
 
-shellcheck .ci/*.sh && # analyze CI scripts
-shellcheck src/* && # analyze source code
-check_code_style src/* && # check source code style
-shellcheck .gitpack/data/.bash_completion .gitpack/install/local/precp # analyze other scripts
+check_code_style "$@" # check source code style
