@@ -515,7 +515,7 @@ refresh_repo() { (
         git fetch -q origin # fetch remote updates (it may ask for a password)
     else # create repository
         mkdir -p "$repo_dir"/ && cd "$repo_dir"/ && # create directory
-        git init && # initialize a Git repository
+        git init -q && # initialize a Git repository
         git remote add origin https://"$1".git && # add repository remote
         git fetch -q origin # fetch Git refs (it may ask for a password)
     fi
