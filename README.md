@@ -55,7 +55,7 @@ If you are in, then GitPack comes in pretty handy. All you need is a URL of a co
 
 ```sh
 mkdir -p /tmp/gitpack/ && cd /tmp/gitpack/ && # prepare a temporary directory
-git clone https://github.com/dominiksalvet/gitpack.git . && # clone repository
+git clone https://github.com/dominiksalvet/gitpack.git ./ && # clone repository
 git checkout "$(git describe --tags --abbrev=0)" && # use latest version
 sudo src/gitpack install github.com/dominiksalvet/gitpack # install GitPack
 ```
@@ -64,7 +64,7 @@ sudo src/gitpack install github.com/dominiksalvet/gitpack # install GitPack
 
 ```sh
 mkdir -p /tmp/gitpack/ && cd /tmp/gitpack/ && # prepare a temporary directory
-git clone https://github.com/dominiksalvet/gitpack.git . && # clone repository
+git clone https://github.com/dominiksalvet/gitpack.git ./ && # clone repository
 git checkout "$(git describe --tags --abbrev=0)" && # use latest version
 src/gitpack install github.com/dominiksalvet/gitpack # install GitPack
 ```
