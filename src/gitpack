@@ -958,10 +958,10 @@ remove_dir_from_dir() {
     files="$(cd -- "$1"/ && find ./ ! -type d)" &&
     dirs="$(cd -- "$1"/ && find ./ -type d ! -path ./ | sort -r)" &&
 
-    for file in $files; do # remove files using the file mask
+    echon "$files" | while read -r file; do # remove files using file mask
         rm -f -- "${2:?}"/"${basename_out:?}"/"${file:?}" || return
     done &&
-    for dir in $dirs; do # remove directories using the file mask
+    echon "$dirs" | while read -r dir; do # remove directories using file mask
         rmdirf -- "${2:?}"/"${basename_out:?}"/"${dir:?}"/ || return
     done &&
     rmdirf -- "${2:?}"/"${basename_out:?}"/ # remove the copied directory itself
