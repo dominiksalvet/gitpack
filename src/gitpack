@@ -510,13 +510,14 @@ refresh_repo() { (
         if [ ! -d "$repo_dir"/ ]; then # fail if local repository does not exist
             echof 'project is not downloaded'; return 1
         fi
-    elif [ -d "$repo_dir"/ ]; then # refresh
+    elif [ -d "$repo_dir"/ ]; then # refresh repository
         cd "$repo_dir"/ &&
-        git fetch -q origin # fetch remote updates
-    else # clone
+        git fetch -q origin # fetch remote updates (it may ask for a password)
+    else # create repository
         mkdir -p "$repo_dir"/ && cd "$repo_dir"/ && # create directory
-        # create local repository by cloning, it may ask the user for a password
-        git clone -q --no-checkout https://"$1".git ./
+        git init && # initialize a Git repository
+        git remote add origin https://"$1".git ./ && # add repository remote
+        git fetch -q origin # fetch Git refs (it may ask for a password)
     fi
 ) }
 
@@ -573,8 +574,8 @@ get_repo_hash() { (
 
     if [ "$2" ]; then # if any version has been provided
         # print a given version if it is a valid Git commit object reference
-        if ! git rev-parse --verify -q origin/"$2"'^{commit}' && # remote branch
-           ! git rev-parse --verify -q "$2"'^{commit}'; then # tag or commit
+        if ! git rev-parse --verify -q "$2"'^{commit}' && # tag or commit
+           ! git rev-parse --verify -q origin/"$2"'^{commit}'; then # branch
             echof "version $2 does not exist"; return 1
         fi
     # get latest tag of the default branch (if any tag exists)
