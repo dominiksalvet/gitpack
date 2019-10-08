@@ -17,6 +17,10 @@ The changes not yet present in any release are listed in this section.
 
 * GitPack *map* files may contain more than one source path per line.
 
+### Fixed
+
+* Removing a file with a space in its path no longer causes issues.
+
 ## 0.5.0 (2019-09-19)
 
 ### Added
