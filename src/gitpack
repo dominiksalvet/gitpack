@@ -954,9 +954,9 @@ remove_dir_from_dir() {
     test "$1" && test "$2" &&
     basename_out="$(basename -- "$1")" && # name of the directory to be removed
 
-    # scan the target directory to obtain a file mask
-    files="$(cd -- "$1"/ && find . ! -type d)" && # files
-    dirs="$(cd -- "$1"/ && find . -type d ! -path . | sort -r)" && # directories
+    # scan the target directory to obtain a file mask (files and directories)
+    files="$(cd -- "$1"/ && find ./ ! -type d)" &&
+    dirs="$(cd -- "$1"/ && find ./ -type d ! -path ./ | sort -r)" &&
 
     for file in $files; do # remove files using the file mask
         rm -f -- "${2:?}"/"${basename_out:?}"/"${file:?}" || return

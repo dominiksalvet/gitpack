@@ -37,9 +37,9 @@ _gitpack_url() {
     # collect global and local cached repository paths (URLs)
     cached_urls="$(
         cd /var/cache/gitpack/repo/ 2>/dev/null &&
-        find . -maxdepth 3 -mindepth 3 -type d | sed 's|^./||'
+        find ./ -maxdepth 3 -mindepth 3 -type d | sed 's|^./||'
         cd ~/.cache/gitpack/repo/ 2>/dev/null &&
-        find . -maxdepth 3 -mindepth 3 -type d | sed 's|^./||'
+        find ./ -maxdepth 3 -mindepth 3 -type d | sed 's|^./||'
         true
     )" &&
     # prepare hints based on given arguments
