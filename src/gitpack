@@ -53,7 +53,7 @@ check_sw_deps() {
 # shellcheck disable=SC2209
 init_constants() {
     # the current version of GitPack
-    VERSION=0.5.0
+    VERSION=0.6.0
 
     # GitPack actions
     ACTION_INSTALL=install

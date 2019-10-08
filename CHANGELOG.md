@@ -8,6 +8,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 The changes not yet present in any release are listed in this section.
 
+## 0.6.0 (2019-10-08)
+
 ### Added
 
 * The support for GitPack to work with any Git branch has been added.
