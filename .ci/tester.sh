@@ -214,7 +214,7 @@ echo statefiles6 >&2 && test ! -x ~/.local/share/gitpack/status.bak &&
 echo status1 >&2 && test ! "$(cat ~/.local/share/gitpack/status)" &&
 
 # contents of log file
-echo log1 >&2 && test "$(grep -Fc '[log]' ~/.local/share/gitpack/gitpack.log)" -eq 26 &&
+echo log1 >&2 && test "$(grep -Fc '[log]' ~/.local/share/gitpack/gitpack.log)" -eq 27 &&
 echo log2 >&2 && test "$(grep -Fc '[db]' ~/.local/share/gitpack/gitpack.log)" -eq 27 &&
 echo log3 >&2 && test "$(grep -Fc '[backup]' ~/.local/share/gitpack/gitpack.log)" -eq 21 &&
 echo log4 >&2 && test "$(grep -Fc '[fail]' ~/.local/share/gitpack/gitpack.log)" -eq 6 &&
