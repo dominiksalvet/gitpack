@@ -239,7 +239,7 @@ echo log22 >&2 && test "$(grep -Fc '[rm]' ~/.local/share/gitpack/gitpack.log)" -
 echo log23 >&2 && test "$(grep -Fc '[postrm]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
 echo log24 >&2 && test "$(wc -l < ~/.local/share/gitpack/gitpack.log)" -eq 208 &&
 
-# clean files
+# clean files (it affects log and cache files)
 echo clean1 >&2 && src/gitpack clean &&
 
 # existence of log files
