@@ -15,6 +15,7 @@ The changes not yet present in any release are listed in this section.
 ### Fixed
 
 * Prefer a tag over a branch when they both have the same name.
+* Tab completion no longer offers URLs of projects that have not been successfully downloaded.
 
 ## 0.6.0 (2019-10-08)
 
