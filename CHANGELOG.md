@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 The changes not yet present in any release are listed in this section.
 
+### Added
+
+* The automatic default branch detection has been added.
+
 ### Fixed
 
 * Prefer a tag over a branch when they both have the same name.

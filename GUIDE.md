@@ -4,7 +4,7 @@ This file contains **everything you need to start** using GitPack in your awesom
 
 ## General
 
-In default, GitPack works with the master branches using their either latest tag (preferred) or latest commit.
+In default, GitPack works with Git default branches using their either latest tag (preferred) or latest commit.
 
 ## Files
 
