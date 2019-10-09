@@ -517,6 +517,8 @@ refresh_repo() { (
         mkdir -p "$repo_dir"/ && cd "$repo_dir"/ && # create directory
         git init -q && # initialize a Git repository
         git remote add origin https://"$1".git && # add repository remote
+        # fetch also the remote HEAD (default branch)
+        git config --add remote.origin.fetch HEAD:refs/remotes/origin/HEAD &&
         git fetch -q origin # fetch Git refs (it may ask for a password)
     fi
 ) }
@@ -579,10 +581,10 @@ get_repo_hash() { (
             echof "version $2 does not exist"; return 1
         fi
     # get latest tag of the default branch (if any tag exists)
-    elif tag="$(git describe --tags --abbrev=0 origin/master 2>/dev/null)"; then
+    elif tag="$(git describe --tags --abbrev=0 origin/HEAD 2>/dev/null)"; then
         git rev-parse --verify "$tag"'^{commit}' # transform the tag to a hash
     else
-        git rev-parse --verify origin/master'^{commit}' # get latest commit hash
+        git rev-parse --verify origin/HEAD'^{commit}' # get latest commit hash
     fi
 ) }
 
