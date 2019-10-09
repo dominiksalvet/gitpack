@@ -80,8 +80,12 @@ echo local18 >&2 && rmdir ~/.local/share/gitpack/ &&
 # check GitPack commands
 echo command1 >&2 && src/gitpack list &&
 echo command2 >&2 && src/gitpack clean &&
-echo command3 >&2 && src/gitpack about &&
-echo command4 >&2 && src/gitpack help &&
+echo command3 >&2 && gitpack_out="$(src/gitpack paths)" &&
+echo command4 >&2 && echo "$gitpack_out" | grep -F 'log '"$HOME"/.local/share/gitpack/ &&
+echo command5 >&2 && echo "$gitpack_out" | grep -F 'cache '"$HOME"/.cache/gitpack/ &&
+echo command6 >&2 && echo "$gitpack_out" | grep -F 'state '"$HOME"/.local/share/gitpack/ &&
+echo command7 >&2 && src/gitpack about &&
+echo command8 >&2 && src/gitpack help &&
 
 # install older version
 echo install1 >&2 && gitpack_out="$(src/gitpack status github.com/dominiksalvet/gitpack=0.1.0)" &&
@@ -210,29 +214,30 @@ echo statefiles6 >&2 && test ! -x ~/.local/share/gitpack/status.bak &&
 echo status1 >&2 && test ! "$(cat ~/.local/share/gitpack/status)" &&
 
 # contents of log file
-echo log1 >&2 && test "$(grep -Fc '[log]' ~/.local/share/gitpack/gitpack.log)" -eq 26 &&
-echo log2 >&2 && test "$(grep -Fc '[db]' ~/.local/share/gitpack/gitpack.log)" -eq 26 &&
-echo log3 >&2 && test "$(grep -Fc '[backup]' ~/.local/share/gitpack/gitpack.log)" -eq 20 &&
+echo log1 >&2 && test "$(grep -Fc '[log]' ~/.local/share/gitpack/gitpack.log)" -eq 29 &&
+echo log2 >&2 && test "$(grep -Fc '[db]' ~/.local/share/gitpack/gitpack.log)" -eq 29 &&
+echo log3 >&2 && test "$(grep -Fc '[backup]' ~/.local/share/gitpack/gitpack.log)" -eq 23 &&
 echo log4 >&2 && test "$(grep -Fc '[fail]' ~/.local/share/gitpack/gitpack.log)" -eq 6 &&
 echo log5 >&2 && test "$(grep -Fc '[signal]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log6 >&2 && test "$(grep -Fc '[exit]' ~/.local/share/gitpack/gitpack.log)" -eq 26 &&
+echo log6 >&2 && test "$(grep -Fc '[exit]' ~/.local/share/gitpack/gitpack.log)" -eq 29 &&
 echo log7 >&2 && test "$(grep -Fc '[list]' ~/.local/share/gitpack/gitpack.log)" -eq 4 &&
 echo log8 >&2 && test "$(grep -Fc '[clean]' ~/.local/share/gitpack/gitpack.log)" -eq 1 &&
-echo log9 >&2 && test "$(grep -Fc '[action]' ~/.local/share/gitpack/gitpack.log)" -eq 18 &&
-echo log10 >&2 && test "$(grep -Fc '[url]' ~/.local/share/gitpack/gitpack.log)" -eq 18 &&
-echo log11 >&2 && test "$(grep -Fc '[fetch]' ~/.local/share/gitpack/gitpack.log)" -eq 15 &&
-echo log12 >&2 && test "$(grep -Fc '[execute]' ~/.local/share/gitpack/gitpack.log)" -eq 15 &&
-echo log13 >&2 && test "$(grep -Fc '[deps]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log14 >&2 && test "$(grep -Fc '[get]' ~/.local/share/gitpack/gitpack.log)" -eq 15 &&
-echo log15 >&2 && test "$(grep -Fc '[insert]' ~/.local/share/gitpack/gitpack.log)" -eq 3 &&
-echo log16 >&2 && test "$(grep -Fc '[delete]' ~/.local/share/gitpack/gitpack.log)" -eq 3 &&
-echo log17 >&2 && test "$(grep -Fc '[precp]' ~/.local/share/gitpack/gitpack.log)" -eq 1 &&
-echo log18 >&2 && test "$(grep -Fc '[cp]' ~/.local/share/gitpack/gitpack.log)" -eq 3 &&
-echo log19 >&2 && test "$(grep -Fc '[postcp]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log20 >&2 && test "$(grep -Fc '[prerm]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log21 >&2 && test "$(grep -Fc '[rm]' ~/.local/share/gitpack/gitpack.log)" -eq 3 &&
-echo log22 >&2 && test "$(grep -Fc '[postrm]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log23 >&2 && test "$(wc -l < ~/.local/share/gitpack/gitpack.log)" -eq 203 &&
+echo log9 >&2 && test "$(grep -Fc '[paths]' ~/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo log10 >&2 && test "$(grep -Fc '[action]' ~/.local/share/gitpack/gitpack.log)" -eq 18 &&
+echo log11 >&2 && test "$(grep -Fc '[url]' ~/.local/share/gitpack/gitpack.log)" -eq 18 &&
+echo log12 >&2 && test "$(grep -Fc '[fetch]' ~/.local/share/gitpack/gitpack.log)" -eq 15 &&
+echo log13 >&2 && test "$(grep -Fc '[execute]' ~/.local/share/gitpack/gitpack.log)" -eq 15 &&
+echo log14 >&2 && test "$(grep -Fc '[deps]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
+echo log15 >&2 && test "$(grep -Fc '[get]' ~/.local/share/gitpack/gitpack.log)" -eq 15 &&
+echo log16 >&2 && test "$(grep -Fc '[insert]' ~/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo log17 >&2 && test "$(grep -Fc '[delete]' ~/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo log18 >&2 && test "$(grep -Fc '[precp]' ~/.local/share/gitpack/gitpack.log)" -eq 1 &&
+echo log19 >&2 && test "$(grep -Fc '[cp]' ~/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo log20 >&2 && test "$(grep -Fc '[postcp]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
+echo log21 >&2 && test "$(grep -Fc '[prerm]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
+echo log22 >&2 && test "$(grep -Fc '[rm]' ~/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo log23 >&2 && test "$(grep -Fc '[postrm]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
+echo log24 >&2 && test "$(wc -l < ~/.local/share/gitpack/gitpack.log)" -eq 203 &&
 
 # clean files
 echo clean1 >&2 && src/gitpack clean &&

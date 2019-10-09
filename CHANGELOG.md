@@ -11,6 +11,7 @@ The changes not yet present in any release are listed in this section.
 ### Added
 
 * The automatic default branch detection has been added.
+* The `paths` command to show all GitPack-specific paths has been added.
 
 ### Fixed
 

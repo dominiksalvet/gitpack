@@ -16,7 +16,7 @@
 # DESCRIPTION:
 #   Prepares the next word hint based on the current part of the word.
 _gitpack() {
-    local FIRST_WORDS='install uninstall status list clean help about' &&
+    local FIRST_WORDS='install uninstall status list clean paths help about' &&
     local first_word="${COMP_WORDS[1]}" &&
     local cur_word="${COMP_WORDS[COMP_CWORD]}" && # the current part of the word
 

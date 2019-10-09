@@ -86,6 +86,7 @@ init_constants() {
     # command log types
     LOGTYPE_LIST=list # list command
     LOGTYPE_CLEAN=clean # clean command
+    LOGTYPE_PATHS=paths # paths command
     # action log types
     LOGTYPE_ACTION=action # action processing
     LOGTYPE_URL=url # URL check
@@ -128,6 +129,7 @@ OPTION:
 COMMAND:
   list   list installed projects
   clean  clean files
+  paths  show paths
   help   show help
   about  show information"
 
@@ -165,6 +167,7 @@ process_args() {
             process_action_args "$@" ;; # process action-based arguments
         list) init_runtime && list ;;
         clean) init_runtime && clean ;;
+        paths) init_runtime && paths ;;
         help) echo "$HELP_MESSAGE"; return ;;
         about) echo "$ABOUT_MESSAGE"; return ;;
         '') echo 'no argument provided' >&2; return 1 ;;
@@ -391,6 +394,15 @@ clean() {
     if ! remove_dir "$CACHE_DIR"; then # in case of fail
         echof 'failed to remove cache directory'; return 1
     fi
+}
+
+# DESCRIPTION:
+#   Prints all GitPack-specific paths.
+paths() {
+    log "$LOGTYPE_PATHS" &&
+    echo "log $LOG_DIR/" &&
+    echo "cache $CACHE_DIR/" &&
+    echo "state $STATE_DIR/"
 }
 
 # DESCRIPTION:
