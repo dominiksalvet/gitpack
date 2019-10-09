@@ -89,7 +89,7 @@ init_constants() {
     # action log types
     LOGTYPE_ACTION=action # action processing
     LOGTYPE_URL=url # URL check
-    LOGTYPE_REFRESH=refresh # refresh repository
+    LOGTYPE_FETCH=fetch # fetch repository
     LOGTYPE_EXECUTE=execute # action executing
     LOGTYPE_DEPS=deps # processing dependencies
     # database log types
@@ -436,7 +436,7 @@ process_action() {
         check_url "$url" &&
 
         # prepare Git repository
-        refresh_repo "$url" &&
+        fetch_repo "$url" &&
 
         # execute the action itself
         execute_action "$1" "$url" "$version"
@@ -502,9 +502,9 @@ get_dep_prefix() {
 #   repository is refreshed.
 # PARAMETERS:
 #   $1 - URL
-refresh_repo() { (
+fetch_repo() { (
     repo_dir="$(url_to_path "$1")" && # get the repository directory path
-    log "$LOGTYPE_REFRESH" "$1" "$repo_dir"/ &&
+    log "$LOGTYPE_FETCH" "$1" "$repo_dir"/ &&
 
     if [ "$OFFLINE_MODE" = true ]; then # offline
         if [ ! -d "$repo_dir"/ ]; then # fail if local repository does not exist

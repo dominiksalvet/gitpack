@@ -220,7 +220,7 @@ echo log7 >&2 && test "$(grep -Fc '[list]' ~/.local/share/gitpack/gitpack.log)" 
 echo log8 >&2 && test "$(grep -Fc '[clean]' ~/.local/share/gitpack/gitpack.log)" -eq 1 &&
 echo log9 >&2 && test "$(grep -Fc '[action]' ~/.local/share/gitpack/gitpack.log)" -eq 18 &&
 echo log10 >&2 && test "$(grep -Fc '[url]' ~/.local/share/gitpack/gitpack.log)" -eq 18 &&
-echo log11 >&2 && test "$(grep -Fc '[refresh]' ~/.local/share/gitpack/gitpack.log)" -eq 15 &&
+echo log11 >&2 && test "$(grep -Fc '[fetch]' ~/.local/share/gitpack/gitpack.log)" -eq 15 &&
 echo log12 >&2 && test "$(grep -Fc '[execute]' ~/.local/share/gitpack/gitpack.log)" -eq 15 &&
 echo log13 >&2 && test "$(grep -Fc '[deps]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
 echo log14 >&2 && test "$(grep -Fc '[get]' ~/.local/share/gitpack/gitpack.log)" -eq 15 &&
