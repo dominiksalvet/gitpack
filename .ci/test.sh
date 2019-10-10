@@ -12,13 +12,16 @@
 
 # run all tests and store their exit status and output for further analysis
 {   .ci/tester.sh 2>&1 1>/dev/null
-    echo "$?" 2>&1 1>~/gitpack-tester-status # store exit status
-} | tee ~/gitpack-tester-output && # store output
+    echo "$?" > ~/gitpack-tester-status 2>/dev/null # store exit status
+} | tee ~/gitpack-tester-output >&2 && # store output
 
-tester_status="$(cat ~/gitpack-tester-status)" && # load exit status
-if [ "$tester_status" -eq 0 ]; then # if tests were successful
+if ! tester_status="$(cat ~/gitpack-tester-status)"; then # load exit status
+    echo 'cannot get exit status of tests' >&2; exit 1
+fi &&
+
+if [ "$tester_status" -eq 0 ]; then # if tests were successful, watch output
     # check if there is an error message (ignoring a diagnostic message format)
-    while read -r line; do
+    echo testtest1 >&2 && while read -r line; do
         # if it does not match the diagnostic format, it is an error message
         if ! echo "$line" | grep -q '^[[:alpha:]]\+[[:digit:]]\+$'; then
             echo "error detected: $line" >&2; exit 1
