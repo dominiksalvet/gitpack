@@ -731,7 +731,6 @@ execute_change() {
     fi &&
 
     uninstall "$1" "$2" && # uninstall source commit
-    echo 'an error report to be detected' >&2 &&
     delete_db_records "$1" && # update GitPack database
     install "$1" "$3" && # install target commit
     insert_db_record "$1" "$3" # update GitPack database
