@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
-# ENTRY POINT
+# MAIN FUNCTION
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
@@ -154,7 +154,7 @@ init_config() {
 }
 
 #-------------------------------------------------------------------------------
-# ARGUMENT PARSING
+# ARGUMENT PROCESSING
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
@@ -213,10 +213,13 @@ process_action_opts() {
 }
 
 # DESCRIPTION:
-#   Backs up the GitPack database by copying it to a different path.
-backup_db() {
-    log "$LOGTYPE_BACKUP" "$STATUS_PATH" "$STATUS_BAK_PATH" &&
-    cp "$STATUS_PATH" "$STATUS_BAK_PATH"
+#   Prints given echo arguments to standard error stream and logs the same into
+#   the GitPack log file as a fail.
+# PARAMETERS:
+#   $@ - echo arguments
+echof() {
+    echo "$@" >&2 # print the fail
+    log "$LOGTYPE_FAIL" "$@" # log the fail
 }
 
 #-------------------------------------------------------------------------------
@@ -299,28 +302,6 @@ term_action() {
     exit "$status" # exit GitPack (it also invokes the EXIT trap)
 }
 
-# DESCRIPTION:
-#   Initializes GitPack database file structure based on prepared global
-#   variables. It fails if it cannot create a file or GitPack does not have read
-#   or write permissions.
-init_db() {
-    log "$LOGTYPE_DB" "$STATUS_PATH" &&
-    mkdir -p "$STATE_DIR"/ && # create the state directory
-    # create GitPack status file if it does not exist
-    if [ ! -e "$STATUS_PATH" ]; then
-        if [ -r "$STATUS_BAK_PATH" ]; then # if there is a status file backup
-            cp "$STATUS_BAK_PATH" "$STATUS_PATH" # recover from the backup
-        else
-            touch "$STATUS_PATH" # create a new status file
-        fi
-    fi &&
-
-    # check access to GitPack status file
-    if [ ! -r "$STATUS_PATH" ] || [ ! -w "$STATUS_PATH" ]; then
-        echof 'cannot access status file'; return 1
-    fi
-}
-
 #-------------------------------------------------------------------------------
 # LOGGING
 #-------------------------------------------------------------------------------
@@ -352,16 +333,6 @@ log() {
 
     # store the log item
     echo "$date_out [$logtype]$details" >> "$LOG_PATH"
-}
-
-# DESCRIPTION:
-#   Prints given echo arguments to standard error stream and logs the same into
-#   the GitPack log file as a fail.
-# PARAMETERS:
-#   $@ - echo arguments
-echof() {
-    echo "$@" >&2 # print the fail
-    log "$LOGTYPE_FAIL" "$@" # log the fail
 }
 
 #-------------------------------------------------------------------------------
@@ -495,17 +466,8 @@ check_url() {
     fi
 }
 
-# DESCRIPTION:
-#   Prints the current prefix for dependency reports considering the current
-#   dependency depth value.
-get_dep_prefix() {
-    if [ "$dep_depth" -gt 0 ]; then
-        echo "$DEP_PREFIX"
-    fi
-}
-
 #-------------------------------------------------------------------------------
-# PREPARE REPOSITORY
+# REPOSITORY
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
@@ -574,7 +536,7 @@ execute_action() {
         "$ACTION_STATUS") execute_status "$2" "$src_hash" "$tar_hash" ;;
     esac &&
 
-    print_report "$state" "$2" "$src_hash" "$tar_hash"
+    report "$state" "$2" "$src_hash" "$tar_hash"
 }
 
 # DESCRIPTION:
@@ -614,8 +576,17 @@ repo_cd() {
 }
 
 #-------------------------------------------------------------------------------
-# PROCESS DEPENDENCIES
+# DEPENDENCIES
 #-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Prints the current prefix for dependency reports considering the current
+#   dependency depth value.
+get_dep_prefix() {
+    if [ "$dep_depth" -gt 0 ]; then
+        echo "$DEP_PREFIX"
+    fi
+}
 
 # DESCRIPTION:
 #   Processes all dependencies of a given project considering a given action. It
@@ -653,6 +624,28 @@ get_deps() { (
 ) }
 
 # DESCRIPTION:
+#   Prepares the environment for a new dependency depth level. It also checks
+#   whether it is possible to continue processing dependencies.
+next_dep_depth() {
+    dep_depth="$((dep_depth + 1))" # increment dependency depth
+
+    # check whether the new dependency depth value is valid
+    if [ "$dep_depth" -gt "$MAX_DEP_DEPTH" ]; then
+        echof 'maximum dependency depth reached'; return 1
+    fi
+}
+
+# DESCRIPTION:
+#   An echo wrapper. It does not print a new line if the final string is empty.
+# PARAMETERS:
+#   $@ - echo arguments
+echon() {
+    if [ "$@" ]; then
+        echo "$@"
+    fi
+}
+
+# DESCRIPTION:
 #   This function is a grep wrapper. Succeeds even in the case of an empty grep
 #   selection.
 # PARAMETERS:
@@ -668,30 +661,8 @@ grepe() {
     return "$grep_status" # return the modified exit status
 }
 
-# DESCRIPTION:
-#   An echo wrapper. It does not print a new line if the final string is empty.
-# PARAMETERS:
-#   $@ - echo arguments
-echon() {
-    if [ "$@" ]; then
-        echo "$@"
-    fi
-}
-
-# DESCRIPTION:
-#   Prepares the environment for a new dependency depth level. It also checks
-#   whether it is possible to continue processing dependencies.
-next_dep_depth() {
-    dep_depth="$((dep_depth + 1))" # increment dependency depth
-
-    # check whether the new dependency depth value is valid
-    if [ "$dep_depth" -gt "$MAX_DEP_DEPTH" ]; then
-        echof 'maximum dependency depth reached'; return 1
-    fi
-}
-
 #-------------------------------------------------------------------------------
-# ACTION EXECUTION
+# EXECUTE ACTION
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
@@ -931,16 +902,6 @@ remove_files_from_dir() {
 }
 
 # DESCRIPTION:
-#   This function is a rmdir wrapper. It succeeds even in case the target
-#   directories do not exist.
-# PARAMETERS:
-#   $@ - rmdir arguments
-rmdirf() {
-    # suppress error output and always succeeds
-    rmdir "$@" 2>/dev/null; true
-}
-
-# DESCRIPTION:
 #   Removes the copy of a given file from a given target directory. In case of a
 #   directory, its content is removed in accordance with the original directory.
 # PARAMETERS:
@@ -982,9 +943,41 @@ remove_dir_from_dir() {
     rmdirf -- "${2:?}"/"${basename_out:?}"/ # remove the copied directory itself
 }
 
+# DESCRIPTION:
+#   This function is a rmdir wrapper. It succeeds even in case the target
+#   directories do not exist.
+# PARAMETERS:
+#   $@ - rmdir arguments
+rmdirf() {
+    # suppress error output and always succeeds
+    rmdir "$@" 2>/dev/null; true
+}
+
 #-------------------------------------------------------------------------------
-# DATABASE OPERATIONS
+# DATABASE
 #-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Initializes GitPack database file structure based on prepared global
+#   variables. It fails if it cannot create a file or GitPack does not have read
+#   or write permissions.
+init_db() {
+    log "$LOGTYPE_DB" "$STATUS_PATH" &&
+    mkdir -p "$STATE_DIR"/ && # create the state directory
+    # create GitPack status file if it does not exist
+    if [ ! -e "$STATUS_PATH" ]; then
+        if [ -r "$STATUS_BAK_PATH" ]; then # if there is a status file backup
+            cp "$STATUS_BAK_PATH" "$STATUS_PATH" # recover from the backup
+        else
+            touch "$STATUS_PATH" # create a new status file
+        fi
+    fi &&
+
+    # check access to GitPack status file
+    if [ ! -r "$STATUS_PATH" ] || [ ! -w "$STATUS_PATH" ]; then
+        echof 'cannot access status file'; return 1
+    fi
+}
 
 # DESCRIPTION:
 #   Selects the first record matching a given URL from the GitPack database.
@@ -1016,8 +1009,15 @@ delete_db_records() {
     echon "$grepe_out" > "$STATUS_PATH"
 }
 
+# DESCRIPTION:
+#   Backs up the GitPack database by copying it to a different path.
+backup_db() {
+    log "$LOGTYPE_BACKUP" "$STATUS_PATH" "$STATUS_BAK_PATH" &&
+    cp "$STATUS_PATH" "$STATUS_BAK_PATH"
+}
+
 #-------------------------------------------------------------------------------
-# STATE REPORT
+# REPORT
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
@@ -1027,7 +1027,7 @@ delete_db_records() {
 #   $2 - URL
 #   $3 - source commit
 #   $4 - target commit
-print_report() {
+report() {
     # prepare given arguments
     prefix="$(get_dep_prefix)[$1] $2" &&
     src_version="$(beautify_hash "$2" "$3")" &&
@@ -1037,13 +1037,12 @@ print_report() {
         "$STATE_INSTALL") echo "$prefix $tar_version" ;;
         "$STATE_UPDATE" | "$STATE_DOWNGRADE" | "$STATE_CHANGE")
             echo "$prefix $tar_version <- $src_version" ;;
-        "$STATE_INSTALLED") echo "$prefix $src_version" ;;
-        "$STATE_UNINSTALL") echo "$prefix $src_version" ;;
+        "$STATE_INSTALLED" | "$STATE_UNINSTALL" | "$STATE_OK")
+            echo "$prefix $src_version" ;;
         "$STATE_UNINSTALLED") echo "$prefix" ;;
         "$STATE_NOTHING") echo "$prefix -> $tar_version" ;;
         "$STATE_OLDER" | "$STATE_NEWER" | "$STATE_DIFF")
             echo "$prefix $src_version -> $tar_version" ;;
-        "$STATE_OK") echo "$prefix $src_version" ;;
     esac
 }
 
@@ -1065,7 +1064,7 @@ beautify_hash() { (
 ) }
 
 #-------------------------------------------------------------------------------
-# ENTRY POINT CALLING
+# CALL MAIN
 #-------------------------------------------------------------------------------
 
 main "$@" # call the main function, having all functions above already defined
