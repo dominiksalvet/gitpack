@@ -497,11 +497,11 @@ init_repo() {
 #   $1 - URL
 #   $2 - repository directory
 fetch_repo() { (
-    if [ -d "$1"/ ]; then # fetch updates
-        cd "$1"/ &&
+    if [ -d "$2"/ ]; then # fetch updates
+        cd "$2"/ &&
         git fetch -q origin # fetch remote updates (if may ask for a password)
     else # create repository directory and fetch files
-        mkdir -p "$1"/ && cd "$1"/ && # create a directory
+        mkdir -p "$2"/ && cd "$2"/ && # create a directory
         git init -q && # create a Git repository
         git remote add origin https://"$1".git && # add repository remote
         # fetch also the remote HEAD (default branch)
