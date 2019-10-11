@@ -471,25 +471,38 @@ check_url() {
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   Initializes a Git repository of a given URL. In case an associated directory
-#   does not exist, it is created and repository files are fetched. Otherwise,
-#   any remote updates are fetched.
+#   Initializes a Git repository of a given URL into a directory in the GitPack
+#   cache. The repository will be downloaded unless the offline mode is enabled,
+#   in which case succeeds only if it is already downloaded.
 # PARAMETERS:
 #   $1 - URL
-init_repo() { (
+init_repo() {
     repo_dir="$(url_to_path "$1")" && # get the repository directory path
     log "$LOGTYPE_REPO" "$1" "$repo_dir"/ &&
 
     if [ "$OFFLINE_MODE" = true ]; then # offline
         if [ ! -d "$repo_dir"/ ]; then # fail if local repository does not exist
-            echof 'project is not downloaded'; return 1
+            echof 'repository is not downloaded'; return 1
         fi
-    elif [ -d "$repo_dir"/ ]; then # refresh repository
-        cd "$repo_dir"/ &&
-        git fetch -q origin # fetch remote updates (it may ask for a password)
-    else # create repository
-        mkdir -p "$repo_dir"/ && cd "$repo_dir"/ && # create directory
-        git init -q && # initialize a Git repository
+    else # online
+        fetch_repo "$1" "$repo_dir"
+    fi
+}
+
+# DESCRIPTION:
+#   Downloads files of a given repository URL so that they are up to date. If a
+#   given repository directory does not exists, it is created and repository
+#   files are fetched. Otherwise, any remote updates are fetched.
+# PARAMETERS:
+#   $1 - URL
+#   $2 - repository directory
+fetch_repo() { (
+    if [ -d "$1"/ ]; then # fetch updates
+        cd "$1"/ &&
+        git fetch -q origin # fetch remote updates (if may ask for a password)
+    else # create repository directory and fetch files
+        mkdir -p "$1"/ && cd "$1"/ && # create a directory
+        git init -q && # create a Git repository
         git remote add origin https://"$1".git && # add repository remote
         # fetch also the remote HEAD (default branch)
         git config --add remote.origin.fetch HEAD:refs/remotes/origin/HEAD &&
