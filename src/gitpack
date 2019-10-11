@@ -303,39 +303,6 @@ term_action() {
 }
 
 #-------------------------------------------------------------------------------
-# LOGGING
-#-------------------------------------------------------------------------------
-
-# DESCRIPTION:
-#   Creates logging file structure and logs the initialization log item.
-init_logging() {
-    mkdir -p "$LOG_DIR"/ && # create the log directory
-    log "$LOGTYPE_LOG" "$COMMAND"
-}
-
-# DESCRIPTION:
-#   Creates a new log item in the predefined log file with current date and time
-#   based on a given type and details.
-# PARAMETERS:
-#   $1 - type
-#   $@ - details (optional)
-log() {
-    date_out="$(date '+%Y-%m-%d %H:%M:%S')" && # catch time immediately
-    logtype="$1" && # use the given log type
-    shift && # shift arguments to details
-
-    details= && # start with no details
-    for detail in "$@"; do # get all details
-        if [ "$detail" ]; then # ignore empty ones
-            details="$details $detail"
-        fi
-    done &&
-
-    # store the log item
-    echo "$date_out [$logtype]$details" >> "$LOG_PATH"
-}
-
-#-------------------------------------------------------------------------------
 # COMMAND PROCESSING
 #-------------------------------------------------------------------------------
 
@@ -1027,6 +994,39 @@ delete_db_records() {
 backup_db() {
     log "$LOGTYPE_BACKUP" "$STATUS_PATH" "$STATUS_BAK_PATH" &&
     cp "$STATUS_PATH" "$STATUS_BAK_PATH"
+}
+
+#-------------------------------------------------------------------------------
+# LOGGING
+#-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Creates logging file structure and logs the initialization log item.
+init_logging() {
+    mkdir -p "$LOG_DIR"/ && # create the log directory
+    log "$LOGTYPE_LOG" "$COMMAND"
+}
+
+# DESCRIPTION:
+#   Creates a new log item in the predefined log file with current date and time
+#   based on a given type and details.
+# PARAMETERS:
+#   $1 - type
+#   $@ - details (optional)
+log() {
+    date_out="$(date '+%Y-%m-%d %H:%M:%S')" && # catch time immediately
+    logtype="$1" && # use the given log type
+    shift && # shift arguments to details
+
+    details= && # start with no details
+    for detail in "$@"; do # get all details
+        if [ "$detail" ]; then # ignore empty ones
+            details="$details $detail"
+        fi
+    done &&
+
+    # store the log item
+    echo "$date_out [$logtype]$details" >> "$LOG_PATH"
 }
 
 #-------------------------------------------------------------------------------
