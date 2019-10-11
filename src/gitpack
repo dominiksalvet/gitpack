@@ -78,8 +78,6 @@ init_constants() {
 
     # global log types
     LOGTYPE_LOG=log # logging initialization
-    LOGTYPE_DB=db # database initialization
-    LOGTYPE_BACKUP=backup # backup status file
     LOGTYPE_FAIL=fail # any recorder fail
     LOGTYPE_SIGNAL=signal # a handled signal
     LOGTYPE_EXIT=exit # exit the program
@@ -90,13 +88,15 @@ init_constants() {
     # action log types
     LOGTYPE_ACTION=action # action processing
     LOGTYPE_URL=url # URL check
-    LOGTYPE_FETCH=fetch # fetch repository
+    LOGTYPE_REPO=repo # repository initialization
     LOGTYPE_EXECUTE=execute # action executing
     LOGTYPE_DEPS=deps # processing dependencies
     # database log types
+    LOGTYPE_DB=db # database initialization
     LOGTYPE_GET=get # get database item
     LOGTYPE_INSERT=insert # insert a database item
     LOGTYPE_DELETE=delete # delete database items
+    LOGTYPE_BACKUP=backup # backup database
     # installation log types
     LOGTYPE_PRECP=precp # precp script execution
     LOGTYPE_CP=cp # copy files using map
@@ -478,7 +478,7 @@ check_url() {
 #   $1 - URL
 init_repo() { (
     repo_dir="$(url_to_path "$1")" && # get the repository directory path
-    log "$LOGTYPE_FETCH" "$1" "$repo_dir"/ &&
+    log "$LOGTYPE_REPO" "$1" "$repo_dir"/ &&
 
     if [ "$OFFLINE_MODE" = true ]; then # offline
         if [ ! -d "$repo_dir"/ ]; then # fail if local repository does not exist
