@@ -551,7 +551,7 @@ get_repo_hash() { (
 repo_cd() {
     cd "$(url_to_path "$1")"/ && # transform the given URL to path
     if [ "$2" ]; then
-        git checkout -qf "$2"
+        git checkout -q "$2"
     fi
 }
 
@@ -973,7 +973,7 @@ get_db_record() {
 #   Inserts a given installation record into the GitPack database.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - commit hash
+#   $2 - commit
 insert_db_record() {
     log "$LOGTYPE_INSERT" "$1" "$2" "$STATUS_PATH" &&
     echo "$1 $2" >> "$STATUS_PATH"
