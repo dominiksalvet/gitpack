@@ -24,7 +24,7 @@ main() {
     init_constants &&
     init_strings &&
     init_config &&
-    store_command "$0 $@" &&
+    store_command "$0 $*" &&
     process_args "$@" # process all given GitPack arguments
 }
 
@@ -154,7 +154,7 @@ init_config() {
 # PARAMETERS:
 #   $@ - complete GitPack command
 store_command() {
-    COMMAND="$@" # the complete current GitPack command
+    COMMAND="$*" # the complete current GitPack command
 }
 
 #-------------------------------------------------------------------------------
