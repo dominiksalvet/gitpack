@@ -23,7 +23,8 @@ main() {
     check_sw_deps &&
     init_constants &&
     init_strings &&
-    init_config "$@" &&
+    init_config &&
+    store_command "$0 $@" &&
     process_args "$@" # process all given GitPack arguments
 }
 
@@ -141,16 +142,19 @@ github.com/dominiksalvet/gitpack"
 }
 
 # DESCRIPTION:
-#   Stores a copy of a complete command, which invoked this GitPack instance
-#   based on given GitPack arguments and initializes other constants used as a
-#   part of the GitPack configuration. None of them may be changed later.
-# PARAMETERS:
-#   $@ - GitPack arguments
+#   Initializes GitPack configuration constants. They must not be changed later.
 init_config() {
-    COMMAND="$0 $*" # the complete current GitPack command
-
     LOG_LINES_KEPT=1000 # when shortening the log file, keep those last lines
-    MAX_DEP_DEPTH=20 # max depth of dependencies, prevent cyclic dependencies
+    MAX_DEP_DEPTH=20 # max depth of dependencies prevents cyclic dependencies
+}
+
+# DESCRIPTION:
+#   Stores a copy of a given command, which invoked this GitPack instance. That
+#   value must not be changed later.
+# PARAMETERS:
+#   $@ - complete GitPack command
+store_command() {
+    COMMAND="$@" # the complete current GitPack command
 }
 
 #-------------------------------------------------------------------------------
