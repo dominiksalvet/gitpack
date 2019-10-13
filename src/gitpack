@@ -362,7 +362,7 @@ remove_dir() {
             # check for a home directory
             test "$PWD" != ~ && test "$pwd_out" != ~
         ) &&
-        rm -rf -- "${1:?}"/ # remove the directory itself recursively
+        rm -fr -- "${1:?}"/ # remove the directory itself recursively
     fi
 }
 
