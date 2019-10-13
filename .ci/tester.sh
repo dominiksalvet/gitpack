@@ -88,13 +88,13 @@ echo command7 >&2 && src/gitpack about &&
 echo command8 >&2 && src/gitpack help &&
 
 # install older version
-echo install1 >&2 && gitpack_out="$(src/gitpack status github.com/dominiksalvet/gitpack=0.1.0)" &&
+echo install1 >&2 && gitpack_out="$(src/gitpack status github.com/dominiksalvet/gitpack=tag/0.1.0)" &&
 echo install2 >&2 && echo "$gitpack_out" | grep '^\[nothing\]' &&
-echo install3 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack=0.1.0)" &&
+echo install3 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack=tag/0.1.0)" &&
 echo install4 >&2 && echo "$gitpack_out" | grep '^\[install\]' &&
-echo install5 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack=0.1.0)" &&
+echo install5 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack=tag/0.1.0)" &&
 echo install6 >&2 && echo "$gitpack_out" | grep '^\[installed\]' &&
-echo install7 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack=0.1.0)" &&
+echo install7 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack=tag/0.1.0)" &&
 echo install8 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
 echo install9 >&2 && gitpack_out="$(src/gitpack list)" &&
 echo install10 >&2 && echo "$gitpack_out" | grep -F 'github.com/dominiksalvet/gitpack' &&
@@ -123,13 +123,13 @@ echo update17 >&2 && test -f ~/.bash_completion.d/gitpack-completion.bash &&
 echo update18 >&2 && test ! -x ~/.bash_completion.d/gitpack-completion.bash &&
 
 # downgrade to older version
-echo downgrade1 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack=0.1.0)" &&
+echo downgrade1 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack=tag/0.1.0)" &&
 echo downgrade2 >&2 && echo "$gitpack_out" | grep '^\[newer\]' &&
-echo downgrade3 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack=0.1.0)" &&
+echo downgrade3 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack=tag/0.1.0)" &&
 echo downgrade4 >&2 && echo "$gitpack_out" | grep '^\[downgrade\]' &&
-echo downgrade5 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack=0.1.0)" &&
+echo downgrade5 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack=tag/0.1.0)" &&
 echo downgrade6 >&2 && echo "$gitpack_out" | grep '^\[installed\]' &&
-echo downgrade7 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack=0.1.0)" &&
+echo downgrade7 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack=tag/0.1.0)" &&
 echo downgrade8 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
 echo downgrade9 >&2 && gitpack_out="$(src/gitpack list)" &&
 echo downgrade10 >&2 && echo "$gitpack_out" | grep -F 'github.com/dominiksalvet/gitpack' &&

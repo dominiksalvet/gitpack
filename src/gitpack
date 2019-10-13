@@ -107,8 +107,13 @@ init_constants() {
     LOGTYPE_RM=rm # remove files using map
     LOGTYPE_POSTRM=postrm # postrm script execution
 
-    # other constants
+    # dependency constants
     DEP_PREFIX='+ ' # prefix for processing dependencies
+
+    # Git fetch remote refspecs
+    GIT_HEAD_REFSPEC='+HEAD:refs/remotes/origin/HEAD' # HEAD
+    GIT_TAG_REFSPEC='+refs/tags/*:refs/remotes/origin/tag/*' # tags
+    GIT_BRANCH_REFSPEC='+refs/heads/*:refs/remotes/origin/branch/*' # branches
 }
 
 # DESCRIPTION:
@@ -126,6 +131,9 @@ ACTION:
 
 OPTION:
   -o  offline mode
+
+VERSION:
+  HEAD, tag/TAG, branch/BRANCH, COMMIT
 
 COMMAND:
   list   list installed projects
@@ -325,7 +333,7 @@ list() {
 # DESCRIPTION:
 #   Cleans the GitPack cache and log performing checks for unintended removal.
 clean() {
-    # log clean operation, also creates a log file if it does not exit
+    # log clean operation, also creates a log file if it does not exist
     log "$LOGTYPE_CLEAN" "$CACHE_DIR"/ &&
 
     # clean log shortening it to a defined number of last lines
@@ -461,24 +469,27 @@ init_repo() {
 }
 
 # DESCRIPTION:
-#   Downloads files of a given repository URL so that they are up to date. If a
-#   given repository directory does not exists, it is created and repository
-#   files are fetched. Otherwise, any remote updates are fetched.
+#   Downloads files of a given repository URL so that they are up to date. If an
+#   appropriate local repository does not exist, it is created and configured.
+#   Then, remote updates are fetched including any reference removal.
 # PARAMETERS:
 #   $1 - URL
 #   $2 - repository directory
 fetch_repo() { (
-    if [ -d "$2"/ ]; then # fetch updates
-        cd "$2"/ &&
-        git fetch -q origin # fetch remote updates (if may ask for a password)
-    else # create repository directory and fetch files
+    if [ -d "$2"/ ]; then # local repository already exists
+        cd "$2"/
+    else # create and configure local repository
         mkdir -p "$2"/ && cd "$2"/ && # create a directory
-        git init -q && # create a Git repository
-        git remote add origin https://"$1".git && # add repository remote
-        # fetch also the remote HEAD (default branch)
-        git config --add remote.origin.fetch HEAD:refs/remotes/origin/HEAD &&
-        git fetch -q origin # fetch Git refs (it may ask for a password)
-    fi
+        # create and configure the Git repository
+        git init -q && # create it
+        git config gc.auto 0 && # disable automatic Git garbage collection
+        git config remote.origin.url https://"$1".git && # add remote URL
+        git config remote.origin.fetch "$GIT_HEAD_REFSPEC" && # HEAD
+        git config --add remote.origin.fetch "$GIT_TAG_REFSPEC" && # tags
+        git config --add remote.origin.fetch "$GIT_BRANCH_REFSPEC" # branches
+    fi &&
+    # fetch remote updates (prune references and do not fetch tags implicitly)
+    git fetch -pnq origin # it may ask for a password
 ) }
 
 # DESCRIPTION:
@@ -524,8 +535,8 @@ execute_action() {
 }
 
 # DESCRIPTION:
-#   Prints a preferred commit hash of a given project. It chooses latest tag's
-#   commit if it exists, otherwise latest commit is chosen.
+#   Prints a preferred commit hash of a given project. Respecting the default
+#   branch, chooses its latest tag's commit (preferred) or latest commit.
 # PARAMETERS:
 #   $1 - URL
 #   $2 - version (optional)
@@ -533,16 +544,16 @@ get_repo_hash() { (
     repo_cd "$1" &&
 
     if [ "$2" ]; then # if any version has been provided
-        # print a given version if it is a valid Git commit object reference
-        if ! git rev-parse --verify -q "$2"'^{commit}' && # tag or commit
-           ! git rev-parse --verify -q origin/"$2"'^{commit}'; then # branch
+        # print the hash of the version if it is a valid Git commit reference
+        if ! git rev-parse --verify -q origin/"$2"'^{commit}' && # references
+           ! git rev-parse --verify -q "$2"'^{commit}'; then # commit
             echof "version $2 does not exist"; return 1
         fi
-    # get latest tag of the default branch (if any tag exists)
-    elif tag="$(git describe --tags --abbrev=0 origin/HEAD 2>/dev/null)"; then
-        git rev-parse --verify "$tag"'^{commit}' # transform the tag to a hash
-    else
-        git rev-parse --verify origin/HEAD'^{commit}' # get latest commit hash
+    else # detect a preferred commit
+        # get latest tag (preferred) or latest commit of the default branch
+        commit="$(git describe --all --abbrev=0 --match 'origin/tag/*' \
+                               --always origin/HEAD)" &&
+        git rev-parse --verify "$commit"'^{commit}' # get commit hash
     fi
 ) }
 
@@ -1064,18 +1075,18 @@ report() {
 }
 
 # DESCRIPTION:
-#   Beautifies a given commit hash prepared for a use in a report. If there is a
-#   tag associated with a given hash, uses this tag. Otherwise, it makes the
-#   given hash shorter. Always succeeds.
+#   Beautifies a given commit hash. If there is a Git reference associated with
+#   the given hash, prints its name. Otherwise, it shortens the given hash.
+#   Always succeeds.
 # PARAMETERS:
 #   $1 - URL
 #   $2 - commit
 beautify_hash() { (
-    # check if given hash is associated with any tag
+    # check if given hash is associated with any reference
     if repo_cd "$1" 2>/dev/null &&
-       tag="$(git describe --tags --exact-match "$2" 2>/dev/null)"; then
-        echo "$tag"
-    else # if no tag found, return short hash
+       git_out="$(git describe --all --exact-match "$2" 2>/dev/null)"; then
+        echo "${git_out#remotes/origin/}" # remove reference prefix
+    else # if no reference found, return short hash
         echo "$2" | cut -c 1-7
     fi
 ) }
