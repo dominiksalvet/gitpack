@@ -111,9 +111,9 @@ init_constants() {
     DEP_PREFIX='+ ' # prefix for processing dependencies
 
     # Git fetch remote refspecs
-    GIT_HEAD_REFSPEC='+HEAD:refs/remotes/origin/HEAD' # HEAD
-    GIT_TAG_REFSPEC='+refs/tags/*:refs/remotes/origin/tag/*' # tags
-    GIT_BRANCH_REFSPEC='+refs/heads/*:refs/remotes/origin/branch/*' # branches
+    HEAD_REFSPEC='+HEAD:refs/remotes/origin/HEAD' # HEAD
+    TAG_REFSPEC='+refs/tags/*:refs/remotes/origin/tag/*' # tags
+    BRANCH_REFSPEC='+refs/heads/*:refs/remotes/origin/branch/*' # branches
 }
 
 # DESCRIPTION:
@@ -257,9 +257,9 @@ init_runtime() {
 #   Initializes all global variables. If there is a global variable, it must be
 #   stated here even though its value is going to be overwritten.
 init_global_vars() {
-    id_out="$(id -u)" && # check if running as root, not a global variable
+    user_id="$(id -u)" && # check if running as root, not a global variable
     # based on previous result, set up the access level
-    if [ "$id_out" -eq 0 ]; then
+    if [ "$user_id" -eq 0 ]; then
         access=global
     else
         access=local
@@ -484,9 +484,9 @@ fetch_repo() { (
         git init -q && # create it
         git config gc.auto 0 && # disable automatic Git garbage collection
         git config remote.origin.url https://"$1".git && # add remote URL
-        git config remote.origin.fetch "$GIT_HEAD_REFSPEC" && # HEAD
-        git config --add remote.origin.fetch "$GIT_TAG_REFSPEC" && # tags
-        git config --add remote.origin.fetch "$GIT_BRANCH_REFSPEC" # branches
+        git config remote.origin.fetch "$HEAD_REFSPEC" && # HEAD
+        git config --add remote.origin.fetch "$TAG_REFSPEC" && # tags
+        git config --add remote.origin.fetch "$BRANCH_REFSPEC" # branches
     fi &&
     # fetch remote updates (prune references and do not fetch tags implicitly)
     git fetch -pnq origin # it may ask for a password
@@ -908,9 +908,9 @@ remove_file_from_dir() {
     if [ -d "$1"/ ]; then
         remove_dir_from_dir "$1" "$2"
     else
-        basename_out="$(basename -- "$1")" && # name of the file to be removed
+        file_name="$(basename -- "$1")" && # name of the file to be removed
         # remove the file from the target directory
-        rm -f -- "${2:?}"/"${basename_out:?}"
+        rm -f -- "${2:?}"/"${file_name:?}"
     fi
 }
 
@@ -923,19 +923,19 @@ remove_file_from_dir() {
 #   $2 - target directory
 remove_dir_from_dir() {
     test "$1" && test "$2" &&
-    basename_out="$(basename -- "$1")" && # name of the directory to be removed
+    dir_name="$(basename -- "$1")" && # name of the directory to be removed
 
     # scan the target directory to obtain a file mask (files and directories)
     files="$(cd -- "$1"/ && find ./ ! -type d)" &&
     dirs="$(cd -- "$1"/ && find ./ -type d ! -path ./ | sort -r)" &&
 
     echon "$files" | while read -r file; do # remove files using file mask
-        rm -f -- "${2:?}"/"${basename_out:?}"/"${file:?}" || return
+        rm -f -- "${2:?}"/"${dir_name:?}"/"${file:?}" || return
     done &&
     echon "$dirs" | while read -r dir; do # remove directories using file mask
-        rmdirf -- "${2:?}"/"${basename_out:?}"/"${dir:?}"/ || return
+        rmdirf -- "${2:?}"/"${dir_name:?}"/"${dir:?}"/ || return
     done &&
-    rmdirf -- "${2:?}"/"${basename_out:?}"/ # remove the copied directory itself
+    rmdirf -- "${2:?}"/"${dir_name:?}"/ # remove the copied directory itself
 }
 
 # DESCRIPTION:
@@ -1029,7 +1029,7 @@ init_logging() {
 #   $1 - type
 #   $@ - details (optional)
 log() {
-    date_out="$(date '+%Y-%m-%d %H:%M:%S')" && # catch time immediately
+    log_time="$(date '+%Y-%m-%d %H:%M:%S')" && # catch time immediately
     logtype="$1" && # use the given log type
     shift && # shift arguments to details
 
@@ -1041,7 +1041,7 @@ log() {
     done &&
 
     # store the log item
-    echo "$date_out [$logtype]$details" >> "$LOG_PATH"
+    echo "$log_time [$logtype]$details" >> "$LOG_PATH"
 }
 
 #-------------------------------------------------------------------------------
@@ -1084,8 +1084,8 @@ report() {
 beautify_hash() { (
     # check if given hash is associated with any reference
     if repo_cd "$1" 2>/dev/null &&
-       git_out="$(git describe --all --exact-match "$2" 2>/dev/null)"; then
-        echo "${git_out#remotes/origin/}" # remove reference prefix
+       ref="$(git describe --all --exact-match "$2" 2>/dev/null)"; then
+        echo "${ref#remotes/origin/}" # remove reference prefix
     else # if no reference found, return short hash
         echo "$2" | cut -c 1-7
     fi
