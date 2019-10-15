@@ -46,7 +46,7 @@ check_sw_deps() (
 #-------------------------------------------------------------------------------
 # STATIC INITIALIZATION
 #-------------------------------------------------------------------------------
-# All constants of this section can be read in other code.
+# All constants of this section may be read in other code.
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
@@ -238,15 +238,16 @@ echof() {
 #-------------------------------------------------------------------------------
 # DYNAMIC INITIALIZATION
 #-------------------------------------------------------------------------------
-# All constants of this section can be read in other code. All global and
-# environment variables of this section can be accessed in other code.
+# All constants of this section may be read in other code. All global and
+# environment variables of this section may be accessed in other code.
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
 #   Initializes a runtime environment for GitPack. After calling this function,
 #   GitPack's environment, logging and file structure will be prepared.
 init_runtime() {
-    init_forced_global_vars &&
+    def_forced_vars &&
+    init_runtime_constants &&
     init_global_vars &&
     init_env_vars &&
     init_paths &&
@@ -256,29 +257,33 @@ init_runtime() {
 }
 
 # DESCRIPTION:
-#   Initializes all forced global variables. Those are global variables, which
-#   would otherwise be used as local variables but for some reason it is not
-#   possible. Their names must start with an underscore character.
-init_forced_global_vars() {
-    # all forced global variables
+#   Defines all forced variables. Those are global variables, which would
+#   otherwise be used as local variables but for some reason it is not possible.
+#   Their names must start with an underscore character.
+def_forced_vars() {
+    # list of all forced variables
     _user_id=
     _signal_status=
     _opt=
 }
 
 # DESCRIPTION:
+#   Initializes runtime constants. They must not be changed later.
+init_runtime_constants() {
+    _user_id="$(id -u)" && # check if running as root
+    if [ "$_user_id" -eq 0 ]; then
+        ACCESS=global # global installation (system installation)
+    else
+        ACCESS=local # local installation (user installation)
+    fi &&
+    SYSTEM="$(uname)" # get the current system name
+}
+
+# DESCRIPTION:
 #   Initializes all standard global variables. If there is such a variable, it
 #   must be stated here even though its value is going to be overwritten.
 init_global_vars() {
-    _user_id="$(id -u)" && # check if running as root
-    if [ "$_user_id" -eq 0 ]; then
-        access=global # global installation (system installation)
-    else
-        access=local # local installation (user installation)
-    fi &&
-    system="$(uname)" && # get the current system name
-
-    state= && # the state of the processed project
+    state= # the state of the processed project
     dep_depth=0 # current dependency depth
 }
 
@@ -293,7 +298,7 @@ init_env_vars() {
 #   not be changed later.
 init_paths() {
     # initialize directory paths
-    if [ "$access" = global ]; then # respect FHS
+    if [ "$ACCESS" = global ]; then # respect FHS
         LOG_DIR=/var/log/gitpack
         CACHE_DIR=/var/cache/gitpack
         STATE_DIR=/var/lib/gitpack
@@ -814,10 +819,10 @@ uninstall() (
 #   Prints the relative path of the appropriate GitPack installation directory
 #   based on the current runtime and system information.
 get_install_dir() {
-    if [ -d .gitpack/install/"${access}-$system"/ ]; then
-        echo .gitpack/install/"${access}-$system" # system-specific directory
+    if [ -d .gitpack/install/"${ACCESS}-$SYSTEM"/ ]; then
+        echo .gitpack/install/"${ACCESS}-$SYSTEM" # system-specific directory
     else
-        echo .gitpack/install/"$access" # system-independent directory
+        echo .gitpack/install/"$ACCESS" # system-independent directory
     fi
 }
 
