@@ -431,12 +431,12 @@ process_action() (
 #   Extracts and normalizes the URL from a given reference.
 # PARAMETERS:
 #   $1 - reference
-ref_to_url() {
-    set "${1%%=*}" # remove version if any
-    set "${1#https://}" # remove https:// prefix
-    set "${1%.git}" # remove .git suffix
-    echo "$1" | tr '[:upper:]' '[:lower:]' # to lowercase
-}
+ref_to_url() (
+    url="${1%%=*}" # remove version if any
+    url="$(echo "$url" | tr '[:upper:]' '[:lower:]')" && # to lowercase
+    url="${url#https://}" && # remove https:// prefix
+    echo "${url%.git}" # remove .git suffix
+)
 
 # DESCRIPTION:
 #   Extracts a version from a given reference if there is any. Always succeeds.
