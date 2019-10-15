@@ -937,8 +937,15 @@ remove_dir_from_dir() {
 # PARAMETERS:
 #   $@ - rmdir arguments
 rmdirf() {
-    # suppress error output and always succeeds
-    rmdir "$@" 2>/dev/null; true
+    # ignore exit status of rmdir and suppress its error output
+    rmdir "$@" 2>/dev/null
+
+    # check if each given directory is removed
+    for dir in "$@"; do
+        if [ -d "$dir"/ ]; then
+            return 1 # fail if any exists
+        fi
+    done
 }
 
 #-------------------------------------------------------------------------------
