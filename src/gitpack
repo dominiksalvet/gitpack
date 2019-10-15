@@ -110,10 +110,12 @@ init_constants() {
     # dependency constants
     DEP_PREFIX='+ ' # prefix for processing dependencies
 
+    # Git-related constants
+    REMOTE_HEAD_REF=refs/gitpack/HEAD
     # Git fetch remote refspecs
-    HEAD_REFSPEC='+HEAD:refs/remotes/origin/HEAD' # HEAD
-    TAG_REFSPEC='+refs/tags/*:refs/remotes/origin/tag/*' # tags
-    BRANCH_REFSPEC='+refs/heads/*:refs/remotes/origin/branch/*' # branches
+    HEAD_REFSPEC=+HEAD:"$REMOTE_HEAD_REF" # remote HEAD
+    TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # remote tags
+    HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # remote branches
 }
 
 # DESCRIPTION:
@@ -131,9 +133,6 @@ ACTION:
 
 OPTION:
   -o  offline mode
-
-VERSION:
-  HEAD, tag/TAG, branch/BRANCH, COMMIT
 
 COMMAND:
   list   list installed projects
@@ -484,12 +483,12 @@ fetch_repo() { (
         git init -q && # create it
         git config gc.auto 0 && # disable automatic Git garbage collection
         git config remote.origin.url https://"$1".git && # add remote URL
-        git config remote.origin.fetch "$HEAD_REFSPEC" && # HEAD
-        git config --add remote.origin.fetch "$TAG_REFSPEC" && # tags
-        git config --add remote.origin.fetch "$BRANCH_REFSPEC" # branches
+        git config remote.origin.fetch "$HEAD_REFSPEC" && # remote HEAD
+        git config --add remote.origin.fetch "$TAGS_REFSPEC" && # remote tags
+        git config --add remote.origin.fetch "$HEADS_REFSPEC" # remote branches
     fi &&
-    # fetch remote updates (prune references and do not fetch tags implicitly)
-    git fetch -pnq origin # it may ask for a password
+    # fetch remote updates (prune, do not fetch tags implicitly, update HEAD)
+    git fetch -pnuq origin # it may ask for a password
 ) }
 
 # DESCRIPTION:
@@ -535,25 +534,26 @@ execute_action() {
 }
 
 # DESCRIPTION:
-#   Prints a preferred commit hash of a given project. Respecting the default
-#   branch, chooses its latest tag's commit (preferred) or latest commit.
+#   Prints a preferred commit hash of a given project. If a version is provided,
+#   it is transformed into an actual commit hash. Otherwise, it chooses latest
+#   tag's commit (preferred) or latest commit of the default branch.
 # PARAMETERS:
 #   $1 - URL
 #   $2 - version (optional)
 get_repo_hash() { (
     repo_cd "$1" &&
+    # transform the given HEAD version into a real remote HEAD reference
+    if [ "$2" = HEAD ]; then set "$1" "$REMOTE_HEAD_REF"; fi &&
 
     if [ "$2" ]; then # if any version has been provided
         # print the hash of the version if it is a valid Git commit reference
-        if ! git rev-parse --verify -q origin/"$2"'^{commit}' && # references
-           ! git rev-parse --verify -q "$2"'^{commit}'; then # commit
+        if ! git rev-parse --verify -q "$2"'^{commit}'; then
             echof "version $2 does not exist"; return 1
         fi
     else # detect a preferred commit
         # get latest tag (preferred) or latest commit of the default branch
-        commit="$(git describe --all --abbrev=0 --match 'origin/tag/*' \
-                               --always origin/HEAD)" &&
-        git rev-parse --verify "$commit"'^{commit}' # get commit hash
+        ref="$(git describe --tags --abbrev=0 --always "$REMOTE_HEAD_REF")" &&
+        git rev-parse --verify "$ref"'^{commit}' # get commit hash
     fi
 ) }
 
@@ -1075,20 +1075,26 @@ report() {
 }
 
 # DESCRIPTION:
-#   Beautifies a given commit hash. If there is a Git reference associated with
-#   the given hash, prints its name. Otherwise, it shortens the given hash.
-#   Always succeeds.
+#   Beautifies a given commit hash. If the hash is empty, exits without any
+#   output. If there is a Git reference associated with the given hash, prints
+#   its name. Otherwise, it shortens the given hash. Always succeeds.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - commit
+#   $2 - commit (optional)
 beautify_hash() { (
+    if [ ! "$2" ]; then return; fi # early return if no commit provided
+
     # check if given hash is associated with any reference
     if repo_cd "$1" 2>/dev/null &&
        ref="$(git describe --all --exact-match "$2" 2>/dev/null)"; then
-        echo "${ref#remotes/origin/}" # remove reference prefix
-    else # if no reference found, return short hash
-        echo "$2" | cut -c 1-7
+        version="${ref#*/}" # remove reference prefix
+        # a HEAD version is always printed as a remote HEAD, not a tag or branch
+        if [ "$version" != HEAD ] || [ refs/"$ref" = "$REMOTE_HEAD_REF" ]; then
+            echo "$version"; return
+        fi
     fi
+
+    echo "$2" | cut -c 1-7 # if no reference found, return short hash
 ) }
 
 #-------------------------------------------------------------------------------

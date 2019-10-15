@@ -13,9 +13,9 @@ The changes not yet present in any release are listed in this section.
 * The automatic default branch detection has been added.
 * The `paths` command to show all GitPack-specific paths has been added.
 
-### Breaking
+### Changed
 
-* GitPack now uses `HEAD`, `tag/<tag>`, `branch/<branch>`, or `<commit>` for project versions.
+* GitPack resolves a version name collision in the following order: HEAD, tags, branches and commits.
 
 ## 0.6.0 (2019-10-08)
 
