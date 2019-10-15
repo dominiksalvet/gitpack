@@ -373,21 +373,22 @@ paths() {
 #   checks related to safety of the whole process.
 # PARAMETERS:
 #   $1 - directory
-remove_dir() { (
+remove_dir() {
     test "$1" && # the directory path must not be empty
     if [ ! -d "$1"/ ]; then return; fi && # the directory does not exist, return
 
-    # store physical path of the given directory
-    cd -- "$1"/ && pwd_out="$(pwd -P)" &&
-    # check for the root directory
-    test "$PWD" != / && test "$pwd_out" != / &&
-    # check for the root directory (with two slashes)
-    test "$PWD" != // && test "$pwd_out" != // &&
-    # check for a home directory
-    test "$PWD" != ~ && test "$pwd_out" != ~ &&
+    (   # store physical path of the given directory
+        cd -- "$1"/ && pwd_out="$(pwd -P)" &&
+        # check for the root directory
+        test "$PWD" != / && test "$pwd_out" != / &&
+        # check for the root directory (with two slashes)
+        test "$PWD" != // && test "$pwd_out" != // &&
+        # check for a home directory
+        test "$PWD" != ~ && test "$pwd_out" != ~
+    ) &&
 
     rm -fr -- "${1:?}"/ # remove the directory itself recursively
-) }
+}
 
 #-------------------------------------------------------------------------------
 # ACTION PROCESSING
