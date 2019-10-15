@@ -884,7 +884,7 @@ remove_files_from_dir() {
     while [ "$#" -gt 1 ]; do # for each file path argument
         test "$1" &&
         remove_file_from_dir "$1" "$target_dir" && # remove the file
-        rmdirf -p -- "${target_dir:?}"/ && # remove empty pathname directories
+        rmdirt -p -- "${target_dir:?}"/ && # remove empty pathname directories
         shift || return # shift to next argument
     done
 }
@@ -926,26 +926,18 @@ remove_dir_from_dir() {
         rm -f -- "${2:?}"/"${dir_name:?}"/"${file:?}" || return
     done &&
     echon "$dirs" | while read -r dir; do # remove directories using file mask
-        rmdirf -- "${2:?}"/"${dir_name:?}"/"${dir:?}"/ || return
+        rmdirt -- "${2:?}"/"${dir_name:?}"/"${dir:?}"/ || return
     done &&
-    rmdirf -- "${2:?}"/"${dir_name:?}"/ # remove the copied directory itself
+    rmdirt -- "${2:?}"/"${dir_name:?}"/ # remove the copied directory itself
 }
 
 # DESCRIPTION:
-#   This function is a rmdir wrapper. It succeeds even in case the target
-#   directories do not exist.
+#   This function is a rmdir wrapper. It prints no errors and always succeeds.
 # PARAMETERS:
 #   $@ - rmdir arguments
-rmdirf() {
-    # ignore exit status of rmdir and suppress its error output
-    rmdir "$@" 2>/dev/null
-
-    # check if each given directory is removed
-    for dir in "$@"; do
-        if [ -d "$dir"/ ]; then
-            return 1 # fail if any exists
-        fi
-    done
+rmdirt() {
+    # suppress error output and always succeeds
+    rmdir "$@" 2>/dev/null; true
 }
 
 #-------------------------------------------------------------------------------
