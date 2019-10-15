@@ -176,7 +176,8 @@ store_command() {
 process_args() {
     case "$1" in # process arguments based on the first argument
         "$ACTION_INSTALL" | "$ACTION_UNINSTALL" | "$ACTION_STATUS")
-            process_action_args "$@" ;; # process action-based arguments
+            # initialize in this environment and process action-based arguments
+            init_runtime && process_action_args "$@" ;;
         list) init_runtime && list ;;
         clean) init_runtime && clean ;;
         paths) init_runtime && paths ;;
@@ -190,12 +191,12 @@ process_args() {
 }
 
 # DESCRIPTION:
-#   Processes a given action and its arguments.
+#   Processes a given action and its arguments. Expects the runtime environment
+#   to be already initialized.
 # PARAMETERS:
 #   $1 - action
 #   $@ - action arguments
 process_action_args() { (
-    init_runtime && # initialize runtime
     action="$1" && # use the given action
     shift && # shift to action arguments
 
