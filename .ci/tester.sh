@@ -15,31 +15,26 @@
 # Checks whether the current commit of GitPack can install itself globally.
 #-------------------------------------------------------------------------------
 
-# copy current repository to global GitPack cache
-echo global1 >&2 && sudo mkdir -p /var/cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-echo global2 >&2 && sudo cp -R ./ /var/cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-
 # install, check status and uninstall it
-# global3 fails for a PR if there is a new commit to the PR before fetching the tested merge commit (a Travis CI bug)
-echo global3 >&2 && gitpack_out="$(sudo src/gitpack install -o github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
-echo global4 >&2 && echo "$gitpack_out" | grep '^\[install\]' &&
-echo global5 >&2 && gitpack_out="$(sudo src/gitpack status -o github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
-echo global6 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
-echo global7 >&2 && gitpack_out="$(sudo src/gitpack uninstall -o github.com/dominiksalvet/gitpack)" &&
-echo global8 >&2 && echo "$gitpack_out" | grep '^\[uninstall\]' &&
+echo global1 >&2 && gitpack_out="$(sudo src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
+echo global2 >&2 && echo "$gitpack_out" | grep '^\[install\]' &&
+echo global3 >&2 && gitpack_out="$(sudo src/gitpack status -o github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
+echo global4 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
+echo global5 >&2 && gitpack_out="$(sudo src/gitpack uninstall -o github.com/dominiksalvet/gitpack)" &&
+echo global6 >&2 && echo "$gitpack_out" | grep '^\[uninstall\]' &&
 
 # clean all global GitPack files
-echo global9 >&2 && sudo rm /var/log/gitpack/gitpack.log &&
-echo global10 >&2 && sudo rmdir /var/log/gitpack/ &&
-echo global11 >&2 && sudo rm -rf /var/cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-echo global12 >&2 && sudo rmdir /var/cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo global13 >&2 && sudo rmdir /var/cache/gitpack/repo/github.com/ &&
-echo global14 >&2 && sudo rmdir /var/cache/gitpack/repo/ &&
-echo global15 >&2 && sudo rmdir /var/cache/gitpack/ &&
-echo global16 >&2 && test ! "$(sudo cat /var/lib/gitpack/status)" &&
-echo global17 >&2 && sudo rm /var/lib/gitpack/status &&
-echo global18 >&2 && sudo rm /var/lib/gitpack/status.bak &&
-echo global19 >&2 && sudo rmdir /var/lib/gitpack/ &&
+echo global7 >&2 && sudo rm /var/log/gitpack/gitpack.log &&
+echo global8 >&2 && sudo rmdir /var/log/gitpack/ &&
+echo global9 >&2 && sudo rm -rf /var/cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
+echo global10 >&2 && sudo rmdir /var/cache/gitpack/repo/github.com/dominiksalvet/ &&
+echo global11 >&2 && sudo rmdir /var/cache/gitpack/repo/github.com/ &&
+echo global12 >&2 && sudo rmdir /var/cache/gitpack/repo/ &&
+echo global13 >&2 && sudo rmdir /var/cache/gitpack/ &&
+echo global14 >&2 && test ! "$(sudo cat /var/lib/gitpack/status)" &&
+echo global15 >&2 && sudo rm /var/lib/gitpack/status &&
+echo global16 >&2 && sudo rm /var/lib/gitpack/status.bak &&
+echo global17 >&2 && sudo rmdir /var/lib/gitpack/ &&
 
 #-------------------------------------------------------------------------------
 # LOCAL INSTALLATION
@@ -47,29 +42,25 @@ echo global19 >&2 && sudo rmdir /var/lib/gitpack/ &&
 # Checks whether the current commit of GitPack can install itself locally.
 #-------------------------------------------------------------------------------
 
-# copy current repository to local GitPack cache
-echo local1 >&2 && mkdir -p ~/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-echo local2 >&2 && cp -R ./ ~/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-
 # install, check status and uninstall it
-echo local3 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
-echo local4 >&2 && echo "$gitpack_out" | grep '^\[install\]' &&
-echo local5 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
-echo local6 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
-echo local7 >&2 && gitpack_out="$(src/gitpack uninstall -o github.com/dominiksalvet/gitpack)" &&
-echo local8 >&2 && echo "$gitpack_out" | grep '^\[uninstall\]' &&
+echo local1 >&2 && gitpack_out="$(src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
+echo local2 >&2 && echo "$gitpack_out" | grep '^\[install\]' &&
+echo local3 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
+echo local4 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
+echo local5 >&2 && gitpack_out="$(src/gitpack uninstall -o github.com/dominiksalvet/gitpack)" &&
+echo local6 >&2 && echo "$gitpack_out" | grep '^\[uninstall\]' &&
 
 # create all local GitPack files
-echo local9 >&2 && rm ~/.local/share/gitpack/gitpack.log &&
-echo local10 >&2 && rm -rf ~/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-echo local11 >&2 && rmdir ~/.cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo local12 >&2 && rmdir ~/.cache/gitpack/repo/github.com/ &&
-echo local13 >&2 && rmdir ~/.cache/gitpack/repo/ &&
-echo local14 >&2 && rmdir ~/.cache/gitpack/ &&
-echo local15 >&2 && test ! "$(cat ~/.local/share/gitpack/status)" &&
-echo local16 >&2 && rm ~/.local/share/gitpack/status &&
-echo local17 >&2 && rm ~/.local/share/gitpack/status.bak &&
-echo local18 >&2 && rmdir ~/.local/share/gitpack/ &&
+echo local7 >&2 && rm ~/.local/share/gitpack/gitpack.log &&
+echo local8 >&2 && rm -rf ~/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
+echo local9 >&2 && rmdir ~/.cache/gitpack/repo/github.com/dominiksalvet/ &&
+echo local10 >&2 && rmdir ~/.cache/gitpack/repo/github.com/ &&
+echo local11 >&2 && rmdir ~/.cache/gitpack/repo/ &&
+echo local12 >&2 && rmdir ~/.cache/gitpack/ &&
+echo local13 >&2 && test ! "$(cat ~/.local/share/gitpack/status)" &&
+echo local14 >&2 && rm ~/.local/share/gitpack/status &&
+echo local15 >&2 && rm ~/.local/share/gitpack/status.bak &&
+echo local16 >&2 && rmdir ~/.local/share/gitpack/ &&
 
 #-------------------------------------------------------------------------------
 # USAGE
