@@ -460,7 +460,7 @@ init_repo() {
 
     if [ "$OFFLINE_MODE" = true ]; then # offline
         if [ ! -d "$repo_dir"/ ]; then # fail if local repository does not exist
-            echof 'repository is not downloaded'; return 1
+            echof 'repository is not downloaded for offline usage'; return 1
         fi
     else # online
         fetch_repo "$1" "$repo_dir"
