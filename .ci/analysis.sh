@@ -40,7 +40,7 @@ init_code_style() {
     FUNC_SUMMARY='{ if (/\(\)/) {
         printf NR" "$1" "
         lines=1
-    } else if (/^(\) )?\}$/) {
+    } else if (/^(\}|\))$/) {
         print lines
     } else {
         lines++

@@ -30,7 +30,7 @@ main() {
 
 # DESCRIPTION:
 #   Checks whether all software dependencies are satisfied.
-check_sw_deps() { (
+check_sw_deps() (
     # a list of required software
     sw_deps='command echo [ cd test pwd rm id mkdir touch grep git uname read cp
              head cut true basename find rmdir tr date tail kill sort getopts'
@@ -41,7 +41,7 @@ check_sw_deps() { (
             echo "missing $sw_dep software" >&2; return 1
         fi
     done
-) }
+)
 
 #-------------------------------------------------------------------------------
 # STATIC INITIALIZATION
@@ -196,7 +196,7 @@ process_args() {
 # PARAMETERS:
 #   $1 - action
 #   $@ - action arguments
-process_action_args() { (
+process_action_args() (
     action="$1" && # use the given action
     shift && # shift to action arguments
 
@@ -209,7 +209,7 @@ process_action_args() { (
     for ref in "$@"; do # process each reference individually with common action
         process_action "$action" "$ref" || return
     done
-) }
+)
 
 # DESCRIPTION:
 #   Processes given arguments as action options. It sets the OPTIND variable
@@ -332,7 +332,7 @@ term_action() {
 
 # DESCRIPTION:
 #   Prints all installed Git projects and their versions or commit hashes.
-list() { (
+list() (
     log "$LOGTYPE_LIST" "$STATUS_PATH" &&
     while read -r db_record; do
         url="${db_record%% *}" # extract URL
@@ -340,11 +340,11 @@ list() { (
         version="$(beautify_hash "$url" "$version")" && # try to beautify it
         echo "$url $version" || return
     done < "$STATUS_PATH"
-) }
+)
 
 # DESCRIPTION:
 #   Cleans the GitPack cache and log performing checks for unintended removal.
-clean() { (
+clean() (
     # log clean operation, also creates a log file if it does not exist
     log "$LOGTYPE_CLEAN" "$CACHE_DIR"/ &&
 
@@ -356,7 +356,7 @@ clean() { (
     if ! remove_dir "$CACHE_DIR"; then # in case of fail
         echof 'failed to remove cache directory'; return 1
     fi
-) }
+)
 
 # DESCRIPTION:
 #   Prints all GitPack-specific paths.
@@ -401,7 +401,7 @@ remove_dir() {
 # PARAMETERS:
 #   $1 - action
 #   $2 - reference
-process_action() { (
+process_action() (
     {   # log current action processing
         log "$LOGTYPE_ACTION" "$1" "$2" &&
         # process given reference - URL + optional version
@@ -420,7 +420,7 @@ process_action() { (
         echo "$(get_dep_prefix)<ERROR> $1 $2" >&2 # report GitPack information
         return "$action_status" # propagate the status further
     }
-) }
+)
 
 # DESCRIPTION:
 #   Extracts and normalizes the URL from a given reference.
@@ -437,12 +437,12 @@ ref_to_url() {
 #   Extracts a version from a given reference if there is any. Always succeeds.
 # PARAMETERS:
 #   $1 - reference
-ref_to_version() { (
+ref_to_version() (
     version="${1#*=}" # remove URL and keep version
     if [ "$version" != "$1" ]; then # check if there was a version
         echo "$version"
     fi
-) }
+)
 
 # DESCRIPTION:
 #   Checks whether a given URL is supported.
@@ -466,7 +466,7 @@ check_url() {
 #   in which case succeeds only if it is already downloaded.
 # PARAMETERS:
 #   $1 - URL
-init_repo() { (
+init_repo() (
     repo_dir="$(url_to_path "$1")" && # get the repository directory path
     log "$LOGTYPE_REPO" "$1" "$repo_dir"/ &&
 
@@ -477,7 +477,7 @@ init_repo() { (
     else # online
         fetch_repo "$1" "$repo_dir"
     fi
-) }
+)
 
 # DESCRIPTION:
 #   Downloads files of a given repository URL so that they are up to date. If an
@@ -486,7 +486,7 @@ init_repo() { (
 # PARAMETERS:
 #   $1 - URL
 #   $2 - repository directory
-fetch_repo() { (
+fetch_repo() (
     if [ -d "$2"/ ]; then # local repository already exists
         cd "$2"/
     else # create and configure local repository
@@ -501,7 +501,7 @@ fetch_repo() { (
     fi &&
     # fetch remote updates (prune, do not fetch tags implicitly, update HEAD)
     git fetch -pnuq origin # it may ask for a password
-) }
+)
 
 # DESCRIPTION:
 #   Transforms a given URL of a Git repository to an actual path where the local
@@ -524,7 +524,7 @@ url_to_path() {
 #   $1 - action
 #   $2 - URL
 #   $3 - version (optional)
-execute_action() { (
+execute_action() (
     log "$LOGTYPE_EXECUTE" "$1" "$2" "$3" &&
     # get source (already installed) project information
     src_db_record="$(get_db_record "$2")" &&
@@ -543,7 +543,7 @@ execute_action() { (
     esac &&
 
     report "$state" "$2" "$src_hash" "$tar_hash"
-) }
+)
 
 # DESCRIPTION:
 #   Prints a preferred commit hash of a given project. If a version is provided,
@@ -552,7 +552,7 @@ execute_action() { (
 # PARAMETERS:
 #   $1 - URL
 #   $2 - version (optional)
-get_repo_hash() { (
+get_repo_hash() (
     repo_cd "$1" &&
     # transform the given HEAD version into a real remote HEAD reference
     if [ "$2" = HEAD ]; then set -- "$1" "$REMOTE_HEAD_REF"; fi &&
@@ -567,7 +567,7 @@ get_repo_hash() { (
         ref="$(git describe --tags --abbrev=0 --always "$REMOTE_HEAD_REF")" &&
         git rev-parse --verify "$ref"'^{commit}' 2>/dev/null # get commit hash
     fi
-) }
+)
 
 # DESCRIPTION:
 #   Changes current working directory to a given repository and checkouts its
@@ -600,7 +600,7 @@ get_dep_prefix() {
 #   $1 - action
 #   $2 - URL
 #   $3 - commit
-process_deps() { (
+process_deps() (
     # early return in the uninstall case
     if [ "$1" = "$ACTION_UNINSTALL" ]; then return; fi
 
@@ -610,21 +610,21 @@ process_deps() { (
             next_dep_depth && # register a new dependency depth level
             process_action "$1" "$dep" || return
     done
-) }
+)
 
 # DESCRIPTION:
 #   Prints all dependencies of a given project's URL and commit if any.
 # PARAMETERS:
 #   $1 - URL
 #   $2 - commit
-get_deps() { (
+get_deps() (
     repo_cd "$1" "$2" &&
     # if there is a file describing dependencies
     if [ -r .gitpack/deps ]; then
         log "$LOGTYPE_DEPS" "$1" "$2" &&
         grepe '^[^#]' .gitpack/deps # remove empty and comment lines
     fi
-) }
+)
 
 # DESCRIPTION:
 #   Prepares the environment for a new dependency depth level. It also checks
@@ -651,14 +651,14 @@ echon() {
 #   selection.
 # PARAMETERS:
 #   $@ - grep arguments
-grepe() { (
+grepe() (
     grep "$@" # execute the grep itself
     grep_status="$?" # store its exit status
 
     # suppress the empty selection error indicator (exit status of 1)
     if [ "$grep_status" -eq 1 ]; then grep_status=0; fi
     return "$grep_status" # return the modified exit status
-) }
+)
 
 #-------------------------------------------------------------------------------
 # EXECUTE ACTION
@@ -751,10 +751,10 @@ execute_status() {
 #   $1 - URL
 #   $2 - first commit
 #   $3 - second commit
-is_ancestor_commit() { (
+is_ancestor_commit() (
     repo_cd "$1" &&
     git merge-base --is-ancestor "$2" "$3"
-) }
+)
 
 #-------------------------------------------------------------------------------
 # INSTALLATION AND UNINSTALLATION
@@ -765,7 +765,7 @@ is_ancestor_commit() { (
 # PARAMETERS:
 #   $1 - URL
 #   $2 - commit
-install() { (
+install() (
     repo_cd "$1" "$2" &&
     install_dir="$(get_install_dir)" && # get preferred installation directory
     install_method="$(basename -- "$install_dir"/)" && # installation method
@@ -783,14 +783,14 @@ install() { (
         log "$LOGTYPE_POSTCP" "$1" "$2" "$install_method" &&
         run_script "$install_dir"/postcp
     fi
-) }
+)
 
 # DESCRIPTION:
 #   Uninstalls a project based on a given repository URL and commit.
 # PARAMETERS:
 #   $1 - URL
 #   $2 - commit
-uninstall() { (
+uninstall() (
     repo_cd "$1" "$2" &&
     install_dir="$(get_install_dir)" && # get preferred installation directory
     install_method="$(basename -- "$install_dir"/)" && # uninstallation method
@@ -808,7 +808,7 @@ uninstall() { (
         log "$LOGTYPE_POSTRM" "$1" "$2" "$install_method" &&
         run_script "$install_dir"/postrm
     fi
-) }
+)
 
 # DESCRIPTION:
 #   Prints the relative path of the appropriate GitPack installation directory
@@ -825,13 +825,13 @@ get_install_dir() {
 #   Runs a given script. In case of an error, prints and logs a fail report.
 # PARAMETERS:
 #   $1 - script path
-run_script() { (
+run_script() (
     "$1" && return # run the script and return early if it exited successfully
 
     script_status="$?" # store the exit status of the failed script
     echof "$(basename -- "$1") script failed with $script_status"
     return 1 # indicate error but do not propagate the exit status further
-) }
+)
 
 #-------------------------------------------------------------------------------
 # COPY FILES
@@ -844,7 +844,7 @@ run_script() { (
 # PARAMETERS:
 #   $1 - map path
 #   $2 - function name
-for_each_route() { (
+for_each_route() (
     if [ -r "$1" ]; then # check whether the map file exists
         grepe_out="$(grepe '^[^#]' "$1")" && # remove empty and comment lines
         # call a given function for each route
@@ -854,7 +854,7 @@ for_each_route() { (
     else # if the map file does not exist, fails
         echof 'missing map file'; return 1
     fi
-) }
+)
 
 # DESCRIPTION:
 #   Copies given files recursively to a given target directory. It also creates
@@ -862,11 +862,11 @@ for_each_route() { (
 # PARAMETERS:
 #   $@ - file paths
 #   -$1 - target directory
-copy_files_to_dir() { (
+copy_files_to_dir() (
     target_dir="$(get_last_arg "$@")" &&
     mkdir -p -- "$target_dir" && # create target directory
     cp -R -- "$@" # copy files recursively into to
-) }
+)
 
 # DESCRIPTION:
 #   Prints the last argument of all given arguments.
@@ -887,7 +887,7 @@ get_last_arg() {
 # PARAMETERS:
 #   $@ - file paths
 #   -$1 - target directory
-remove_files_from_dir() { (
+remove_files_from_dir() (
     # get the target directory to remove files from
     target_dir="$(get_last_arg "$@")" &&
     test "$target_dir" &&
@@ -898,7 +898,7 @@ remove_files_from_dir() { (
         rmdirt -p -- "${target_dir:?}"/ && # remove empty pathname directories
         shift || return # shift to next argument
     done
-) }
+)
 
 # DESCRIPTION:
 #   Removes the copy of a given file from a given target directory. In case of a
@@ -906,7 +906,7 @@ remove_files_from_dir() { (
 # PARAMETERS:
 #   $1 - file path
 #   $2 - target directory
-remove_file_from_dir() { (
+remove_file_from_dir() (
     test "$1" && test "$2" &&
 
     if [ -d "$1"/ ]; then
@@ -916,7 +916,7 @@ remove_file_from_dir() { (
         # remove the file from the target directory
         rm -f -- "${2:?}"/"${file_name:?}"
     fi
-) }
+)
 
 # DESCRIPTION:
 #   Removes the copy of a given directory from a given target directory. It uses
@@ -925,7 +925,7 @@ remove_file_from_dir() { (
 # PARAMETERS:
 #   $1 - directory
 #   $2 - target directory
-remove_dir_from_dir() { (
+remove_dir_from_dir() (
     test "$1" && test "$2" &&
     dir_name="$(basename -- "$1")" && # name of the directory to be removed
 
@@ -940,7 +940,7 @@ remove_dir_from_dir() { (
         rmdirt -- "${2:?}"/"${dir_name:?}"/"${dir:?}"/ || return
     done &&
     rmdirt -- "${2:?}"/"${dir_name:?}"/ # remove the copied directory itself
-) }
+)
 
 # DESCRIPTION:
 #   This function is a rmdir wrapper. It prints no errors and always succeeds.
@@ -981,11 +981,11 @@ init_db() {
 #   Selects the first record matching a given URL from the GitPack database.
 # PARAMETERS:
 #   $1 - URL
-get_db_record() { (
+get_db_record() (
     log "$LOGTYPE_GET" "$1" "$STATUS_PATH" &&
     grepe_out="$(grepe -F "$1" "$STATUS_PATH")" &&
     echon "$grepe_out" | head -n 1
-) }
+)
 
 # DESCRIPTION:
 #   Inserts a given installation record into the GitPack database.
@@ -1001,11 +1001,11 @@ insert_db_record() {
 #   Deletes all installation records with given URL from the GitPack database.
 # PARAMETERS:
 #   $1 - URL
-delete_db_records() { (
+delete_db_records() (
     log "$LOGTYPE_DELETE" "$1" "$STATUS_PATH" &&
     grepe_out="$(grepe -Fv "$1" "$STATUS_PATH")" &&
     echon "$grepe_out" > "$STATUS_PATH"
-) }
+)
 
 # DESCRIPTION:
 #   Backs up the GitPack database by copying it to a different path.
@@ -1031,7 +1031,7 @@ init_logging() {
 # PARAMETERS:
 #   $1 - type
 #   $@ - details (optional)
-log() { (
+log() (
     log_time="$(date '+%Y-%m-%d %H:%M:%S')" && # catch time immediately
     logtype="$1" && # use the given log type
     shift && # shift arguments to details
@@ -1045,7 +1045,7 @@ log() { (
 
     # store the log item
     echo "$log_time [$logtype]$details" >> "$LOG_PATH"
-) }
+)
 
 #-------------------------------------------------------------------------------
 # REPORT
@@ -1058,7 +1058,7 @@ log() { (
 #   $2 - URL
 #   $3 - source commit
 #   $4 - target commit
-report() { (
+report() (
     # prepare given arguments
     prefix="$(get_dep_prefix)[$1] $2" &&
     src_version="$(beautify_hash "$2" "$3")" &&
@@ -1075,7 +1075,7 @@ report() { (
         "$STATE_OLDER" | "$STATE_NEWER" | "$STATE_DIFF")
             echo "$prefix $src_version -> $tar_version" ;;
     esac
-) }
+)
 
 # DESCRIPTION:
 #   Beautifies a given commit hash. If the hash is empty, exits without any
@@ -1084,7 +1084,7 @@ report() { (
 # PARAMETERS:
 #   $1 - URL
 #   $2 - commit (optional)
-beautify_hash() { (
+beautify_hash() (
     if [ ! "$2" ]; then return; fi # early return if no commit provided
 
     # check if given hash is associated with any reference
@@ -1098,7 +1098,7 @@ beautify_hash() { (
     fi
 
     echo "$2" | cut -c 1-7 # if no reference found, return short hash
-) }
+)
 
 #-------------------------------------------------------------------------------
 # CALL MAIN
