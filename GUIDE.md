@@ -41,7 +41,7 @@ GitPack provides the following environment variables to all called scripts:
 
 * `OFFLINE_MODE`
   * Equals either `false` or `true`.
-  * Once set to `true`, online access must be avoided.
+  * Once set to `true`, any online access should be avoided.
 
 ## Examples
 
