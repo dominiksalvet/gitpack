@@ -362,19 +362,19 @@ paths() {
 #   $1 - directory
 remove_dir() {
     test "$1" && # the directory path must not be empty
-    if [ -d "$1"/ ]; then # check if the directory exists
-        (   # store physical path of the given directory
-            cd -- "$1"/ && pwd_out="$(pwd -P)" &&
+    if [ ! -d "$1"/ ]; then return; fi && # the directory does not exist, return
 
-            # check for the root directory
-            test "$PWD" != / && test "$pwd_out" != / &&
-            # check for the root directory (with two slashes)
-            test "$PWD" != // && test "$pwd_out" != // &&
-            # check for a home directory
-            test "$PWD" != ~ && test "$pwd_out" != ~
-        ) &&
-        rm -fr -- "${1:?}"/ # remove the directory itself recursively
-    fi
+    (   # store physical path of the given directory
+        cd -- "$1"/ && pwd_out="$(pwd -P)" &&
+
+        # check for the root directory
+        test "$PWD" != / && test "$pwd_out" != / &&
+        # check for the root directory (with two slashes)
+        test "$PWD" != // && test "$pwd_out" != // &&
+        # check for a home directory
+        test "$PWD" != ~ && test "$pwd_out" != ~
+    ) &&
+    rm -fr -- "${1:?}"/ # remove the directory itself recursively
 }
 
 #-------------------------------------------------------------------------------
@@ -543,7 +543,7 @@ execute_action() {
 get_repo_hash() { (
     repo_cd "$1" &&
     # transform the given HEAD version into a real remote HEAD reference
-    if [ "$2" = HEAD ]; then set "$1" "$REMOTE_HEAD_REF"; fi &&
+    if [ "$2" = HEAD ]; then set -- "$1" "$REMOTE_HEAD_REF"; fi &&
 
     if [ "$2" ]; then # if any version has been provided
         # print the hash of the version if it is a valid Git commit reference
@@ -578,9 +578,7 @@ repo_cd() {
 #   Prints the current prefix for dependency reports considering the current
 #   dependency depth value.
 get_dep_prefix() {
-    if [ "$dep_depth" -gt 0 ]; then
-        echo "$DEP_PREFIX"
-    fi
+    if [ "$dep_depth" -gt 0 ]; then echo "$DEP_PREFIX"; fi
 }
 
 # DESCRIPTION:
@@ -591,9 +589,8 @@ get_dep_prefix() {
 #   $2 - URL
 #   $3 - commit
 process_deps() {
-    if [ "$1" = "$ACTION_UNINSTALL" ]; then
-        return 0 # early return in the uninstall case
-    fi
+    # early return in the uninstall case
+    if [ "$1" = "$ACTION_UNINSTALL" ]; then return; fi
 
     deps="$(get_deps "$2" "$3")" && # get all dependencies
     # run the given action recursively for each dependency reference
@@ -635,9 +632,7 @@ next_dep_depth() {
 # PARAMETERS:
 #   $@ - echo arguments
 echon() {
-    if [ "$@" ]; then
-        echo "$@"
-    fi
+    if [ "$@" ]; then echo "$@"; fi
 }
 
 # DESCRIPTION:
@@ -650,9 +645,7 @@ grepe() {
     grep_status="$?" # store its exit status
 
     # suppress the empty selection error indicator (exit status of 1)
-    if [ "$grep_status" -eq 1 ]; then
-        grep_status=0
-    fi
+    if [ "$grep_status" -eq 1 ]; then grep_status=0; fi
     return "$grep_status" # return the modified exit status
 }
 
