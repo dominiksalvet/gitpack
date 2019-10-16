@@ -5,8 +5,8 @@
 # github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
-#   Tester runs individual tests to check the basic functionality and behavior
-#   of GitPack. The current state of execution is reported to stderr.
+#   This script tests basic functionality and behavior of GitPack. The current
+#   state of execution is reported to stderr.
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
