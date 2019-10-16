@@ -18,7 +18,7 @@
 #   Runs in a subshell to imitate an external command.
 # PARAMETERS:
 #   $@ - script paths
-check_code_style() { (
+check_code_style() (
     init_code_style && # initialize the code style check
 
     # perform checks for each given script file
@@ -26,7 +26,7 @@ check_code_style() { (
         check_line_length "$script_path" "$MAX_LINE_LENGTH" &&
         check_func_length "$script_path" "$MAX_FUNC_LENGTH" || return
     done
-) }
+)
 
 # DESCRIPTION:
 #   Initializes constants for code style check.
@@ -53,7 +53,7 @@ init_code_style() {
 # PARAMETERS:
 #   $1 - script path
 #   $2 - maximum characters per line
-check_line_length() {
+check_line_length() (
     lineno=0 # initialize line counter
     while IFS= read -r line; do
         lineno="$((lineno + 1))" # increment line counter
@@ -62,7 +62,7 @@ check_line_length() {
             return 1
         fi
     done < "$1"
-}
+)
 
 # DESCRIPTION:
 #   Checks whether each function of a given script file has at most a given
@@ -70,7 +70,7 @@ check_line_length() {
 # PARAMETERS:
 #   $1 - script path
 #   $2 - maximum lines per function
-check_func_length() {
+check_func_length() (
     # use '(' as a field separator to make creating the final output easier
     awk_out="$(awk -F '(' "$FUNC_SUMMARY" "$1")" &&
     echo "$awk_out" | while read -r line; do # for each function summary
@@ -89,7 +89,7 @@ check_func_length() {
             return 1
         fi
     done
-}
+)
 
 #-------------------------------------------------------------------------------
 # ANALYZE
