@@ -39,7 +39,7 @@ _gitpack_url() {
     cached_urls="$(
         cd /var/cache/gitpack/repo/ 2>/dev/null &&
         find ./ -maxdepth 3 -mindepth 3 ! -empty -type d | sed 's|^./||'
-        cd ~/.cache/gitpack/repo/ 2>/dev/null &&
+        cd "$HOME"/.cache/gitpack/repo/ 2>/dev/null &&
         find ./ -maxdepth 3 -mindepth 3 ! -empty -type d | sed 's|^./||'
         true
     )" &&

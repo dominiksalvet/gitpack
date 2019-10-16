@@ -16,7 +16,7 @@
 #-------------------------------------------------------------------------------
 
 # install, check status and uninstall it
-echo global1 >&2 && gitpack_out="$(sudo src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
+echo global1 >&2 && gitpack_out="$(sudo src/gitpack install github.com/dominiksalvet/gitpack="${TRAVIS_COMMIT:?}")" &&
 echo global2 >&2 && echo "$gitpack_out" | grep '^\[install\]' &&
 echo global3 >&2 && gitpack_out="$(sudo src/gitpack status -o github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
 echo global4 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
@@ -51,16 +51,16 @@ echo local5 >&2 && gitpack_out="$(src/gitpack uninstall -o github.com/dominiksal
 echo local6 >&2 && echo "$gitpack_out" | grep '^\[uninstall\]' &&
 
 # create all local GitPack files
-echo local7 >&2 && rm ~/.local/share/gitpack/gitpack.log &&
-echo local8 >&2 && rm -rf ~/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-echo local9 >&2 && rmdir ~/.cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo local10 >&2 && rmdir ~/.cache/gitpack/repo/github.com/ &&
-echo local11 >&2 && rmdir ~/.cache/gitpack/repo/ &&
-echo local12 >&2 && rmdir ~/.cache/gitpack/ &&
-echo local13 >&2 && test ! "$(cat ~/.local/share/gitpack/status)" &&
-echo local14 >&2 && rm ~/.local/share/gitpack/status &&
-echo local15 >&2 && rm ~/.local/share/gitpack/status.bak &&
-echo local16 >&2 && rmdir ~/.local/share/gitpack/ &&
+echo local7 >&2 && rm "$HOME"/.local/share/gitpack/gitpack.log &&
+echo local8 >&2 && rm -rf "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
+echo local9 >&2 && rmdir "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/ &&
+echo local10 >&2 && rmdir "$HOME"/.cache/gitpack/repo/github.com/ &&
+echo local11 >&2 && rmdir "$HOME"/.cache/gitpack/repo/ &&
+echo local12 >&2 && rmdir "$HOME"/.cache/gitpack/ &&
+echo local13 >&2 && test ! "$(cat "$HOME"/.local/share/gitpack/status)" &&
+echo local14 >&2 && rm "$HOME"/.local/share/gitpack/status &&
+echo local15 >&2 && rm "$HOME"/.local/share/gitpack/status.bak &&
+echo local16 >&2 && rmdir "$HOME"/.local/share/gitpack/ &&
 
 #-------------------------------------------------------------------------------
 # USAGE
@@ -90,28 +90,28 @@ echo install8 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
 echo install9 >&2 && gitpack_out="$(src/gitpack list)" &&
 echo install10 >&2 && echo "$gitpack_out" | grep -F 'github.com/dominiksalvet/gitpack' &&
 # check installed files
-echo install11 >&2 && test -x ~/.local/bin/gitpack &&
+echo install11 >&2 && test -x "$HOME"/.local/bin/gitpack &&
 
 # install current version + test status file recovery
 echo update1 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack)" &&
 echo update2 >&2 && echo "$gitpack_out" | grep '^\[older\]' &&
-echo update3 >&2 && rm ~/.local/share/gitpack/status &&
+echo update3 >&2 && rm "$HOME"/.local/share/gitpack/status &&
 echo update4 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack)" &&
 echo update5 >&2 && echo "$gitpack_out" | grep '^\[update\]' &&
-echo update6 >&2 && rm ~/.local/share/gitpack/status &&
+echo update6 >&2 && rm "$HOME"/.local/share/gitpack/status &&
 echo update7 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack)" &&
 echo update8 >&2 && echo "$gitpack_out" | grep '^\[installed\]' &&
-echo update9 >&2 && rm ~/.local/share/gitpack/status &&
+echo update9 >&2 && rm "$HOME"/.local/share/gitpack/status &&
 echo update10 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack)" &&
 echo update11 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
-echo update12 >&2 && rm ~/.local/share/gitpack/status &&
+echo update12 >&2 && rm "$HOME"/.local/share/gitpack/status &&
 echo update13 >&2 && gitpack_out="$(src/gitpack list)" &&
 echo update14 >&2 && echo "$gitpack_out" | grep -F 'github.com/dominiksalvet/gitpack' &&
-echo update15 >&2 && rm ~/.local/share/gitpack/status &&
+echo update15 >&2 && rm "$HOME"/.local/share/gitpack/status &&
 # check installed files
-echo update16 >&2 && test -x ~/.local/bin/gitpack &&
-echo update17 >&2 && test -f ~/.bash_completion.d/gitpack-completion.bash &&
-echo update18 >&2 && test ! -x ~/.bash_completion.d/gitpack-completion.bash &&
+echo update16 >&2 && test -x "$HOME"/.local/bin/gitpack &&
+echo update17 >&2 && test -f "$HOME"/.bash_completion.d/gitpack-completion.bash &&
+echo update18 >&2 && test ! -x "$HOME"/.bash_completion.d/gitpack-completion.bash &&
 
 # downgrade to older version
 echo downgrade1 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack=0.1.0)" &&
@@ -125,8 +125,8 @@ echo downgrade8 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
 echo downgrade9 >&2 && gitpack_out="$(src/gitpack list)" &&
 echo downgrade10 >&2 && echo "$gitpack_out" | grep -F 'github.com/dominiksalvet/gitpack' &&
 # check installed files
-echo downgrade11 >&2 && test -x ~/.local/bin/gitpack &&
-echo downgrade12 >&2 && test ! -e ~/.bash_completion.d/gitpack-completion.bash &&
+echo downgrade11 >&2 && test -x "$HOME"/.local/bin/gitpack &&
+echo downgrade12 >&2 && test ! -e "$HOME"/.bash_completion.d/gitpack-completion.bash &&
 
 # uninstall
 echo uninstall1 >&2 && gitpack_out="$(src/gitpack uninstall -o github.com/dominiksalvet/gitpack)" &&
@@ -136,8 +136,8 @@ echo uninstall4 >&2 && echo "$gitpack_out" | grep '^\[uninstalled\]' &&
 echo uninstall5 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack)" &&
 echo uninstall6 >&2 && echo "$gitpack_out" | grep '^\[nothing\]' &&
 # check installed files
-echo uninstall7 >&2 && test ! -e ~/.local/bin/gitpack &&
-echo uninstall8 >&2 && test ! -e ~/.bash_completion.d/gitpack-completion.bash &&
+echo uninstall7 >&2 && test ! -e "$HOME"/.local/bin/gitpack &&
+echo uninstall8 >&2 && test ! -e "$HOME"/.bash_completion.d/gitpack-completion.bash &&
 
 # expected to fail
 echo xfail1 >&2 && ! src/gitpack 2>/dev/null && # no argument
@@ -161,87 +161,87 @@ echo xfail12 >&2 && echo "$gitpack_out" | grep '^<ERROR>' &&
 #-------------------------------------------------------------------------------
 
 # existence of log files
-echo logfiles1 >&2 && test -d ~/.local/share/gitpack/ &&
-echo logfiles2 >&2 && test -r ~/.local/share/gitpack/ &&
-echo logfiles3 >&2 && test -w ~/.local/share/gitpack/ &&
-echo logfiles4 >&2 && test -x ~/.local/share/gitpack/ &&
-echo logfiles5 >&2 && test -f ~/.local/share/gitpack/gitpack.log &&
-echo logfiles6 >&2 && test -r ~/.local/share/gitpack/gitpack.log &&
-echo logfiles7 >&2 && test -w ~/.local/share/gitpack/gitpack.log &&
-echo logfiles8 >&2 && test ! -x ~/.local/share/gitpack/gitpack.log &&
+echo logfiles1 >&2 && test -d "$HOME"/.local/share/gitpack/ &&
+echo logfiles2 >&2 && test -r "$HOME"/.local/share/gitpack/ &&
+echo logfiles3 >&2 && test -w "$HOME"/.local/share/gitpack/ &&
+echo logfiles4 >&2 && test -x "$HOME"/.local/share/gitpack/ &&
+echo logfiles5 >&2 && test -f "$HOME"/.local/share/gitpack/gitpack.log &&
+echo logfiles6 >&2 && test -r "$HOME"/.local/share/gitpack/gitpack.log &&
+echo logfiles7 >&2 && test -w "$HOME"/.local/share/gitpack/gitpack.log &&
+echo logfiles8 >&2 && test ! -x "$HOME"/.local/share/gitpack/gitpack.log &&
 
 # existence of cache files
-echo cachefiles1 >&2 && test -d ~/.cache/gitpack/ &&
-echo cachefiles2 >&2 && test -r ~/.cache/gitpack/ &&
-echo cachefiles3 >&2 && test -w ~/.cache/gitpack/ &&
-echo cachefiles4 >&2 && test -x ~/.cache/gitpack/ &&
-echo cachefiles5 >&2 && test -d ~/.cache/gitpack/repo/ &&
-echo cachefiles6 >&2 && test -r ~/.cache/gitpack/repo/ &&
-echo cachefiles7 >&2 && test -w ~/.cache/gitpack/repo/ &&
-echo cachefiles8 >&2 && test -x ~/.cache/gitpack/repo/ &&
-echo cachefiles9 >&2 && test -d ~/.cache/gitpack/repo/github.com/ &&
-echo cachefiles10 >&2 && test -r ~/.cache/gitpack/repo/github.com/ &&
-echo cachefiles11 >&2 && test -w ~/.cache/gitpack/repo/github.com/ &&
-echo cachefiles12 >&2 && test -x ~/.cache/gitpack/repo/github.com/ &&
-echo cachefiles13 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo cachefiles14 >&2 && test -r ~/.cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo cachefiles15 >&2 && test -w ~/.cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo cachefiles16 >&2 && test -x ~/.cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo cachefiles17 >&2 && test -d ~/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-echo cachefiles18 >&2 && test -r ~/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-echo cachefiles19 >&2 && test -w ~/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-echo cachefiles20 >&2 && test -x ~/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-echo cachefiles21 >&2 && test ! -d ~/.cache/gitpack/repo/github.com/a/ &&
+echo cachefiles1 >&2 && test -d "$HOME"/.cache/gitpack/ &&
+echo cachefiles2 >&2 && test -r "$HOME"/.cache/gitpack/ &&
+echo cachefiles3 >&2 && test -w "$HOME"/.cache/gitpack/ &&
+echo cachefiles4 >&2 && test -x "$HOME"/.cache/gitpack/ &&
+echo cachefiles5 >&2 && test -d "$HOME"/.cache/gitpack/repo/ &&
+echo cachefiles6 >&2 && test -r "$HOME"/.cache/gitpack/repo/ &&
+echo cachefiles7 >&2 && test -w "$HOME"/.cache/gitpack/repo/ &&
+echo cachefiles8 >&2 && test -x "$HOME"/.cache/gitpack/repo/ &&
+echo cachefiles9 >&2 && test -d "$HOME"/.cache/gitpack/repo/github.com/ &&
+echo cachefiles10 >&2 && test -r "$HOME"/.cache/gitpack/repo/github.com/ &&
+echo cachefiles11 >&2 && test -w "$HOME"/.cache/gitpack/repo/github.com/ &&
+echo cachefiles12 >&2 && test -x "$HOME"/.cache/gitpack/repo/github.com/ &&
+echo cachefiles13 >&2 && test -d "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/ &&
+echo cachefiles14 >&2 && test -r "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/ &&
+echo cachefiles15 >&2 && test -w "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/ &&
+echo cachefiles16 >&2 && test -x "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/ &&
+echo cachefiles17 >&2 && test -d "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
+echo cachefiles18 >&2 && test -r "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
+echo cachefiles19 >&2 && test -w "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
+echo cachefiles20 >&2 && test -x "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
+echo cachefiles21 >&2 && test ! -d "$HOME"/.cache/gitpack/repo/github.com/a/ &&
 
 # existence of state files
-echo statefiles1 >&2 && test -r ~/.local/share/gitpack/status &&
-echo statefiles2 >&2 && test -w ~/.local/share/gitpack/status &&
-echo statefiles3 >&2 && test ! -x ~/.local/share/gitpack/status &&
-echo statefiles4 >&2 && test -r ~/.local/share/gitpack/status.bak &&
-echo statefiles5 >&2 && test -w ~/.local/share/gitpack/status.bak &&
-echo statefiles6 >&2 && test ! -x ~/.local/share/gitpack/status.bak &&
+echo statefiles1 >&2 && test -r "$HOME"/.local/share/gitpack/status &&
+echo statefiles2 >&2 && test -w "$HOME"/.local/share/gitpack/status &&
+echo statefiles3 >&2 && test ! -x "$HOME"/.local/share/gitpack/status &&
+echo statefiles4 >&2 && test -r "$HOME"/.local/share/gitpack/status.bak &&
+echo statefiles5 >&2 && test -w "$HOME"/.local/share/gitpack/status.bak &&
+echo statefiles6 >&2 && test ! -x "$HOME"/.local/share/gitpack/status.bak &&
 
 # contents of status file
-echo status1 >&2 && test ! "$(cat ~/.local/share/gitpack/status)" &&
+echo status1 >&2 && test ! "$(cat "$HOME"/.local/share/gitpack/status)" &&
 
 # contents of log file
-echo log1 >&2 && test "$(grep -Fc '[log]' ~/.local/share/gitpack/gitpack.log)" -eq 27 &&
-echo log2 >&2 && test "$(grep -Fc '[fail]' ~/.local/share/gitpack/gitpack.log)" -eq 6 &&
-echo log3 >&2 && test "$(grep -Fc '[signal]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log4 >&2 && test "$(grep -Fc '[exit]' ~/.local/share/gitpack/gitpack.log)" -eq 27 &&
-echo log5 >&2 && test "$(grep -Fc '[list]' ~/.local/share/gitpack/gitpack.log)" -eq 4 &&
-echo log6 >&2 && test "$(grep -Fc '[clean]' ~/.local/share/gitpack/gitpack.log)" -eq 1 &&
-echo log7 >&2 && test "$(grep -Fc '[paths]' ~/.local/share/gitpack/gitpack.log)" -eq 1 &&
-echo log8 >&2 && test "$(grep -Fc '[action]' ~/.local/share/gitpack/gitpack.log)" -eq 18 &&
-echo log9 >&2 && test "$(grep -Fc '[url]' ~/.local/share/gitpack/gitpack.log)" -eq 18 &&
-echo log10 >&2 && test "$(grep -Fc '[repo]' ~/.local/share/gitpack/gitpack.log)" -eq 15 &&
-echo log11 >&2 && test "$(grep -Fc '[execute]' ~/.local/share/gitpack/gitpack.log)" -eq 15 &&
-echo log12 >&2 && test "$(grep -Fc '[deps]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log13 >&2 && test "$(grep -Fc '[db]' ~/.local/share/gitpack/gitpack.log)" -eq 27 &&
-echo log14 >&2 && test "$(grep -Fc '[get]' ~/.local/share/gitpack/gitpack.log)" -eq 15 &&
-echo log15 >&2 && test "$(grep -Fc '[insert]' ~/.local/share/gitpack/gitpack.log)" -eq 3 &&
-echo log16 >&2 && test "$(grep -Fc '[delete]' ~/.local/share/gitpack/gitpack.log)" -eq 3 &&
-echo log17 >&2 && test "$(grep -Fc '[backup]' ~/.local/share/gitpack/gitpack.log)" -eq 21 &&
-echo log18 >&2 && test "$(grep -Fc '[precp]' ~/.local/share/gitpack/gitpack.log)" -eq 1 &&
-echo log19 >&2 && test "$(grep -Fc '[cp]' ~/.local/share/gitpack/gitpack.log)" -eq 3 &&
-echo log20 >&2 && test "$(grep -Fc '[postcp]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log21 >&2 && test "$(grep -Fc '[prerm]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log22 >&2 && test "$(grep -Fc '[rm]' ~/.local/share/gitpack/gitpack.log)" -eq 3 &&
-echo log23 >&2 && test "$(grep -Fc '[postrm]' ~/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log24 >&2 && test "$(wc -l < ~/.local/share/gitpack/gitpack.log)" -eq 208 &&
+echo log1 >&2 && test "$(grep -Fc '[log]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 27 &&
+echo log2 >&2 && test "$(grep -Fc '[fail]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 6 &&
+echo log3 >&2 && test "$(grep -Fc '[signal]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
+echo log4 >&2 && test "$(grep -Fc '[exit]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 27 &&
+echo log5 >&2 && test "$(grep -Fc '[list]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 4 &&
+echo log6 >&2 && test "$(grep -Fc '[clean]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 1 &&
+echo log7 >&2 && test "$(grep -Fc '[paths]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 1 &&
+echo log8 >&2 && test "$(grep -Fc '[action]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 18 &&
+echo log9 >&2 && test "$(grep -Fc '[url]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 18 &&
+echo log10 >&2 && test "$(grep -Fc '[repo]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
+echo log11 >&2 && test "$(grep -Fc '[execute]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
+echo log12 >&2 && test "$(grep -Fc '[deps]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
+echo log13 >&2 && test "$(grep -Fc '[db]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 27 &&
+echo log14 >&2 && test "$(grep -Fc '[get]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
+echo log15 >&2 && test "$(grep -Fc '[insert]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo log16 >&2 && test "$(grep -Fc '[delete]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo log17 >&2 && test "$(grep -Fc '[backup]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 21 &&
+echo log18 >&2 && test "$(grep -Fc '[precp]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 1 &&
+echo log19 >&2 && test "$(grep -Fc '[cp]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo log20 >&2 && test "$(grep -Fc '[postcp]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
+echo log21 >&2 && test "$(grep -Fc '[prerm]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
+echo log22 >&2 && test "$(grep -Fc '[rm]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo log23 >&2 && test "$(grep -Fc '[postrm]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
+echo log24 >&2 && test "$(wc -l < "$HOME"/.local/share/gitpack/gitpack.log)" -eq 208 &&
 
 # clean files (it affects log and cache files)
 echo clean1 >&2 && src/gitpack clean &&
 
 # existence of log files
-echo clean2 >&2 && test -d ~/.local/share/gitpack/ &&
-echo clean3 >&2 && test -r ~/.local/share/gitpack/ &&
-echo clean4 >&2 && test -w ~/.local/share/gitpack/ &&
-echo clean5 >&2 && test -x ~/.local/share/gitpack/ &&
-echo clean6 >&2 && test -f ~/.local/share/gitpack/gitpack.log &&
-echo clean7 >&2 && test -r ~/.local/share/gitpack/gitpack.log &&
-echo clean8 >&2 && test -w ~/.local/share/gitpack/gitpack.log &&
-echo clean9 >&2 && test ! -x ~/.local/share/gitpack/gitpack.log &&
+echo clean2 >&2 && test -d "$HOME"/.local/share/gitpack/ &&
+echo clean3 >&2 && test -r "$HOME"/.local/share/gitpack/ &&
+echo clean4 >&2 && test -w "$HOME"/.local/share/gitpack/ &&
+echo clean5 >&2 && test -x "$HOME"/.local/share/gitpack/ &&
+echo clean6 >&2 && test -f "$HOME"/.local/share/gitpack/gitpack.log &&
+echo clean7 >&2 && test -r "$HOME"/.local/share/gitpack/gitpack.log &&
+echo clean8 >&2 && test -w "$HOME"/.local/share/gitpack/gitpack.log &&
+echo clean9 >&2 && test ! -x "$HOME"/.local/share/gitpack/gitpack.log &&
 
 # existence of cache files
-echo clean10 >&2 && test ! -d ~/.cache/gitpack/
+echo clean10 >&2 && test ! -d "$HOME"/.cache/gitpack/

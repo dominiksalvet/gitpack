@@ -14,7 +14,7 @@
 #-------------------------------------------------------------------------------
 
 readonly GLOBAL_LOG_PATH=/var/log/gitpack/gitpack.log
-readonly LOCAL_LOG_PATH=~/.local/share/gitpack/gitpack.log
+readonly LOCAL_LOG_PATH="$HOME"/.local/share/gitpack/gitpack.log
 
 #-------------------------------------------------------------------------------
 # PRINT LOG

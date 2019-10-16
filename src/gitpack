@@ -302,9 +302,9 @@ init_paths() {
         readonly CACHE_DIR=/var/cache/gitpack
         readonly STATE_DIR=/var/lib/gitpack
     else # respect XDG
-        readonly LOG_DIR=~/.local/share/gitpack
-        readonly CACHE_DIR=~/.cache/gitpack
-        readonly STATE_DIR=~/.local/share/gitpack
+        readonly LOG_DIR="$HOME"/.local/share/gitpack
+        readonly CACHE_DIR="$HOME"/.cache/gitpack
+        readonly STATE_DIR="$HOME"/.local/share/gitpack
     fi
 
     # initialize derived paths
@@ -388,7 +388,7 @@ remove_dir() {
         # check for the root directory (with two slashes)
         test "$PWD" != // && test "$pwd_out" != // &&
         # check for a home directory
-        test "$PWD" != ~ && test "$pwd_out" != ~
+        test "$PWD" != "$HOME" && test "$pwd_out" != "$HOME"
     ) &&
 
     rm -fr -- "${1:?}"/ # remove the directory itself recursively

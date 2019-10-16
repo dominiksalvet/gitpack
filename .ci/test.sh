@@ -12,10 +12,10 @@
 
 # run all tests and store their exit status and output for further analysis
 {   .ci/tests.sh 2>&1 1>/dev/null
-    echo "$?" > ~/gitpack-tests-status 2>/dev/null # store exit status
-} | tee ~/gitpack-tests-output >&2 && # store output
+    echo "$?" > "$HOME"/gitpack-tests-status 2>/dev/null # store exit status
+} | tee "$HOME"/gitpack-tests-output >&2 && # store output
 
-if ! tests_status="$(cat ~/gitpack-tests-status)"; then # load exit status
+if ! tests_status="$(cat "$HOME"/gitpack-tests-status)"; then # load exit status
     echo 'cannot get exit status of tests' >&2; exit 1
 fi &&
 
@@ -26,7 +26,7 @@ if [ "$tests_status" -eq 0 ]; then # if tests were successful, watch output
         if ! echo "$line" | grep -q '^[[:alpha:]]\+[[:digit:]]\+$'; then
             echo "error detected: $line" >&2; exit 1
         fi
-    done < ~/gitpack-tests-output &&
+    done < "$HOME"/gitpack-tests-output &&
     exit 0 # success
 else
     exit "$tests_status" # fail
