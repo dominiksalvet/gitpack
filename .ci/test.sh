@@ -21,7 +21,7 @@ fi &&
 
 if [ "$tests_status" -eq 0 ]; then # if tests were successful, watch output
     # check if there is an error message (ignoring a diagnostic message format)
-    echo testtests1 >&2 && while read -r line; do
+    echo testtests1 >&2 && while IFS= read -r line; do
         # if it does not match the diagnostic format, it is an error message
         if ! echo "$line" | grep -q '^[[:alpha:]]\+[[:digit:]]\+$'; then
             echo "error detected: $line" >&2; exit 1

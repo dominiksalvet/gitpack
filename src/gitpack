@@ -852,7 +852,7 @@ for_each_route() (
     if [ -r "$1" ]; then # check whether the map file exists
         grepe_out="$(grepe '^[^#]' "$1")" && # remove empty and comment lines
         # call a given function for each route
-        echon "$grepe_out" | while read -r route; do
+        echon "$grepe_out" | while IFS= read -r route; do
             eval "$2" "$route" || return
         done
     else # if the map file does not exist, fails
@@ -937,10 +937,10 @@ remove_dir_from_dir() (
     files="$(cd -- "$1"/ && find ./ ! -type d)" &&
     dirs="$(cd -- "$1"/ && find ./ -type d ! -path ./ | sort -r)" &&
 
-    echon "$files" | while read -r file; do # remove files using file mask
+    echon "$files" | while IFS= read -r file; do # remove files using mask
         rm -f -- "${2:?}"/"${dir_name:?}"/"${file:?}" || return
     done &&
-    echon "$dirs" | while read -r dir; do # remove directories using file mask
+    echon "$dirs" | while IFS= read -r dir; do # remove directories using mask
         rmdirt -- "${2:?}"/"${dir_name:?}"/"${dir:?}"/ || return
     done &&
     rmdirt -- "${2:?}"/"${dir_name:?}"/ # remove the copied directory itself
