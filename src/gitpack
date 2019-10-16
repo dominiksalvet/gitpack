@@ -582,7 +582,7 @@ get_repo_hash() (
 repo_cd() {
     cd "$(url_to_path "$1")"/ && # transform the given URL to path
     if [ "$2" ]; then
-        git checkout -q "$2"
+        git checkout -qf "$2"
     fi
 }
 
