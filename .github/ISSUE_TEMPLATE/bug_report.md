@@ -24,10 +24,10 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 **Execution log**
-State the used log: global (*/var/log/gitpack/gitpack.log*), or local (*~/.local/share/gitpack/gitpack.log*).
+Attach the *gitpack.log* contents below. Use `gitpack paths` command to find its location.
 
 <details>
-    <summary>gitpack.log</summary>
+    <summary><i>gitpack.log</i></summary>
 
 ```
 <gitpack.log contents>
