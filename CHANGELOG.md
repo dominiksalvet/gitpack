@@ -15,7 +15,8 @@ The changes not yet present in any release are listed in this section.
 
 ### Changed
 
-* GitPack resolves a version name collision in the following order: HEAD, tags, branches and commits.
+* GitPack resolves a version name collision in the following order: `HEAD`, tags, branches and commits.
+* The report of a GitPack action never prints `HEAD` as a version.
 
 ## 0.6.0 (2019-10-08)
 

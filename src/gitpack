@@ -108,7 +108,7 @@ init_constants() {
     LOGTYPE_POSTRM=postrm # postrm script execution
 
     # Git-related constants
-    REMOTE_HEAD_REF=refs/gitpack/HEAD
+    REMOTE_HEAD_REF=refs/remote/HEAD
     # Git fetch remote refspecs
     HEAD_REFSPEC=+HEAD:"$REMOTE_HEAD_REF" # remote HEAD
     TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # remote tags
@@ -1096,13 +1096,13 @@ beautify_hash() (
     if repo_cd "$1" 2>/dev/null &&
        ref="$(git describe --all --exact-match "$2" 2>/dev/null)"; then
         version="${ref#*/}" # remove reference prefix
-        # a HEAD version is always printed as a remote HEAD, not a tag or branch
-        if [ "$version" != HEAD ] || [ refs/"$ref" = "$REMOTE_HEAD_REF" ]; then
+        # do not print HEAD as it either provides no information or is ambiguous
+        if [ "$version" != HEAD ]; then
             echo "$version"; return
         fi
     fi
 
-    echo "$2" | cut -c 1-7 # if no reference found, return short hash
+    echo "$2" | cut -c 1-7 # if no reference found or HEAD, return short hash
 )
 
 #-------------------------------------------------------------------------------
