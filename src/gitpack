@@ -46,84 +46,82 @@ check_sw_deps() (
 #-------------------------------------------------------------------------------
 # STATIC INITIALIZATION
 #-------------------------------------------------------------------------------
-# All constants of this section may be read in other code.
-#-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   Initializes static constants. They must not be changed later.
-# shellcheck disable=SC2209
+#   Initializes static constants.
 init_constants() {
     # the current version of GitPack
-    VERSION=0.6.0
+    readonly VERSION=0.6.0
 
     # GitPack actions
-    ACTION_INSTALL=install
-    ACTION_UNINSTALL=uninstall
-    ACTION_STATUS=status
+    readonly ACTION_INSTALL=install
+    readonly ACTION_UNINSTALL=uninstall
+    readonly ACTION_STATUS=status
 
     # project states of install action
-    STATE_INSTALL=install # just installed
-    STATE_UPDATE=update # just updated
-    STATE_DOWNGRADE=downgrade # just downgraded
-    STATE_CHANGE=change # just changed
-    STATE_INSTALLED=installed # already installed
+    readonly STATE_INSTALL=install # just installed
+    readonly STATE_UPDATE=update # just updated
+    readonly STATE_DOWNGRADE=downgrade # just downgraded
+    readonly STATE_CHANGE=change # just changed
+    readonly STATE_INSTALLED=installed # already installed
     # project states of uninstall action
-    STATE_UNINSTALL=uninstall # just uninstalled
-    STATE_UNINSTALLED=uninstalled # already uninstalled
+    readonly STATE_UNINSTALL=uninstall # just uninstalled
+    readonly STATE_UNINSTALLED=uninstalled # already uninstalled
     # project states of status action
-    STATE_NOTHING=nothing # project is not installed
-    STATE_OLDER=older # current version is older than target version
-    STATE_NEWER=newer # current version is newer than target version
-    STATE_DIFF=diff # current version is incomparable to target version
-    STATE_OK=ok # current version is equal to target version
+    readonly STATE_NOTHING=nothing # project is not installed
+    readonly STATE_OLDER=older # current version is older than target version
+    readonly STATE_NEWER=newer # current version is newer than target version
+    readonly STATE_DIFF=diff # current version is incomparable to target version
+    readonly STATE_OK=ok # current version is equal to target version
 
     # global log types
-    LOGTYPE_LOG=log # logging initialization
-    LOGTYPE_FAIL=fail # any recorder fail
-    LOGTYPE_SIGNAL=signal # a handled signal
-    LOGTYPE_EXIT=exit # exit the program
+    readonly LOGTYPE_LOG=log # logging initialization
+    readonly LOGTYPE_FAIL=fail # any recorder fail
+    readonly LOGTYPE_SIGNAL=signal # a handled signal
+    readonly LOGTYPE_EXIT=exit # exit the program
     # command log types
-    LOGTYPE_LIST=list # list command
-    LOGTYPE_CLEAN=clean # clean command
-    LOGTYPE_PATHS=paths # paths command
+    readonly LOGTYPE_LIST=list # list command
+    readonly LOGTYPE_CLEAN=clean # clean command
+    readonly LOGTYPE_PATHS=paths # paths command
     # action log types
-    LOGTYPE_ACTION=action # action processing
-    LOGTYPE_URL=url # URL check
-    LOGTYPE_REPO=repo # repository initialization
-    LOGTYPE_EXECUTE=execute # action executing
-    LOGTYPE_DEPS=deps # processing dependencies
+    readonly LOGTYPE_ACTION=action # action processing
+    readonly LOGTYPE_URL=url # URL check
+    readonly LOGTYPE_REPO=repo # repository initialization
+    readonly LOGTYPE_EXECUTE=execute # action executing
+    readonly LOGTYPE_DEPS=deps # processing dependencies
     # database log types
-    LOGTYPE_DB=db # database initialization
-    LOGTYPE_GET=get # get database item
-    LOGTYPE_INSERT=insert # insert a database item
-    LOGTYPE_DELETE=delete # delete database items
-    LOGTYPE_BACKUP=backup # backup database
+    readonly LOGTYPE_DB=db # database initialization
+    readonly LOGTYPE_GET=get # get database item
+    readonly LOGTYPE_INSERT=insert # insert a database item
+    readonly LOGTYPE_DELETE=delete # delete database items
+    readonly LOGTYPE_BACKUP=backup # backup database
     # installation log types
-    LOGTYPE_PRECP=precp # precp script execution
-    LOGTYPE_CP=cp # copy files using map
-    LOGTYPE_POSTCP=postcp # postcp script execution
+    readonly LOGTYPE_PRECP=precp # precp script execution
+    readonly LOGTYPE_CP=cp # copy files using map
+    readonly LOGTYPE_POSTCP=postcp # postcp script execution
     # uninstallation log types
-    LOGTYPE_PRERM=prerm # prerm script execution
-    LOGTYPE_RM=rm # remove files using map
-    LOGTYPE_POSTRM=postrm # postrm script execution
+    readonly LOGTYPE_PRERM=prerm # prerm script execution
+    readonly LOGTYPE_RM=rm # remove files using map
+    readonly LOGTYPE_POSTRM=postrm # postrm script execution
 
     # Git-related constants
-    REMOTE_HEAD_REF=refs/remote/HEAD
+    readonly REMOTE_HEAD_REF=refs/remote/HEAD
     # Git fetch remote refspecs
-    HEAD_REFSPEC=+HEAD:"$REMOTE_HEAD_REF" # remote HEAD
-    TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # remote tags
-    HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # remote branches
+    readonly HEAD_REFSPEC=+HEAD:"$REMOTE_HEAD_REF" # remote HEAD
+    readonly TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # remote tags
+    readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # remote branches
 
     # other constants
-    URL_REGEX='^[[:alnum:]_][[:alnum:]_\.-]*(/[[:alnum:]_][[:alnum:]_\.-]*){2}$'
-    DEP_PREFIX='+ ' # prefix for processing dependencies
+    readonly URL_REGEX='^[[:alnum:]_][[:alnum:]_\.-]*'\
+'(/[[:alnum:]_][[:alnum:]_\.-]*){2}$'
+    readonly DEP_PREFIX='+ ' # prefix for processing dependencies
 }
 
 # DESCRIPTION:
-#   Initializes strings usually used to display reports to the user. They must
-#   not be changed later. Constants must be already initialized.
+#   Initializes strings usually used to display reports to the user. Constants
+#   must be already initialized.
 init_strings() {
-    HELP_MESSAGE="USAGE:
+    readonly HELP_MESSAGE="USAGE:
   gitpack ACTION [OPTION...] URL[=VERSION]...
   gitpack COMMAND
 
@@ -142,7 +140,7 @@ COMMAND:
   help   show help
   about  show information"
 
-    ABOUT_MESSAGE="GitPack $VERSION
+    readonly ABOUT_MESSAGE="GitPack $VERSION
 The simplest Git-based package manager.
 
 Copyright 2019 Dominik Salvet
@@ -150,19 +148,18 @@ github.com/dominiksalvet/gitpack"
 }
 
 # DESCRIPTION:
-#   Initializes GitPack configuration constants. They must not be changed later.
+#   Initializes GitPack configuration constants.
 init_config() {
-    LOG_LINES_KEPT=1000 # when shortening the log file, keep those last lines
-    MAX_DEP_DEPTH=20 # max depth of dependencies prevents cyclic dependencies
+    readonly LOG_LINES_KEPT=1000 # keep those last lines when cleaning log
+    readonly MAX_DEP_DEPTH=20 # max depth of nested dependencies
 }
 
 # DESCRIPTION:
-#   Stores a copy of a given command, which invoked this GitPack instance. That
-#   value must not be changed later.
+#   Stores a copy of a given command, which invoked this GitPack instance.
 # PARAMETERS:
 #   $@ - complete GitPack command
 store_command() {
-    COMMAND="$*" # the complete current GitPack command
+    readonly COMMAND="$*" # the complete current GitPack command
 }
 
 #-------------------------------------------------------------------------------
@@ -238,9 +235,6 @@ echof() {
 #-------------------------------------------------------------------------------
 # DYNAMIC INITIALIZATION
 #-------------------------------------------------------------------------------
-# All constants of this section may be read in other code. All global and
-# environment variables of this section may be accessed in other code.
-#-------------------------------------------------------------------------------
 
 # DESCRIPTION:
 #   Initializes a runtime environment for GitPack. After calling this function,
@@ -259,24 +253,28 @@ init_runtime() {
 # DESCRIPTION:
 #   Defines all forced variables. Those are global variables, which would
 #   otherwise be used as local variables but for some reason it is not possible.
-#   Their names must start with an underscore character.
+#   They must not be reused and their names must exclusively start with an
+#   underscore character.
 def_forced_vars() {
     # list of all forced variables
     _user_id=
+    _system_name=
     _signal_status=
     _opt=
 }
 
 # DESCRIPTION:
-#   Initializes runtime constants. They must not be changed later.
+#   Initializes runtime constants.
 init_runtime_constants() {
     _user_id="$(id -u)" && # check if running as root
     if [ "$_user_id" -eq 0 ]; then
-        ACCESS=global # global installation (system installation)
+        readonly ACCESS=global # global installation (system installation)
     else
-        ACCESS=local # local installation (user installation)
+        readonly ACCESS=local # local installation (user installation)
     fi &&
-    SYSTEM="$(uname)" # get the current system name
+
+    _system_name="$(uname)" && # get the current system name
+    readonly SYSTEM="$_system_name"
 }
 
 # DESCRIPTION:
@@ -288,31 +286,32 @@ init_global_vars() {
 }
 
 # DESCRIPTION:
-#   Initializes all environment variables. They can be read in called scripts.
+#   Initializes all environment variables with default values, which may be
+#   overwritten later. They can be read in project's control scripts to adjust
+#   their execution appropriately.
 init_env_vars() {
     export OFFLINE_MODE=false # GitPack offline mode
 }
 
 # DESCRIPTION:
-#   Initializes all GitPack-specific paths. They must start with '/' and must
-#   not be changed later.
+#   Initializes all GitPack-specific paths. They must be absolute paths.
 init_paths() {
     # initialize directory paths
     if [ "$ACCESS" = global ]; then # respect FHS
-        LOG_DIR=/var/log/gitpack
-        CACHE_DIR=/var/cache/gitpack
-        STATE_DIR=/var/lib/gitpack
+        readonly LOG_DIR=/var/log/gitpack
+        readonly CACHE_DIR=/var/cache/gitpack
+        readonly STATE_DIR=/var/lib/gitpack
     else # respect XDG
-        LOG_DIR=~/.local/share/gitpack
-        CACHE_DIR=~/.cache/gitpack
-        STATE_DIR=~/.local/share/gitpack
+        readonly LOG_DIR=~/.local/share/gitpack
+        readonly CACHE_DIR=~/.cache/gitpack
+        readonly STATE_DIR=~/.local/share/gitpack
     fi
 
     # initialize derived paths
-    LOG_PATH="$LOG_DIR"/gitpack.log # the execution log file
-    CACHE_REPO_DIR="$CACHE_DIR"/repo # the cache for local Git repositories
-    STATUS_PATH="$STATE_DIR"/status # the database of installed projects
-    STATUS_BAK_PATH="$STATE_DIR"/status.bak # the database backup
+    readonly LOG_PATH="$LOG_DIR"/gitpack.log # execution log file
+    readonly CACHE_REPO_DIR="$CACHE_DIR"/repo # cache for local repositories
+    readonly STATUS_PATH="$STATE_DIR"/status # database of installed projects
+    readonly STATUS_BAK_PATH="$STATE_DIR"/status.bak # database backup
 }
 
 # DESCRIPTION:

@@ -9,9 +9,20 @@
 #   data to the global installation data.
 #-------------------------------------------------------------------------------
 
+#-------------------------------------------------------------------------------
+# DEFINITIONS
+#-------------------------------------------------------------------------------
+
+readonly GLOBAL_LOG_PATH=/var/log/gitpack/gitpack.log
+readonly LOCAL_LOG_PATH=~/.local/share/gitpack/gitpack.log
+
+#-------------------------------------------------------------------------------
+# PRINT LOG
+#-------------------------------------------------------------------------------
+
 # dump the preferred log
-if [ -r ~/.local/share/gitpack/gitpack.log ]; then
-    cat ~/.local/share/gitpack/gitpack.log
-elif [ -r /var/log/gitpack/gitpack.log ]; then
-    cat /var/log/gitpack/gitpack.log
+if [ -r "$LOCAL_LOG_PATH" ]; then # print local if exists
+    cat "$LOCAL_LOG_PATH"
+elif [ -r "$GLOBAL_LOG_PATH" ]; then # otherwise, print global
+    cat "$GLOBAL_LOG_PATH"
 fi

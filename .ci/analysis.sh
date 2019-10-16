@@ -31,13 +31,13 @@ check_code_style() (
 # DESCRIPTION:
 #   Initializes constants for code style check.
 init_code_style() {
-    MAX_LINE_LENGTH=80 # maximum number of characters per each line
-    MAX_FUNC_LENGTH=20 # maximum number of lines per each function
-    IGNORED_FUNCS='init_constants init_strings' # function length exceptions
+    readonly MAX_LINE_LENGTH=80 # maximum number of characters per each line
+    readonly MAX_FUNC_LENGTH=20 # maximum number of lines per each function
+    readonly IGNORED_FUNCS='init_constants init_strings' # function length exceptions
 
     # AWK prints '<lineno> <function> <lines>' per line for shell script file inputs
     # shellcheck disable=SC2016
-    FUNC_SUMMARY='{ if (/\(\)/) {
+    readonly FUNC_SUMMARY='{ if (/\(\)/) {
         printf NR" "$1" "
         lines=1
     } else if (/^(\}|\))$/) {

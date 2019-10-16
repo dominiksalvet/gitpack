@@ -16,7 +16,8 @@
 # DESCRIPTION:
 #   Prepares the next word hint based on the current part of the word.
 _gitpack() {
-    local FIRST_WORDS='install uninstall status list clean paths help about' &&
+    local -r FIRST_WORDS='install uninstall status list clean paths help
+                          about' && # the list of possible first arguments
     local first_word="${COMP_WORDS[1]}" &&
     local cur_word="${COMP_WORDS[COMP_CWORD]}" && # the current part of the word
 
@@ -25,7 +26,7 @@ _gitpack() {
         mapfile -t COMPREPLY < <(compgen -W "$FIRST_WORDS" -- "$cur_word")
     else # repository URLs
         case "$first_word" in # print them only for actions
-            install|uninstall|status) _gitpack_url ;;
+            install | uninstall | status) _gitpack_url ;;
         esac
     fi
 }
