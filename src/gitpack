@@ -198,13 +198,13 @@ process_action_args() (
     shift && # shift to action arguments
 
     process_action_opts "$@" && # action options (sets the OPTIND variable)
-    shift "$((OPTIND - 1))" && # shift to reference arguments
-    if [ "$#" -eq 0 ]; then # check if there is any reference argument
+    shift "$((OPTIND - 1))" && # shift to URL arguments
+    if [ "$#" -eq 0 ]; then # check if there is any URL argument
         echof 'no URL provided'; return 1
     fi &&
 
-    for ref in "$@"; do # process each reference individually with common action
-        process_action "$action" "$ref" || return
+    for raw_url in "$@"; do # process each URL individually with a common action
+        process_action "$action" "$raw_url" || return
     done
 )
 
@@ -340,8 +340,8 @@ list() (
     log "$LOGTYPE_LIST" "$STATUS_PATH" &&
     while read -r db_record; do
         url="${db_record%% *}" # extract URL
-        version="${db_record#* }" # extract commit hash
-        version="$(beautify_hash "$url" "$version")" && # try to beautify it
+        version="${db_record#* }" # extract commit hash as a version
+        version="$(beautify_hash "$url" "$version")" && # beautify it
         echo "$url $version" || return
     done < "$STATUS_PATH"
 )
@@ -404,13 +404,13 @@ remove_dir() {
 #   Also prints a report after the execution.
 # PARAMETERS:
 #   $1 - action
-#   $2 - reference
+#   $2 - raw URL
 process_action() (
     {   # log current action processing
         log "$LOGTYPE_ACTION" "$1" "$2" &&
-        # process given reference - URL + optional version
-        url="$(ref_to_url "$2")" &&
-        version="$(ref_to_version "$2")" &&
+        # process the given URL
+        url="$(raw_url_to_url "$2")" &&
+        version="$(raw_url_to_version "$2")" &&
         check_url "$url" &&
 
         # prepare Git repository
@@ -427,10 +427,11 @@ process_action() (
 )
 
 # DESCRIPTION:
-#   Extracts and normalizes the URL from a given reference.
+#   Normalizes a given raw URL. It removes a version from the URL if present,
+#   and shortens the URL.
 # PARAMETERS:
-#   $1 - reference
-ref_to_url() (
+#   $1 - raw URL
+raw_url_to_url() (
     url="${1%%=*}" # remove version if any
     url="$(echo "$url" | tr '[:upper:]' '[:lower:]')" && # to lowercase
     url="${url#https://}" && # remove https:// prefix
@@ -438,10 +439,10 @@ ref_to_url() (
 )
 
 # DESCRIPTION:
-#   Extracts a version from a given reference if there is any. Always succeeds.
+#   Extracts a version from a given raw URL if there is any. Always succeeds.
 # PARAMETERS:
-#   $1 - reference
-ref_to_version() (
+#   $1 - raw URL
+raw_url_to_version() (
     version="${1#*=}" # remove URL and keep version
     if [ "$version" != "$1" ]; then # check if there was a version
         echo "$version"
@@ -486,7 +487,7 @@ init_repo() (
 # DESCRIPTION:
 #   Downloads files of a given repository URL so that they are up to date. If an
 #   appropriate local repository does not exist, it is created and configured.
-#   Then, remote updates are fetched including any reference removal.
+#   Then, remote updates are fetched including any Git reference removal.
 # PARAMETERS:
 #   $1 - URL
 #   $2 - repository directory
@@ -562,7 +563,7 @@ get_repo_hash() (
     if [ "$2" = HEAD ]; then set -- "$1" "$REMOTE_HEAD_REF"; fi &&
 
     if [ "$2" ]; then # if any version has been provided
-        # print the hash of the version if it is a valid Git commit reference
+        # print the commit hash of the version if it is a valid Git reference
         if ! git rev-parse --verify "$2"^0 2>/dev/null; then
             echof "version $2 does not exist"; return 1
         fi
@@ -574,11 +575,11 @@ get_repo_hash() (
 )
 
 # DESCRIPTION:
-#   Changes current working directory to a given repository and checkouts its
-#   given commit. If the commit parameter is empty, no checkout is performed.
+#   Changes current working directory to the local repository of a given URL. If
+#   a commit hash provided, it also checkouts the given commit.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - commit (optional)
+#   $2 - hash (optional)
 repo_cd() {
     cd "$(url_to_path "$1")"/ && # transform the given URL to path
     if [ "$2" ]; then
@@ -603,13 +604,13 @@ get_dep_prefix() {
 # PARAMETERS:
 #   $1 - action
 #   $2 - URL
-#   $3 - commit
+#   $3 - hash
 process_deps() (
     # early return in the uninstall case
     if [ "$1" = "$ACTION_UNINSTALL" ]; then return; fi
 
     deps="$(get_deps "$2" "$3")" && # get all dependencies
-    # run the given action recursively for each dependency reference
+    # run the given action recursively for each dependency URL
     echon "$deps" | while read -r dep; do
             next_dep_depth && # register a new dependency depth level
             process_action "$1" "$dep" || return
@@ -617,10 +618,10 @@ process_deps() (
 )
 
 # DESCRIPTION:
-#   Prints all dependencies of a given project's URL and commit if any.
+#   Prints all dependencies of a given project's URL and a commit hash.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - commit
+#   $2 - hash
 get_deps() (
     repo_cd "$1" "$2" &&
     # if there is a file describing dependencies
@@ -670,12 +671,12 @@ grepe() (
 
 # DESCRIPTION:
 #   Decides whether install, change, or do nothing with a given project. If any
-#   operation is done, it will use only given commits and also updates the
+#   operation is done, it will use only given commit hashes and also updates the
 #   GitPack database.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - source commit (optional)
-#   $3 - target commit
+#   $2 - source hash (optional)
+#   $3 - target hash
 execute_install() {
     if [ ! "$2" ]; then # no source version
         state="$STATE_INSTALL" &&
@@ -689,12 +690,12 @@ execute_install() {
 }
 
 # DESCRIPTION:
-#   Changes version of a given project from a given source commit to a given
-#   target commit and updates the GitPack database.
+#   Changes version of a given project from a given source commit hash to a
+#   given target commit hash and updates the GitPack database.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - source commit
-#   $3 - target commit
+#   $2 - source hash
+#   $3 - target hash
 execute_change() {
     if is_ancestor_commit "$1" "$2" "$3"; then # source version is older
         state="$STATE_UPDATE"
@@ -712,11 +713,11 @@ execute_change() {
 
 # DESCRIPTION:
 #   Decides whether uninstall, or do nothing with a given project. If any
-#   operation is done, it will use only given commit and also updates the
-#   GitPack database.
+#   operation is done, it will use only the given commit hash and also updates
+#   the GitPack database.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - commit (optional)
+#   $2 - hash (optional)
 execute_uninstall() {
     if [ "$2" ]; then # if installed
         state="$STATE_UNINSTALL" &&
@@ -728,12 +729,12 @@ execute_uninstall() {
 }
 
 # DESCRIPTION:
-#   Checks a given repository considering given source and target commits. It
-#   always succeeds.
+#   Checks a given repository considering given source and target commit hashes.
+#   It always succeeds.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - source commit (optional)
-#   $3 - target commit
+#   $2 - source hash (optional)
+#   $3 - target hash
 execute_status() {
     if [ ! "$2" ]; then # no source version
         state="$STATE_NOTHING"
@@ -749,12 +750,12 @@ execute_status() {
 }
 
 # DESCRIPTION:
-#   Checks whether the first given commit is an ancestor of the second commit in
-#   a given Git repository.
+#   Checks whether the commit of the first hash is an ancestor of the commit of
+#   the second hash in a given Git repository.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - first commit
-#   $3 - second commit
+#   $2 - first hash
+#   $3 - second hash
 is_ancestor_commit() (
     repo_cd "$1" &&
     git merge-base --is-ancestor "$2" "$3"
@@ -765,10 +766,10 @@ is_ancestor_commit() (
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   Installs a project based on a given repository URL and commit.
+#   Installs a project based on a given repository URL and a commit hash.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - commit
+#   $2 - hash
 install() (
     repo_cd "$1" "$2" &&
     install_dir="$(get_install_dir)" && # get preferred installation directory
@@ -790,10 +791,10 @@ install() (
 )
 
 # DESCRIPTION:
-#   Uninstalls a project based on a given repository URL and commit.
+#   Uninstalls a project based on a given repository URL and a commit hash.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - commit
+#   $2 - hash
 uninstall() (
     repo_cd "$1" "$2" &&
     install_dir="$(get_install_dir)" && # get preferred installation directory
@@ -995,7 +996,7 @@ get_db_record() (
 #   Inserts a given installation record into the GitPack database.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - commit
+#   $2 - hash
 insert_db_record() {
     log "$LOGTYPE_INSERT" "$1" "$2" "$STATUS_PATH" &&
     echo "$1 $2" >> "$STATUS_PATH"
@@ -1056,12 +1057,12 @@ log() (
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   Prints a report of a given Git project and all associated parameters.
+#   Prints a report of a given Git project based on included parameters.
 # PARAMETERS:
 #   $1 - state
 #   $2 - URL
-#   $3 - source commit
-#   $4 - target commit
+#   $3 - source hash
+#   $4 - target hash
 report() (
     # prepare given arguments
     prefix="$(get_dep_prefix)[$1] $2" &&
@@ -1087,11 +1088,11 @@ report() (
 #   its name. Otherwise, it shortens the given hash. Always succeeds.
 # PARAMETERS:
 #   $1 - URL
-#   $2 - commit (optional)
+#   $2 - hash (optional)
 beautify_hash() (
-    if [ ! "$2" ]; then return; fi # early return if no commit provided
+    if [ ! "$2" ]; then return; fi # early return if no commit hash provided
 
-    # check if given hash is associated with any reference
+    # check if the given commit hash is associated with any Git reference
     if repo_cd "$1" 2>/dev/null &&
        ref="$(git describe --all --exact-match "$2" 2>/dev/null)"; then
         version="${ref#*/}" # remove reference prefix
