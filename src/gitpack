@@ -5,7 +5,7 @@
 # github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
-#   This is the main file of GitPack - Git-based package manager.
+#   This is GitPack, the simplest Git-based package manager.
 # PARAMETERS:
 #   All given arguments are processed as GitPack's help describes.
 #-------------------------------------------------------------------------------
@@ -563,13 +563,13 @@ get_repo_hash() (
 
     if [ "$2" ]; then # if any version has been provided
         # print the hash of the version if it is a valid Git commit reference
-        if ! git rev-parse --verify "$2"'^{commit}' 2>/dev/null; then
+        if ! git rev-parse --verify "$2"^0 2>/dev/null; then
             echof "version $2 does not exist"; return 1
         fi
     else # detect a preferred commit
         # get latest tag (preferred) or latest commit of the default branch
         ref="$(git describe --tags --abbrev=0 --always "$REMOTE_HEAD_REF")" &&
-        git rev-parse --verify "$ref"'^{commit}' 2>/dev/null # get commit hash
+        git rev-parse --verify "$ref"^0 2>/dev/null # get commit hash
     fi
 )
 
