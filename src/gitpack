@@ -338,12 +338,12 @@ term_action() {
 #   Prints all installed Git projects and their versions or commit hashes.
 list() (
     log "$LOGTYPE_LIST" "$STATUS_PATH" &&
-    while read -r db_record; do
-        url="${db_record%% *}" # extract URL
-        version="${db_record#* }" # extract commit hash as a version
-        version="$(beautify_hash "$url" "$version")" && # beautify it
+    get_db_records | while read -r db_record; do
+        url="$(get_db_record_url "$db_record")" && # extract URL
+        hash="$(get_db_record_hash "$db_record")" && # extract commit hash
+        version="$(beautify_hash "$url" "$hash")" && # beautify it
         echo "$url $version" || return
-    done < "$STATUS_PATH"
+    done
 )
 
 # DESCRIPTION:
@@ -533,7 +533,7 @@ execute_action() (
     log "$LOGTYPE_EXECUTE" "$1" "$2" "$3" &&
     # get source (already installed) project information
     src_db_record="$(get_db_record "$2")" &&
-    src_hash="${src_db_record#* }" && # extract commit hash
+    src_hash="$(get_db_record_hash "$src_db_record")" && # extract commit hash
     # get target (installation candidate) project information
     tar_hash="$(get_repo_hash "$2" "$3")" &&
 
@@ -1011,6 +1011,28 @@ delete_db_records() (
     grepe_out="$(grepe -Fv "$1" "$STATUS_PATH")" &&
     echon "$grepe_out" > "$STATUS_PATH"
 )
+
+# DESCRIPTION:
+#   Prints all records of the GitPack database.
+get_db_records() {
+    cat "$STATUS_PATH"
+}
+
+# DESCRIPTION:
+#   Extracts a URL from a given database record.
+# PARAMETERS:
+#   $1 - database record
+get_db_record_url() {
+    echo "${1%% *}" # remove everything after a space (including)
+}
+
+# DESCRIPTION:
+#   Extracts a commit hash from a given database record.
+# PARAMETERS:
+#   $1 - database record
+get_db_record_hash() {
+    echo "${1#* }" # remove everything before a space (including)
+}
 
 # DESCRIPTION:
 #   Backs up the GitPack database by copying it to a different path.
