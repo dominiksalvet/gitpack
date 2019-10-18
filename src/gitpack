@@ -338,7 +338,7 @@ term_action() {
 #   Prints all installed Git projects and their versions or commit hashes.
 list() (
     log "$LOGTYPE_LIST" "$STATUS_PATH" &&
-    get_db_records | while read -r db_record; do
+    get_db | while IFS= read -r db_record; do
         url="$(get_db_record_url "$db_record")" && # extract URL
         hash="$(get_db_record_hash "$db_record")" && # extract commit hash
         version="$(beautify_hash "$url" "$hash")" && # beautify it
@@ -455,7 +455,6 @@ raw_url_to_version() (
 #   $1 - URL
 check_url() {
     log "$LOGTYPE_URL" "$1" &&
-
     if ! echo "$1" | grep -qE "$URL_REGEX"; then
         echof 'unsupported URL delivered'; return 1
     fi
@@ -611,7 +610,7 @@ process_deps() (
 
     deps="$(get_deps "$2" "$3")" && # get all dependencies
     # run the given action recursively for each dependency URL
-    echon "$deps" | while read -r dep; do
+    echon "$deps" | while IFS= read -r dep; do
             next_dep_depth && # register a new dependency depth level
             process_action "$1" "$dep" || return
     done
@@ -988,8 +987,12 @@ init_db() {
 #   $1 - URL
 get_db_record() (
     log "$LOGTYPE_GET" "$1" "$STATUS_PATH" &&
-    grepe_out="$(grepe -F "$1" "$STATUS_PATH")" &&
-    echon "$grepe_out" | head -n 1
+    get_db | while IFS= read -r db_record; do
+        url="$(get_db_record_url "$1")" || return
+        if [ "$url" = "$1" ]; then
+            echo "$db_record"; return
+        fi
+    done
 )
 
 # DESCRIPTION:
@@ -1008,15 +1011,28 @@ insert_db_record() {
 #   $1 - URL
 delete_db_records() (
     log "$LOGTYPE_DELETE" "$1" "$STATUS_PATH" &&
-    grepe_out="$(grepe -Fv "$1" "$STATUS_PATH")" &&
-    echon "$grepe_out" > "$STATUS_PATH"
+    pruned_db="$(get_pruned_db "$1")" &&
+    echon "$pruned_db" > "$STATUS_PATH"
 )
 
 # DESCRIPTION:
 #   Prints all records of the GitPack database.
-get_db_records() {
+get_db() {
     cat "$STATUS_PATH"
 }
+
+# DESCRIPTION:
+#   Prints all records of the GitPack database except those with a given URL.
+# PARAMETERS:
+#   $1 - URL
+get_pruned_db() (
+    get_db | while IFS= read -r db_record; do
+        url="$(get_db_record_url)" || return
+        if [ "$url" != "$1" ]; then
+            echo "$db_record"
+        fi
+    done
+)
 
 # DESCRIPTION:
 #   Extracts a URL from a given database record.
