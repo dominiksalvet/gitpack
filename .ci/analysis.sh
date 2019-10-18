@@ -24,7 +24,7 @@ check_code_style() (
     # perform checks for each given script file
     for script_path in "$@"; do
         check_lines_length "$script_path" &&
-        check_functions "$script_path" || return
+        check_funcs_length "$script_path" || return
     done
 )
 
@@ -34,21 +34,10 @@ init_code_style() {
     readonly MAX_LINE_LENGTH=80 # maximum number of characters per each line
     readonly MAX_FUNC_LENGTH=20 # maximum number of lines per each function
     readonly IGNORED_FUNCS='init_constants init_strings' # function length exceptions
-
-    # AWK prints '<lineno> <function> <lines>' per line for shell script file inputs
-    # shellcheck disable=SC2016
-    readonly FUNC_SUMMARY='{ if (/\(\)/) {
-        printf NR" "$1" "
-        lines=1
-    } else if (/^(\}|\))$/) {
-        print lines
-    } else {
-        lines++
-    } }'
 }
 
 #-------------------------------------------------------------------------------
-# LINES LENGHT
+# LINES LENGTH
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
@@ -67,51 +56,55 @@ check_lines_length() (
 )
 
 #-------------------------------------------------------------------------------
-# CHECK FUNCTIONS
+# FUNCTIONS LENGTH
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   Checks whether each function of a given script file meets code style.
+#   Checks whether each function of a given script file has at most a defined
+#   number of lines.
 # PARAMETERS:
 #   $1 - script path
-check_functions() (
-    prev_lineno=; prev_function= # initialize previous function details
-    # use '(' as a field separator to make creating the final output easier
-    awk_out="$(awk -F '(' "$FUNC_SUMMARY" "$1")" &&
-    echo "$awk_out" | while IFS= read -r line; do # for each function summary
-        lineno="$(echo "$line" | cut -f 1 -d ' ' -s)" && # extract line number
-        function="$(echo "$line" | cut -f 2 -d ' ' -s)" && # extract function name
-        lines="$(echo "$line" | cut -f 3 -d ' ' -s)" || return # extract function length in lines
+check_funcs_length() (
+    # create function summaries '<lineno> <function> <lines>' and process them
+    summarize_funcs "$1" | while IFS= read -r line; do # for each function summary
+        lineno="$(echo "$line" | cut -f 1 -d ' ')" && # extract line number
+        function="$(echo "$line" | cut -f 2 -d ' ')" && # extract function name
+        lines="$(echo "$line" | cut -f 3 -d ' ')" || return # extract function length in lines
 
-        if [ ! "$lineno" ] || [ ! "$function" ] || [ ! "$lines" ]; then
-            echo "$1:$prev_lineno $prev_function() has bad code style" >&2; return 1
-        fi
+        # exclude ignored functions
+        for ignored_function in $IGNORED_FUNCS; do
+            if [ "$function" = "$ignored_function" ]; then lines="$MAX_FUNC_LENGTH"; fi
+        done
 
-        if ! check_function_length "$function" "$lines" "$MAX_FUNC_LENGTH"; then
+        if [ "$lines" -gt "$MAX_FUNC_LENGTH" ]; then # check function length
             echo "$1:$lineno $function() has more than $MAX_FUNC_LENGTH lines" >&2; return 1
         fi
-
-        prev_lineno="$lineno"; prev_function="$function" # store previous function details
     done
 )
 
 # DESCRIPTION:
-#   Checks whether a given function with a given number of lines has at most a
-#   given maximum number of lines considering ignored functions.
+#   Prints a summary for each function in a given script. Each output line has
+#   the following format: '<lineno> <function> <lines>'.
 # PARAMETERS:
-#   $1 - function name
-#   $2 - function lines
-#   #3 - maximum lines
-check_function_length() (
-    lines="$2" # store number of lines in the function
+#   $1 - script path
+summarize_funcs() (
+    lineno=0 # line counter
+    function_lineno=; function_name= # function details
+    in_function=false # indicator whether the parses is in a function
 
-    # exclude ignored functions
-    for ignored_function in $IGNORED_FUNCS; do
-        if [ "$1" = "$ignored_function" ]; then lines="$3"; fi
-    done
-
-    # function lines must be less or equal to maximum lines
-    test "$lines" -le "$3"
+    while IFS= read -r line; do # for each line of the given script file
+        lineno="$((lineno + 1))" && # increase line counter
+        if [ "$in_function" = false ]; then
+            if echo "$line" | grep -q '^[^#]*()'; then # check if function
+                function_lineno="$lineno"
+                function_name="${line%%(*}" # store its name
+                in_function=true
+            fi
+        elif [ "$line" = '}' ] || [ "$line" = ')' ]; then # if end of function
+            echo "$function_lineno $function_name $((lineno - function_lineno))"
+            in_function=false
+        fi
+    done < "$1"
 )
 
 #-------------------------------------------------------------------------------
