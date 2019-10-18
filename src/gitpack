@@ -132,6 +132,8 @@ ACTION:
 
 OPTION:
   -o  offline mode
+  -h  show commit hashes
+  --  no further options
 
 COMMAND:
   list   list installed projects
@@ -214,9 +216,10 @@ process_action_args() (
 # PARAMETERS:
 #   $@ - action arguments
 process_action_opts() {
-    while getopts :o _opt; do # for each option argument
+    while getopts :oh _opt; do # for each option argument
         case "$_opt" in
             o)  OFFLINE_MODE=true ;;
+            h)  hash_mode=true ;;
             \?) echof "invalid option -$OPTARG"; return 1 ;;
         esac
     done
@@ -283,6 +286,9 @@ init_runtime_constants() {
 init_global_vars() {
     state= # the state of the processed project
     dep_depth=0 # current dependency depth
+
+    # command line options
+    hash_mode=false # use only commit hashes as versions during reports
 }
 
 # DESCRIPTION:
@@ -290,6 +296,7 @@ init_global_vars() {
 #   overwritten later. They can be read in project's control scripts to adjust
 #   their execution appropriately.
 init_env_vars() {
+    # command line options
     export OFFLINE_MODE=false # GitPack offline mode
 }
 
@@ -1130,8 +1137,8 @@ report() (
 beautify_hash() (
     if [ ! "$2" ]; then return; fi # early return if no commit hash provided
 
-    # check if the given commit hash is associated with any Git reference
-    if repo_cd "$1" 2>/dev/null &&
+    # if hash mode disabled, check if any Git reference associated with the hash
+    if [ "$hash_mode" = false ] && repo_cd "$1" 2>/dev/null &&
        ref="$(git describe --all --exact-match "$2" 2>/dev/null)"; then
         version="${ref#*/}" # remove reference prefix
         # do not print HEAD as it either provides no information or is ambiguous

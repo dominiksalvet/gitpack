@@ -12,6 +12,7 @@ The changes not yet present in any release are listed in this section.
 
 * The automatic default branch detection has been added.
 * The `paths` command to show all GitPack-specific paths has been added.
+* Hash mode option `-h` forcing to always show commit hashes has been added.
 
 ### Changed
 
