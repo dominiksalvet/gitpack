@@ -24,17 +24,17 @@ echo global5 >&2 && gitpack_out="$(sudo src/gitpack uninstall -o github.com/domi
 echo global6 >&2 && echo "$gitpack_out" | grep '^\[uninstall\]' &&
 
 # clean all global GitPack files
-echo global7 >&2 && sudo rm /var/log/gitpack/gitpack.log &&
-echo global8 >&2 && sudo rmdir /var/log/gitpack/ &&
-echo global9 >&2 && sudo rm -rf /var/cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-echo global10 >&2 && sudo rmdir /var/cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo global11 >&2 && sudo rmdir /var/cache/gitpack/repo/github.com/ &&
-echo global12 >&2 && sudo rmdir /var/cache/gitpack/repo/ &&
-echo global13 >&2 && sudo rmdir /var/cache/gitpack/ &&
-echo global14 >&2 && test ! "$(sudo cat /var/lib/gitpack/status)" &&
-echo global15 >&2 && sudo rm /var/lib/gitpack/status &&
-echo global16 >&2 && sudo rm /var/lib/gitpack/status.bak &&
-echo global17 >&2 && sudo rmdir /var/lib/gitpack/ &&
+echo global7 >&2 && sudo rm -rf /var/cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
+echo global8 >&2 && sudo rmdir /var/cache/gitpack/repo/github.com/dominiksalvet/ &&
+echo global9 >&2 && sudo rmdir /var/cache/gitpack/repo/github.com/ &&
+echo global10 >&2 && sudo rmdir /var/cache/gitpack/repo/ &&
+echo global11 >&2 && sudo rmdir /var/cache/gitpack/ &&
+echo global12 >&2 && sudo rm /var/lib/gitpack/status.bak &&
+echo global13 >&2 && test ! "$(sudo cat /var/lib/gitpack/status)" &&
+echo global14 >&2 && sudo rm /var/lib/gitpack/status &&
+echo global15 >&2 && sudo rmdir /var/lib/gitpack/ &&
+echo global16 >&2 && sudo rm /var/log/gitpack/gitpack.log &&
+echo global17 >&2 && sudo rmdir /var/log/gitpack/ &&
 
 #-------------------------------------------------------------------------------
 # LOCAL INSTALLATION
@@ -51,15 +51,15 @@ echo local5 >&2 && gitpack_out="$(src/gitpack uninstall -o github.com/dominiksal
 echo local6 >&2 && echo "$gitpack_out" | grep '^\[uninstall\]' &&
 
 # create all local GitPack files
-echo local7 >&2 && rm "$HOME"/.local/share/gitpack/gitpack.log &&
-echo local8 >&2 && rm -rf "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-echo local9 >&2 && rmdir "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo local10 >&2 && rmdir "$HOME"/.cache/gitpack/repo/github.com/ &&
-echo local11 >&2 && rmdir "$HOME"/.cache/gitpack/repo/ &&
-echo local12 >&2 && rmdir "$HOME"/.cache/gitpack/ &&
+echo local7 >&2 && rm -rf "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
+echo local8 >&2 && rmdir "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/ &&
+echo local9 >&2 && rmdir "$HOME"/.cache/gitpack/repo/github.com/ &&
+echo local10 >&2 && rmdir "$HOME"/.cache/gitpack/repo/ &&
+echo local11 >&2 && rmdir "$HOME"/.cache/gitpack/ &&
+echo local12 >&2 && rm "$HOME"/.local/share/gitpack/status.bak &&
 echo local13 >&2 && test ! "$(cat "$HOME"/.local/share/gitpack/status)" &&
 echo local14 >&2 && rm "$HOME"/.local/share/gitpack/status &&
-echo local15 >&2 && rm "$HOME"/.local/share/gitpack/status.bak &&
+echo local15 >&2 && rm "$HOME"/.local/share/gitpack/gitpack.log &&
 echo local16 >&2 && rmdir "$HOME"/.local/share/gitpack/ &&
 
 #-------------------------------------------------------------------------------
