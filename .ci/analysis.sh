@@ -5,7 +5,7 @@
 # github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
-#   Checks whether GitPack source code files meet a defined code style using a
+#   Checks whether GitPack source code files meet essential code style using a
 #   static code analysis.
 #-------------------------------------------------------------------------------
 
@@ -23,8 +23,8 @@ check_code_style() (
 
     # perform checks for each given script file
     for script_path in "$@"; do
-        check_line_length "$script_path" "$MAX_LINE_LENGTH" &&
-        check_func_length "$script_path" "$MAX_FUNC_LENGTH" || return
+        check_lines_length "$script_path" &&
+        check_functions "$script_path" || return
     done
 )
 
@@ -47,48 +47,71 @@ init_code_style() {
     } }'
 }
 
+#-------------------------------------------------------------------------------
+# LINES LENGHT
+#-------------------------------------------------------------------------------
+
 # DESCRIPTION:
-#   Checks whether each line of a given script file has at most a given number
+#   Checks whether each line of a given script file has at most a defined number
 #   of characters.
 # PARAMETERS:
 #   $1 - script path
-#   $2 - maximum characters per line
-check_line_length() (
+check_lines_length() (
     lineno=0 # initialize line counter
     while IFS= read -r line; do
         lineno="$((lineno + 1))" # increment line counter
-        if [ "${#line}" -gt "$2" ]; then # check line length
-            echo "$1:$lineno line has more than $2 characters" >&2
-            return 1
+        if [ "${#line}" -gt "$MAX_LINE_LENGTH" ]; then # check line length
+            echo "$1:$lineno line has more than $MAX_LINE_LENGTH characters" >&2; return 1
         fi
     done < "$1"
 )
 
+#-------------------------------------------------------------------------------
+# CHECK FUNCTIONS
+#-------------------------------------------------------------------------------
+
 # DESCRIPTION:
-#   Checks whether each function of a given script file has at most a given
-#   number of lines considering defined constants.
+#   Checks whether each function of a given script file meets code style.
 # PARAMETERS:
 #   $1 - script path
-#   $2 - maximum lines per function
-check_func_length() (
+check_functions() (
+    prev_lineno=; prev_function= # initialize previous function details
     # use '(' as a field separator to make creating the final output easier
     awk_out="$(awk -F '(' "$FUNC_SUMMARY" "$1")" &&
-    echo "$awk_out" | while read -r line; do # for each function summary
-        lineno="$(echo "$line" | cut -f 1 -d ' ')" && # extract line number
-        function="$(echo "$line" | cut -f 2 -d ' ')" && # extract function name
-        lines="$(echo "$line" | cut -f 3 -d ' ')" || return # extract function length in lines
+    echo "$awk_out" | while IFS= read -r line; do # for each function summary
+        lineno="$(echo "$line" | cut -f 1 -d ' ' -s)" && # extract line number
+        function="$(echo "$line" | cut -f 2 -d ' ' -s)" && # extract function name
+        lines="$(echo "$line" | cut -f 3 -d ' ' -s)" || return # extract function length in lines
 
-        for ignored_function in $IGNORED_FUNCS; do # exclude ignored functions
-            if [ "$function" = "$ignored_function" ]; then
-                lines="$2"
-            fi
-        done
-
-        if [ "$lines" -gt "$2" ]; then # check function length
-            echo "$1:$lineno $function() has more than $2 lines" >&2
-            return 1
+        if [ ! "$lineno" ] || [ ! "$function" ] || [ ! "$lines" ]; then
+            echo "$1:$prev_lineno $prev_function() has bad code style" >&2; return 1
         fi
+
+        if ! check_function_length "$function" "$lines" "$MAX_FUNC_LENGTH"; then
+            echo "$1:$lineno $function() has more than $MAX_FUNC_LENGTH lines" >&2; return 1
+        fi
+
+        prev_lineno="$lineno"; prev_function="$function" # store previous function details
     done
+)
+
+# DESCRIPTION:
+#   Checks whether a given function with a given number of lines has at most a
+#   given maximum number of lines considering ignored functions.
+# PARAMETERS:
+#   $1 - function name
+#   $2 - function lines
+#   #3 - maximum lines
+check_function_length() (
+    lines="$2" # store number of lines in the function
+
+    # exclude ignored functions
+    for ignored_function in $IGNORED_FUNCS; do
+        if [ "$1" = "$ignored_function" ]; then lines="$3"; fi
+    done
+
+    # function lines must be less or equal to maximum lines
+    test "$lines" -le "$3"
 )
 
 #-------------------------------------------------------------------------------

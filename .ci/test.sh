@@ -19,15 +19,14 @@ if ! tests_status="$(cat "$HOME"/gitpack-tests-status)"; then # load exit status
     echo 'cannot get exit status of tests' >&2; exit 1
 fi &&
 
-if [ "$tests_status" -eq 0 ]; then # if tests were successful, watch output
+if [ "$tests_status" -eq 0 ]; then # if tests were successful, check output
     # check if there is an error message (ignoring a diagnostic message format)
     echo testtests1 >&2 && while IFS= read -r line; do
         # if it does not match the diagnostic format, it is an error message
         if ! echo "$line" | grep -q '^[[:alpha:]]\+[[:digit:]]\+$'; then
             echo "error detected: $line" >&2; exit 1
         fi
-    done < "$HOME"/gitpack-tests-output &&
-    exit 0 # success
+    done < "$HOME"/gitpack-tests-output
 else
     exit "$tests_status" # fail
 fi
