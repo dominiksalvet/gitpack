@@ -987,9 +987,9 @@ init_db() {
 #   $1 - URL
 get_db_record() (
     log "$LOGTYPE_GET" "$1" "$STATUS_PATH" &&
-    get_db | while IFS= read -r db_record; do
-        url="$(get_db_record_url "$1")" || return
-        if [ "$url" = "$1" ]; then
+    get_db | while IFS= read -r db_record; do # for each database record
+        url="$(get_db_record_url "$db_record")" || return # get URL
+        if [ "$url" = "$1" ]; then # once it matches, prints record and return
             echo "$db_record"; return
         fi
     done
@@ -1016,23 +1016,23 @@ delete_db_records() (
 )
 
 # DESCRIPTION:
-#   Prints all records of the GitPack database.
-get_db() {
-    cat "$STATUS_PATH"
-}
-
-# DESCRIPTION:
 #   Prints all records of the GitPack database except those with a given URL.
 # PARAMETERS:
 #   $1 - URL
 get_pruned_db() (
-    get_db | while IFS= read -r db_record; do
-        url="$(get_db_record_url)" || return
-        if [ "$url" != "$1" ]; then
+    get_db | while IFS= read -r db_record; do # for each database record
+        url="$(get_db_record_url "$db_record")" || return # get URL
+        if [ "$url" != "$1" ]; then # do not print records with the given URL
             echo "$db_record"
         fi
     done
 )
+
+# DESCRIPTION:
+#   Prints all records of the GitPack database.
+get_db() {
+    cat "$STATUS_PATH"
+}
 
 # DESCRIPTION:
 #   Extracts a URL from a given database record.
