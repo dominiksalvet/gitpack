@@ -9,16 +9,8 @@
 #   data to the global installation data.
 #-------------------------------------------------------------------------------
 
-#-------------------------------------------------------------------------------
-# DEFINITIONS
-#-------------------------------------------------------------------------------
-
 readonly GLOBAL_LOG_PATH=/var/log/gitpack/gitpack.log
 readonly LOCAL_LOG_PATH="$HOME"/.local/share/gitpack/gitpack.log
-
-#-------------------------------------------------------------------------------
-# PRINT LOG
-#-------------------------------------------------------------------------------
 
 # dump the preferred log
 if [ -r "$LOCAL_LOG_PATH" ]; then # print local if exists

@@ -435,7 +435,7 @@ process_action() (
 
 # DESCRIPTION:
 #   Normalizes a given raw URL. It removes a version from the URL if present,
-#   and shortens the URL.
+#   and trims the URL.
 # PARAMETERS:
 #   $1 - raw URL
 raw_url_to_url() (

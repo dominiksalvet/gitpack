@@ -10,18 +10,25 @@
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
+# INITIALIZATION
+#-------------------------------------------------------------------------------
+
+# prepare constants used in the tests below
+echo init1 >&2 && SHORT_TRAVIS_COMMIT="$(echo "${TRAVIS_COMMIT:?}" | cut -c 1-7)" &&
+
+#-------------------------------------------------------------------------------
 # GLOBAL INSTALLATION
 #-------------------------------------------------------------------------------
 # Checks whether the current commit of GitPack can install itself globally.
 #-------------------------------------------------------------------------------
 
 # install, check status and uninstall it
-echo global1 >&2 && gitpack_out="$(sudo src/gitpack install github.com/dominiksalvet/gitpack="${TRAVIS_COMMIT:?}")" &&
-echo global2 >&2 && echo "$gitpack_out" | grep '^\[install\]' &&
-echo global3 >&2 && gitpack_out="$(sudo src/gitpack status -o github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
-echo global4 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
-echo global5 >&2 && gitpack_out="$(sudo src/gitpack uninstall -o github.com/dominiksalvet/gitpack)" &&
-echo global6 >&2 && echo "$gitpack_out" | grep '^\[uninstall\]' &&
+echo global1 >&2 && gitpack_out="$(sudo src/gitpack install -h github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
+echo global2 >&2 && test "$gitpack_out" = "[install] github.com/dominiksalvet/gitpack $SHORT_TRAVIS_COMMIT" &&
+echo global3 >&2 && gitpack_out="$(sudo src/gitpack status -oh github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
+echo global4 >&2 && test "$gitpack_out" = "[ok] github.com/dominiksalvet/gitpack $SHORT_TRAVIS_COMMIT" &&
+echo global5 >&2 && gitpack_out="$(sudo src/gitpack uninstall -oh github.com/dominiksalvet/gitpack)" &&
+echo global6 >&2 && test "$gitpack_out" = "[uninstall] github.com/dominiksalvet/gitpack $SHORT_TRAVIS_COMMIT" &&
 
 # clean all global GitPack files
 echo global7 >&2 && sudo rm -rf /var/cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
@@ -43,12 +50,12 @@ echo global17 >&2 && sudo rmdir /var/log/gitpack/ &&
 #-------------------------------------------------------------------------------
 
 # install, check status and uninstall it
-echo local1 >&2 && gitpack_out="$(src/gitpack install github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
-echo local2 >&2 && echo "$gitpack_out" | grep '^\[install\]' &&
-echo local3 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
-echo local4 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
-echo local5 >&2 && gitpack_out="$(src/gitpack uninstall -o github.com/dominiksalvet/gitpack)" &&
-echo local6 >&2 && echo "$gitpack_out" | grep '^\[uninstall\]' &&
+echo local1 >&2 && gitpack_out="$(src/gitpack install -h github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
+echo local2 >&2 && test "$gitpack_out" = "[install] github.com/dominiksalvet/gitpack $SHORT_TRAVIS_COMMIT" &&
+echo local3 >&2 && gitpack_out="$(src/gitpack status -oh github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
+echo local4 >&2 && test "$gitpack_out" = "[ok] github.com/dominiksalvet/gitpack $SHORT_TRAVIS_COMMIT" &&
+echo local5 >&2 && gitpack_out="$(src/gitpack uninstall -oh github.com/dominiksalvet/gitpack)" &&
+echo local6 >&2 && test "$gitpack_out" = "[uninstall] github.com/dominiksalvet/gitpack $SHORT_TRAVIS_COMMIT" &&
 
 # create all local GitPack files
 echo local7 >&2 && rm -rf "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
@@ -72,38 +79,39 @@ echo local16 >&2 && rmdir "$HOME"/.local/share/gitpack/ &&
 echo command1 >&2 && src/gitpack list &&
 echo command2 >&2 && src/gitpack clean &&
 echo command3 >&2 && gitpack_out="$(src/gitpack paths)" &&
-echo command4 >&2 && echo "$gitpack_out" | grep -F 'log '"$HOME"/.local/share/gitpack/ &&
-echo command5 >&2 && echo "$gitpack_out" | grep -F 'cache '"$HOME"/.cache/gitpack/ &&
-echo command6 >&2 && echo "$gitpack_out" | grep -F 'state '"$HOME"/.local/share/gitpack/ &&
+echo command4 >&2 && echo "$gitpack_out" | grep -Fx 'log '"$HOME"/.local/share/gitpack/ &&
+echo command5 >&2 && echo "$gitpack_out" | grep -Fx 'cache '"$HOME"/.cache/gitpack/ &&
+echo command6 >&2 && echo "$gitpack_out" | grep -Fx 'state '"$HOME"/.local/share/gitpack/ &&
 echo command7 >&2 && src/gitpack about &&
 echo command8 >&2 && src/gitpack help &&
 
 # install older version
 echo install1 >&2 && gitpack_out="$(src/gitpack status github.com/dominiksalvet/gitpack=0.1.0)" &&
-echo install2 >&2 && echo "$gitpack_out" | grep '^\[nothing\]' &&
+echo install2 >&2 && test "$gitpack_out" = '[nothing] github.com/dominiksalvet/gitpack -> 0.1.0' &&
 echo install3 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack=0.1.0)" &&
-echo install4 >&2 && echo "$gitpack_out" | grep '^\[install\]' &&
+echo install4 >&2 && test "$gitpack_out" = '[install] github.com/dominiksalvet/gitpack 0.1.0' &&
 echo install5 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack=0.1.0)" &&
-echo install6 >&2 && echo "$gitpack_out" | grep '^\[installed\]' &&
+echo install6 >&2 && test "$gitpack_out" = '[installed] github.com/dominiksalvet/gitpack 0.1.0' &&
 echo install7 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack=0.1.0)" &&
-echo install8 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
+echo install8 >&2 && test "$gitpack_out" = '[ok] github.com/dominiksalvet/gitpack 0.1.0' &&
 echo install9 >&2 && gitpack_out="$(src/gitpack list)" &&
-echo install10 >&2 && echo "$gitpack_out" | grep -F 'github.com/dominiksalvet/gitpack' &&
+echo install10 >&2 &&
+    test "$gitpack_out" = 'github.com/dominiksalvet/gitpack 5bc956ff49aca7d21f868e700762232b25085c3d' &&
 # check installed files
 echo install11 >&2 && test -x "$HOME"/.local/bin/gitpack &&
 
 # install current version + test status file recovery
 echo update1 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack)" &&
-echo update2 >&2 && echo "$gitpack_out" | grep '^\[older\]' &&
+echo update2 >&2 && echo "$gitpack_out" | grep -F '[older] github.com/dominiksalvet/gitpack 0.1.0' &&
 echo update3 >&2 && rm "$HOME"/.local/share/gitpack/status &&
 echo update4 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack)" &&
-echo update5 >&2 && echo "$gitpack_out" | grep '^\[update\]' &&
+echo update5 >&2 && echo "$gitpack_out" | grep -F '[update] github.com/dominiksalvet/gitpack' &&
 echo update6 >&2 && rm "$HOME"/.local/share/gitpack/status &&
 echo update7 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack)" &&
-echo update8 >&2 && echo "$gitpack_out" | grep '^\[installed\]' &&
+echo update8 >&2 && echo "$gitpack_out" | grep -F '[installed] github.com/dominiksalvet/gitpack' &&
 echo update9 >&2 && rm "$HOME"/.local/share/gitpack/status &&
 echo update10 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack)" &&
-echo update11 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
+echo update11 >&2 && echo "$gitpack_out" | grep -F '[ok] github.com/dominiksalvet/gitpack' &&
 echo update12 >&2 && rm "$HOME"/.local/share/gitpack/status &&
 echo update13 >&2 && gitpack_out="$(src/gitpack list)" &&
 echo update14 >&2 && echo "$gitpack_out" | grep -F 'github.com/dominiksalvet/gitpack' &&
@@ -113,46 +121,54 @@ echo update16 >&2 && test -x "$HOME"/.local/bin/gitpack &&
 echo update17 >&2 && test -f "$HOME"/.bash_completion.d/gitpack-completion.bash &&
 echo update18 >&2 && test ! -x "$HOME"/.bash_completion.d/gitpack-completion.bash &&
 
-# downgrade to older version
-echo downgrade1 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack=0.1.0)" &&
-echo downgrade2 >&2 && echo "$gitpack_out" | grep '^\[newer\]' &&
-echo downgrade3 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack=0.1.0)" &&
-echo downgrade4 >&2 && echo "$gitpack_out" | grep '^\[downgrade\]' &&
-echo downgrade5 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack=0.1.0)" &&
-echo downgrade6 >&2 && echo "$gitpack_out" | grep '^\[installed\]' &&
-echo downgrade7 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack=0.1.0)" &&
-echo downgrade8 >&2 && echo "$gitpack_out" | grep '^\[ok\]' &&
+# downgrade to older version + test hash mode
+echo downgrade1 >&2 && gitpack_out="$(src/gitpack status -oh github.com/dominiksalvet/gitpack=0.1.0)" &&
+echo downgrade2 >&2 && echo "$gitpack_out" | grep -F '[newer] github.com/dominiksalvet/gitpack' &&
+echo downgrade3 >&2 && gitpack_out="$(src/gitpack install -oh github.com/dominiksalvet/gitpack=0.1.0)" &&
+echo downgrade4 >&2 && test "$gitpack_out" = '[downgrade] github.com/dominiksalvet/gitpack 5bc956f' &&
+echo downgrade5 >&2 && gitpack_out="$(src/gitpack install -oh github.com/dominiksalvet/gitpack=0.1.0)" &&
+echo downgrade6 >&2 && test "$gitpack_out" = '[installed] github.com/dominiksalvet/gitpack 5bc956f' &&
+echo downgrade7 >&2 && gitpack_out="$(src/gitpack status -oh github.com/dominiksalvet/gitpack=0.1.0)" &&
+echo downgrade8 >&2 && test "$gitpack_out" = '[ok] github.com/dominiksalvet/gitpack 5bc956f' &&
 echo downgrade9 >&2 && gitpack_out="$(src/gitpack list)" &&
-echo downgrade10 >&2 && echo "$gitpack_out" | grep -F 'github.com/dominiksalvet/gitpack' &&
+echo downgrade10 >&2 &&
+    test "$gitpack_out" = 'github.com/dominiksalvet/gitpack 5bc956ff49aca7d21f868e700762232b25085c3d' &&
 # check installed files
 echo downgrade11 >&2 && test -x "$HOME"/.local/bin/gitpack &&
 echo downgrade12 >&2 && test ! -e "$HOME"/.bash_completion.d/gitpack-completion.bash &&
 
-# uninstall
-echo uninstall1 >&2 && gitpack_out="$(src/gitpack uninstall -o github.com/dominiksalvet/gitpack)" &&
-echo uninstall2 >&2 && echo "$gitpack_out" | grep '^\[uninstall\]' &&
-echo uninstall3 >&2 && gitpack_out="$(src/gitpack uninstall -o github.com/dominiksalvet/gitpack)" &&
-echo uninstall4 >&2 && echo "$gitpack_out" | grep '^\[uninstalled\]' &&
-echo uninstall5 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack)" &&
-echo uninstall6 >&2 && echo "$gitpack_out" | grep '^\[nothing\]' &&
+# uninstall + test hash mode
+echo uninstall1 >&2 && gitpack_out="$(src/gitpack uninstall -oh github.com/dominiksalvet/gitpack)" &&
+echo uninstall2 >&2 && test "$gitpack_out" = '[uninstall] github.com/dominiksalvet/gitpack 5bc956f' &&
+echo uninstall3 >&2 && gitpack_out="$(src/gitpack uninstall -oh github.com/dominiksalvet/gitpack)" &&
+echo uninstall4 >&2 && test "$gitpack_out" = '[uninstalled] github.com/dominiksalvet/gitpack' &&
+echo uninstall5 >&2 && gitpack_out="$(src/gitpack status -oh github.com/dominiksalvet/gitpack)" &&
+echo uninstall6 >&2 && echo "$gitpack_out" | grep -F '[nothing] github.com/dominiksalvet/gitpack' &&
+echo uninstall7 >&2 && gitpack_out="$(src/gitpack list)" &&
+echo uninstall8 >&2 && test ! "$gitpack_out" &&
 # check installed files
-echo uninstall7 >&2 && test ! -e "$HOME"/.local/bin/gitpack &&
-echo uninstall8 >&2 && test ! -e "$HOME"/.bash_completion.d/gitpack-completion.bash &&
+echo uninstall9 >&2 && test ! -e "$HOME"/.local/bin/gitpack &&
+echo uninstall10 >&2 && test ! -e "$HOME"/.bash_completion.d/gitpack-completion.bash &&
 
 # expected to fail
 echo xfail1 >&2 && ! src/gitpack 2>/dev/null && # no argument
 echo xfail2 >&2 && ! src/gitpack duck 2>/dev/null && # invalid argument
 echo xfail3 >&2 && ! src/gitpack -o 2>/dev/null && # invalid argument
-echo xfail4 >&2 && ! src/gitpack status 2>/dev/null && # no URL
-echo xfail5 >&2 && ! src/gitpack status -o 2>/dev/null && # no URL
-echo xfail6 >&2 && ! src/gitpack status -w github.com/dominiksalvet/gitpack 2>/dev/null && # invalid option
+echo xfail4 >&2 && ! src/gitpack -h 2>/dev/null && # invalid argument
+echo xfail5 >&2 && ! src/gitpack status 2>/dev/null && # no URL
+echo xfail6 >&2 && ! src/gitpack status -o 2>/dev/null && # no URL
+echo xfail7 >&2 && ! src/gitpack status -h 2>/dev/null && # no URL
+echo xfail8 >&2 && ! src/gitpack status -w github.com/dominiksalvet/gitpack 2>/dev/null && # invalid option
 # unsupported URL
-echo xfail7 >&2 && ! gitpack_out="$(src/gitpack status github.com 2>&1)" &&
-echo xfail8 >&2 && echo "$gitpack_out" | grep '^<ERROR>' &&
-echo xfail9 >&2 && ! gitpack_out="$(src/gitpack status github.com/a 2>&1)" &&
-echo xfail10 >&2 && echo "$gitpack_out" | grep '^<ERROR>' &&
-echo xfail11 >&2 && ! gitpack_out="$(src/gitpack status github.com/a/b/c 2>&1)" &&
-echo xfail12 >&2 && echo "$gitpack_out" | grep '^<ERROR>' &&
+echo xfail9 >&2 && ! gitpack_out="$(src/gitpack status github.com 2>&1)" &&
+echo xfail10 >&2 && gitpack_out="$(echo "$gitpack_out" | tail -n 1)" &&
+echo xfail11 >&2 && test "$gitpack_out" = '<ERROR> status github.com' &&
+echo xfail12 >&2 && ! gitpack_out="$(src/gitpack status github.com/a 2>&1)" &&
+echo xfail13 >&2 && gitpack_out="$(echo "$gitpack_out" | tail -n 1)" &&
+echo xfail14 >&2 && test "$gitpack_out" = '<ERROR> status github.com/a' &&
+echo xfail15 >&2 && ! gitpack_out="$(src/gitpack status github.com/a/b/c 2>&1)" &&
+echo xfail16 >&2 && gitpack_out="$(echo "$gitpack_out" | tail -n 1)" &&
+echo xfail17 >&2 && test "$gitpack_out" = '<ERROR> status github.com/a/b/c' &&
 
 #-------------------------------------------------------------------------------
 # FILES
