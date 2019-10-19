@@ -124,7 +124,7 @@ echo update18 >&2 && test ! -x "$HOME"/.bash_completion.d/gitpack-completion.bas
 echo downgrade1 >&2 && gitpack_out="$(src/gitpack status -oh github.com/dominiksalvet/gitpack=0.1.0)" &&
 echo downgrade2 >&2 && echo "$gitpack_out" | grep -F '[newer] github.com/dominiksalvet/gitpack' &&
 echo downgrade3 >&2 && gitpack_out="$(src/gitpack install -oh github.com/dominiksalvet/gitpack=0.1.0)" &&
-echo downgrade4 >&2 && test "$gitpack_out" = '[downgrade] github.com/dominiksalvet/gitpack 5bc956f' &&
+echo downgrade4 >&2 && echo "$gitpack_out" | grep -F '[downgrade] github.com/dominiksalvet/gitpack 5bc956f' &&
 echo downgrade5 >&2 && gitpack_out="$(src/gitpack install -oh github.com/dominiksalvet/gitpack=0.1.0)" &&
 echo downgrade6 >&2 && test "$gitpack_out" = '[installed] github.com/dominiksalvet/gitpack 5bc956f' &&
 echo downgrade7 >&2 && gitpack_out="$(src/gitpack status -oh github.com/dominiksalvet/gitpack=0.1.0)" &&
