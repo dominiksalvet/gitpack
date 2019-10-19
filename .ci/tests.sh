@@ -14,7 +14,7 @@
 #-------------------------------------------------------------------------------
 
 # prepare constants used in the tests below
-echo init1 >&2 && SHORT_TRAVIS_COMMIT="$(echo "${TRAVIS_COMMIT:?}" | cut -c 1-7)" &&
+echo inittests1 >&2 && SHORT_TRAVIS_COMMIT="$(echo "${TRAVIS_COMMIT:?}" | cut -c 1-7)" &&
 
 #-------------------------------------------------------------------------------
 # GLOBAL INSTALLATION
@@ -95,8 +95,7 @@ echo install6 >&2 && test "$gitpack_out" = '[installed] github.com/dominiksalvet
 echo install7 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack=0.1.0)" &&
 echo install8 >&2 && test "$gitpack_out" = '[ok] github.com/dominiksalvet/gitpack 0.1.0' &&
 echo install9 >&2 && gitpack_out="$(src/gitpack list)" &&
-echo install10 >&2 &&
-    test "$gitpack_out" = 'github.com/dominiksalvet/gitpack 5bc956ff49aca7d21f868e700762232b25085c3d' &&
+echo install10 >&2 && test "$gitpack_out" = 'github.com/dominiksalvet/gitpack 0.1.0' &&
 # check installed files
 echo install11 >&2 && test -x "$HOME"/.local/bin/gitpack &&
 
@@ -131,8 +130,7 @@ echo downgrade6 >&2 && test "$gitpack_out" = '[installed] github.com/dominiksalv
 echo downgrade7 >&2 && gitpack_out="$(src/gitpack status -oh github.com/dominiksalvet/gitpack=0.1.0)" &&
 echo downgrade8 >&2 && test "$gitpack_out" = '[ok] github.com/dominiksalvet/gitpack 5bc956f' &&
 echo downgrade9 >&2 && gitpack_out="$(src/gitpack list)" &&
-echo downgrade10 >&2 &&
-    test "$gitpack_out" = 'github.com/dominiksalvet/gitpack 5bc956ff49aca7d21f868e700762232b25085c3d' &&
+echo downgrade10 >&2 && test "$gitpack_out" = 'github.com/dominiksalvet/gitpack 0.1.0' &&
 # check installed files
 echo downgrade11 >&2 && test -x "$HOME"/.local/bin/gitpack &&
 echo downgrade12 >&2 && test ! -e "$HOME"/.bash_completion.d/gitpack-completion.bash &&
