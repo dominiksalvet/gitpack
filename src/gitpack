@@ -23,6 +23,7 @@ main() {
     check_sw_deps &&
     init_constants &&
     init_strings &&
+    init_core_config &&
     init_config &&
     store_command "$0 $*" &&
     process_args "$@" # process all given GitPack arguments
@@ -103,23 +104,11 @@ init_constants() {
     readonly LOGTYPE_PRERM=prerm # prerm script execution
     readonly LOGTYPE_RM=rm # remove files using map
     readonly LOGTYPE_POSTRM=postrm # postrm script execution
-
-    # Git-related constants
-    readonly REMOTE_HEAD_REF=refs/remote/HEAD
-    # Git fetch remote refspecs
-    readonly HEAD_REFSPEC=+HEAD:"$REMOTE_HEAD_REF" # remote HEAD
-    readonly TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # remote tags
-    readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # remote branches
-
-    # other constants
-    readonly URL_REGEX='^[[:alnum:]_][[:alnum:]_\.-]*'\
-'(/[[:alnum:]_][[:alnum:]_\.-]*){2}$'
-    readonly DEP_PREFIX='+ ' # prefix for processing dependencies
 }
 
 # DESCRIPTION:
-#   Initializes strings usually used to display reports to the user. Constants
-#   must be already initialized.
+#   Initializes strings used to display output to end users. Constants must be
+#   already initialized.
 init_strings() {
     readonly HELP_MESSAGE="USAGE:
   gitpack ACTION [OPTION...] URL[=VERSION]...
@@ -147,6 +136,27 @@ The simplest Git-based package manager.
 
 Copyright 2019 Dominik Salvet
 github.com/dominiksalvet/gitpack"
+}
+
+#-------------------------------------------------------------------------------
+# INITIALIZE CONFIGURATION
+#-------------------------------------------------------------------------------
+
+# DESCRIPTION:
+#   Initializes core GitPack configuration constants. Their values should not be
+#   modified unless you really know what you are doing.
+init_core_config() {
+    # Git-related constants
+    readonly REMOTE_HEAD_REF=refs/remote/HEAD
+    # Git fetch remote refspecs
+    readonly HEAD_REFSPEC=+HEAD:"$REMOTE_HEAD_REF" # remote HEAD
+    readonly TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # remote tags
+    readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # remote branches
+
+    # other constants
+    readonly URL_REGEX='^[[:alnum:]_][[:alnum:]_\.-]*'\
+'(/[[:alnum:]_][[:alnum:]_\.-]*){2}$'
+    readonly DEP_PREFIX='+ ' # prefix for processing dependencies
 }
 
 # DESCRIPTION:
