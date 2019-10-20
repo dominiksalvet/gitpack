@@ -58,6 +58,10 @@ init_constants() {
     readonly ACTION_INSTALL=install
     readonly ACTION_UNINSTALL=uninstall
     readonly ACTION_STATUS=status
+    # GitPack runtime commands
+    readonly COMMAND_LIST=list
+    readonly COMMAND_CLEAN=clean
+    readonly COMMAND_PATHS=paths
 
     # project states of install action
     readonly STATE_INSTALL=install # just installed
@@ -111,8 +115,9 @@ init_constants() {
 #   already initialized.
 init_strings() {
     readonly HELP_MESSAGE="USAGE:
-  gitpack ACTION [OPTION...] URL[=VERSION]...
-  gitpack COMMAND
+  gitpack ACTION [-oh] URL[=VERSION]...
+  gitpack list [-h]
+  gitpack (clean | paths | help | about)
 
 ACTION:
   $ACTION_INSTALL    install/update projects
@@ -122,7 +127,6 @@ ACTION:
 OPTION:
   -o  offline mode
   -h  show commit hashes
-  --  no further options
 
 COMMAND:
   list   list installed projects
@@ -146,16 +150,19 @@ github.com/dominiksalvet/gitpack"
 #   Initializes core GitPack configuration constants. Their values should not be
 #   modified unless you really know what you are doing.
 init_core_config() {
-    # Git-related constants
-    readonly REMOTE_HEAD_REF=refs/remote/HEAD
-    # Git fetch remote refspecs
-    readonly HEAD_REFSPEC=+HEAD:"$REMOTE_HEAD_REF" # remote HEAD
-    readonly TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # remote tags
-    readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # remote branches
+    # lists of possible options per argument types
+    readonly ACTION_OPTS=oh # for any action
+    readonly LIST_OPTS=h # for the list command
 
-    # other constants
+    # Git-related configuration
+    readonly REMOTE_HEAD_REF=refs/remote/HEAD # full remote HEAD reference path
+    readonly HEAD_REFSPEC=+HEAD:"$REMOTE_HEAD_REF" # fetch remote HEAD
+    readonly TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # fetch remote tags
+    readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # fetch remote branches
+
+    # other configuration
     readonly URL_REGEX='^[[:alnum:]_][[:alnum:]_\.-]*'\
-'(/[[:alnum:]_][[:alnum:]_\.-]*){2}$'
+'(/[[:alnum:]_][[:alnum:]_\.-]*){2}$' # valid URL regular expression
     readonly DEP_PREFIX='+ ' # prefix for processing dependencies
 }
 
@@ -185,11 +192,9 @@ store_command() {
 process_args() {
     case "$1" in # process arguments based on the first argument
         "$ACTION_INSTALL" | "$ACTION_UNINSTALL" | "$ACTION_STATUS")
-            # initialize in this environment and process action-based arguments
-            init_runtime && process_action_args "$@" ;;
-        list) init_runtime && list ;;
-        clean) init_runtime && clean ;;
-        paths) init_runtime && paths ;;
+            init_runtime && process_action_args "$@" ;; # actions
+        "$COMMAND_LIST" | "$COMMAND_CLEAN" | "$COMMAND_PATHS")
+            init_runtime && process_command_args "$@" ;; # commands
         help) echo "$HELP_MESSAGE"; return ;;
         about) echo "$ABOUT_MESSAGE"; return ;;
         '') echo 'no argument provided' >&2; return 1 ;;
@@ -206,10 +211,10 @@ process_args() {
 #   $1 - action
 #   $@ - action arguments
 process_action_args() (
-    action="$1" && # use the given action
+    action="$1" # store the given action
     shift && # shift to action arguments
 
-    process_action_opts "$@" && # action options (sets the OPTIND variable)
+    process_opts "$ACTION_OPTS" "$@" && # sets the OPTIND variable
     shift "$((OPTIND - 1))" && # shift to URL arguments
     if [ "$#" -eq 0 ]; then # check if there is any URL argument
         echof 'no URL provided'; return 1
@@ -221,15 +226,37 @@ process_action_args() (
 )
 
 # DESCRIPTION:
-#   Processes given arguments as action options. It sets the OPTIND variable
-#   holding the position of the following argument.
+#   Processes a given runtime command and its arguments. Expects the runtime
+#   environment to be already initialized.
 # PARAMETERS:
-#   $@ - action arguments
-process_action_opts() {
-    while getopts :oh _opt; do # for each option argument
+#   $1 - command
+#   $@ - command arguments
+process_command_args() (
+    command="$1" # store the given command
+    shift && # shift to command arguments
+
+    # choose and execute the command
+    case "$command" in
+        "$COMMAND_LIST") process_opts "$LIST_OPTS" "$@" && list ;;
+        "$COMMAND_CLEAN") clean ;;
+        "$COMMAND_PATHS") paths ;;
+    esac
+)
+
+# DESCRIPTION:
+#   Processes given arguments as a given type of options. It sets the OPTIND
+#   variable holding the position of the following argument.
+# PARAMETERS:
+#   $1 - options type
+#   $@ - arguments
+process_opts() {
+    _opts_type="$1" # store the given type of options
+    shift && # shift to actual arguments
+
+    while getopts :"$_opts_type" _opt; do # for each option argument
         case "$_opt" in
-            o)  OFFLINE_MODE=true ;;
-            h)  hash_mode=true ;;
+            o) OFFLINE_MODE=true ;;
+            h) hash_mode=true ;;
             \?) echof "invalid option -$OPTARG"; return 1 ;;
         esac
     done
@@ -273,6 +300,7 @@ def_forced_vars() {
     _user_id=
     _system_name=
     _signal_status=
+    _opts_type=
     _opt=
 }
 
