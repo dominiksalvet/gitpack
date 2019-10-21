@@ -241,7 +241,7 @@ echo log20 >&2 && test "$(grep -Fc '[postcp]' "$HOME"/.local/share/gitpack/gitpa
 echo log21 >&2 && test "$(grep -Fc '[prerm]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
 echo log22 >&2 && test "$(grep -Fc '[rm]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
 echo log23 >&2 && test "$(grep -Fc '[postrm]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log24 >&2 && test "$(wc -l < "$HOME"/.local/share/gitpack/gitpack.log)" -eq 259 &&
+echo log24 >&2 && test "$(wc -l < "$HOME"/.local/share/gitpack/gitpack.log)" -eq 262 &&
 
 # clean files (it affects log and cache files)
 echo clean1 >&2 && src/gitpack clean &&
