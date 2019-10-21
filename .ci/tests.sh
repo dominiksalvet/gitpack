@@ -14,7 +14,7 @@
 #-------------------------------------------------------------------------------
 
 # prepare constants used in the tests below
-echo inittests1 >&2 && SHORT_TRAVIS_COMMIT="$(echo "${TRAVIS_COMMIT:?}" | cut -c 1-7)" &&
+echo inittests1 >&2 && SHORT_TRAVIS_COMMIT="$(echo "${TRAVIS_COMMIT:?}" | cut -c 1-7)" && true &&
 
 #-------------------------------------------------------------------------------
 # GLOBAL INSTALLATION
