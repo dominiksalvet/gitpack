@@ -34,7 +34,8 @@ main() {
 check_sw_deps() (
     # a list of required software
     sw_deps='command echo [ cd test pwd rm id mkdir touch grep git uname read cp
-             head cut true basename find rmdir tr date tail kill sort getopts'
+             head cut true basename find rmdir tr date tail kill sort getopts
+             wc'
 
     # check if any piece of software is missing
     for sw_dep in $sw_deps; do
@@ -161,8 +162,7 @@ init_core_config() {
     readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # fetch remote branches
 
     # other configuration
-    readonly URL_REGEX='^[[:alnum:]_][[:alnum:]_\.-]*'\
-'(/[[:alnum:]_][[:alnum:]_\.-]*){2}$' # valid URL regular expression
+    readonly BAD_URL_REGEX='((^|/)(\.|\.\.)($|/)| )' # bad URL regex
     readonly DEP_PREFIX='+ ' # prefix for processing dependencies
 }
 
@@ -500,7 +500,9 @@ raw_url_to_version() (
 #   $1 - URL
 check_url() {
     log "$LOGTYPE_URL" "$1" &&
-    if ! echo "$1" | grep -qE "$URL_REGEX"; then
+
+    if [ "$(echo "$1" | wc -l)" -ne 1 ] || # URL must be a single line
+       echo "$1" | grep -qE "$BAD_URL_REGEX"; then
         echof 'unsupported URL delivered'; return 1
     fi
 }
