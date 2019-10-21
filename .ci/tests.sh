@@ -156,17 +156,19 @@ echo xfail4 >&2 && ! src/gitpack -h 2>/dev/null && # invalid argument
 echo xfail5 >&2 && ! src/gitpack status 2>/dev/null && # no URL
 echo xfail6 >&2 && ! src/gitpack status -o 2>/dev/null && # no URL
 echo xfail7 >&2 && ! src/gitpack status -h 2>/dev/null && # no URL
-echo xfail8 >&2 && ! src/gitpack status -w github.com/dominiksalvet/gitpack 2>/dev/null && # invalid option
-# unsupported URL
-echo xfail9 >&2 && ! gitpack_out="$(src/gitpack status github.com 2>&1)" &&
-echo xfail10 >&2 && gitpack_out="$(echo "$gitpack_out" | tail -n 1)" &&
-echo xfail11 >&2 && test "$gitpack_out" = '<ERROR> status github.com' &&
-echo xfail12 >&2 && ! gitpack_out="$(src/gitpack status github.com/a 2>&1)" &&
-echo xfail13 >&2 && gitpack_out="$(echo "$gitpack_out" | tail -n 1)" &&
-echo xfail14 >&2 && test "$gitpack_out" = '<ERROR> status github.com/a' &&
-echo xfail15 >&2 && ! gitpack_out="$(src/gitpack status github.com/a/b/c 2>&1)" &&
-echo xfail16 >&2 && gitpack_out="$(echo "$gitpack_out" | tail -n 1)" &&
-echo xfail17 >&2 && test "$gitpack_out" = '<ERROR> status github.com/a/b/c' &&
+echo xfail8 >&2 && ! src/gitpack status -z github.com/dominiksalvet/gitpack 2>/dev/null && # invalid option
+# unsupported URLs
+echo xfail9 >&2 && ! src/gitpack status . 2>/dev/null &&
+echo xfail10 >&2 && ! src/gitpack status .. 2>/dev/null &&
+echo xfail11 >&2 && ! src/gitpack status xfail/. 2>/dev/null &&
+echo xfail12 >&2 && ! src/gitpack status xfail/.. 2>/dev/null &&
+echo xfail13 >&2 && ! src/gitpack status ./xfail 2>/dev/null &&
+echo xfail14 >&2 && ! src/gitpack status ../xfail 2>/dev/null &&
+echo xfail15 >&2 && ! src/gitpack status xfail/./xfail 2>/dev/null &&
+echo xfail16 >&2 && ! src/gitpack status xfail/../xfail 2>/dev/null &&
+echo xfail17 >&2 && ! src/gitpack status 'x fail' 2>/dev/null &&
+echo xfail18 >&2 && ! src/gitpack status 'x
+fail' 2>/dev/null &&
 
 #-------------------------------------------------------------------------------
 # FILES
@@ -184,7 +186,7 @@ echo logfiles6 >&2 && test -r "$HOME"/.local/share/gitpack/gitpack.log &&
 echo logfiles7 >&2 && test -w "$HOME"/.local/share/gitpack/gitpack.log &&
 echo logfiles8 >&2 && test ! -x "$HOME"/.local/share/gitpack/gitpack.log &&
 
-# existence of cache files
+# existing cache files
 echo cachefiles1 >&2 && test -d "$HOME"/.cache/gitpack/ &&
 echo cachefiles2 >&2 && test -r "$HOME"/.cache/gitpack/ &&
 echo cachefiles3 >&2 && test -w "$HOME"/.cache/gitpack/ &&
@@ -193,19 +195,16 @@ echo cachefiles5 >&2 && test -d "$HOME"/.cache/gitpack/repo/ &&
 echo cachefiles6 >&2 && test -r "$HOME"/.cache/gitpack/repo/ &&
 echo cachefiles7 >&2 && test -w "$HOME"/.cache/gitpack/repo/ &&
 echo cachefiles8 >&2 && test -x "$HOME"/.cache/gitpack/repo/ &&
-echo cachefiles9 >&2 && test -d "$HOME"/.cache/gitpack/repo/github.com/ &&
-echo cachefiles10 >&2 && test -r "$HOME"/.cache/gitpack/repo/github.com/ &&
-echo cachefiles11 >&2 && test -w "$HOME"/.cache/gitpack/repo/github.com/ &&
-echo cachefiles12 >&2 && test -x "$HOME"/.cache/gitpack/repo/github.com/ &&
-echo cachefiles13 >&2 && test -d "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo cachefiles14 >&2 && test -r "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo cachefiles15 >&2 && test -w "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo cachefiles16 >&2 && test -x "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/ &&
-echo cachefiles17 >&2 && test -d "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-echo cachefiles18 >&2 && test -r "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-echo cachefiles19 >&2 && test -w "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-echo cachefiles20 >&2 && test -x "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
-echo cachefiles21 >&2 && test ! -d "$HOME"/.cache/gitpack/repo/github.com/a/ &&
+echo cachefiles9 >&2 && test -d "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
+echo cachefiles10 >&2 && test -r "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
+echo cachefiles11 >&2 && test -w "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
+echo cachefiles12 >&2 && test -x "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
+# nonexistent cache files
+echo cachefiles13 >&2 && test ! -d "$HOME"/.cache/gitpack/repo/xfail/ &&
+echo cachefiles14 >&2 && test ! -d "$HOME"/.cache/gitpack/repo/xfail/xfail/ &&
+echo cachefiles15 >&2 && test ! -d "$HOME"/.cache/gitpack/repo/'x fail'/ &&
+echo cachefiles16 >&2 && test ! -d "$HOME"/.cache/gitpack/repo/'x
+fail'/ &&
 
 # existence of state files
 echo statefiles1 >&2 && test -r "$HOME"/.local/share/gitpack/status &&
