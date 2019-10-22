@@ -225,23 +225,24 @@ echo log4 >&2 && test "$(grep -Fc '[exit]' "$HOME"/.local/share/gitpack/gitpack.
 echo log5 >&2 && test "$(grep -Fc '[list]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 5 &&
 echo log6 >&2 && test "$(grep -Fc '[clean]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 1 &&
 echo log7 >&2 && test "$(grep -Fc '[paths]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 1 &&
-echo log8 >&2 && test "$(grep -Fc '[action]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 25 &&
-echo log9 >&2 && test "$(grep -Fc '[url]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 25 &&
-echo log10 >&2 && test "$(grep -Fc '[repo]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
-echo log11 >&2 && test "$(grep -Fc '[execute]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
-echo log12 >&2 && test "$(grep -Fc '[deps]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log13 >&2 && test "$(grep -Fc '[db]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 36 &&
-echo log14 >&2 && test "$(grep -Fc '[get]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
-echo log15 >&2 && test "$(grep -Fc '[insert]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
-echo log16 >&2 && test "$(grep -Fc '[delete]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
-echo log17 >&2 && test "$(grep -Fc '[backup]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 22 &&
-echo log18 >&2 && test "$(grep -Fc '[precp]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 1 &&
-echo log19 >&2 && test "$(grep -Fc '[cp]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
-echo log20 >&2 && test "$(grep -Fc '[postcp]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log21 >&2 && test "$(grep -Fc '[prerm]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log22 >&2 && test "$(grep -Fc '[rm]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
-echo log23 >&2 && test "$(grep -Fc '[postrm]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log24 >&2 && test "$(wc -l < "$HOME"/.local/share/gitpack/gitpack.log)" -eq 262 &&
+echo log8 >&2 && test "$(grep -Fc '[install]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 6 &&
+echo log9 >&2 && test "$(grep -Fc '[uninstall]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 2 &&
+echo log10 >&2 && test "$(grep -Fc '[status]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 17 &&
+echo log11 >&2 && test "$(grep -Fc '[url]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 25 &&
+echo log12 >&2 && test "$(grep -Fc '[repo]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
+echo log13 >&2 && test "$(grep -Fc '[deps]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
+echo log14 >&2 && test "$(grep -Fc '[db]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 36 &&
+echo log15 >&2 && test "$(grep -Fc '[get]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
+echo log16 >&2 && test "$(grep -Fc '[insert]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo log17 >&2 && test "$(grep -Fc '[delete]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo log18 >&2 && test "$(grep -Fc '[backup]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 22 &&
+echo log19 >&2 && test "$(grep -Fc '[precp]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 1 &&
+echo log20 >&2 && test "$(grep -Fc '[cp]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo log21 >&2 && test "$(grep -Fc '[postcp]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
+echo log22 >&2 && test "$(grep -Fc '[prerm]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
+echo log23 >&2 && test "$(grep -Fc '[rm]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
+echo log24 >&2 && test "$(grep -Fc '[postrm]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
+echo log25 >&2 && test "$(wc -l < "$HOME"/.local/share/gitpack/gitpack.log)" -eq 247 &&
 
 # clean files (it affects log and cache files)
 echo clean1 >&2 && src/gitpack clean &&

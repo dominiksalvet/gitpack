@@ -85,15 +85,9 @@ init_constants() {
     readonly LOGTYPE_FAIL=fail # any recorder fail
     readonly LOGTYPE_SIGNAL=signal # a handled signal
     readonly LOGTYPE_EXIT=exit # exit the program
-    # command log types
-    readonly LOGTYPE_LIST=list # list command
-    readonly LOGTYPE_CLEAN=clean # clean command
-    readonly LOGTYPE_PATHS=paths # paths command
     # action log types
-    readonly LOGTYPE_ACTION=action # action processing
     readonly LOGTYPE_URL=url # URL check
     readonly LOGTYPE_REPO=repo # repository initialization
-    readonly LOGTYPE_EXECUTE=execute # action executing
     readonly LOGTYPE_DEPS=deps # processing dependencies
     # database log types
     readonly LOGTYPE_DB=db # database initialization
@@ -382,7 +376,7 @@ term_action() {
 # DESCRIPTION:
 #   Prints all installed Git projects and their versions or commit hashes.
 list() (
-    log "$LOGTYPE_LIST" "$STATUS_PATH" &&
+    log "$COMMAND_LIST" "$STATUS_PATH" &&
     get_db | while IFS= read -r db_record; do
         url="$(get_db_record_url "$db_record")" && # extract URL
         hash="$(get_db_record_hash "$db_record")" && # extract commit hash
@@ -395,7 +389,7 @@ list() (
 #   Cleans the GitPack cache and log performing checks for unintended removal.
 clean() (
     # log clean operation, also creates a log file if it does not exist
-    log "$LOGTYPE_CLEAN" "$CACHE_DIR"/ &&
+    log "$COMMAND_CLEAN" "$CACHE_DIR"/ &&
 
     # clean log shortening it to a defined number of last lines
     tail_out="$(tail -n "$LOG_LINES_KEPT" "$LOG_PATH")" &&
@@ -410,7 +404,7 @@ clean() (
 # DESCRIPTION:
 #   Prints all GitPack-specific paths.
 paths() {
-    log "$LOGTYPE_PATHS" &&
+    log "$COMMAND_PATHS" &&
     echo "log $LOG_DIR/" &&
     echo "cache $CACHE_DIR/" &&
     echo "state $STATE_DIR/"
@@ -452,7 +446,7 @@ remove_dir() {
 #   $2 - raw URL
 process_action() (
     {   # log current action processing
-        log "$LOGTYPE_ACTION" "$1" "$2" &&
+        log "$1" "$2" &&
         # process the given URL
         url="$(raw_url_to_url "$2")" &&
         version="$(raw_url_to_version "$2")" &&
@@ -576,7 +570,6 @@ url_to_path() {
 #   $2 - URL
 #   $3 - version (optional)
 execute_action() (
-    log "$LOGTYPE_EXECUTE" "$1" "$2" "$3" &&
     # get source (already installed) project information
     src_db_record="$(get_db_record "$2")" &&
     src_hash="$(get_db_record_hash "$src_db_record")" && # extract commit hash
