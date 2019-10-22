@@ -183,7 +183,7 @@ store_command() {
 #   Processes given GitPack arguments and performs all associated operations.
 # PARAMETERS:
 #   $@ - GitPack arguments
-process_args() {
+process_args() (
     case "$1" in # process arguments based on the first argument
         "$ACTION_INSTALL" | "$ACTION_UNINSTALL" | "$ACTION_STATUS")
             init_runtime && process_action_args "$@" ;; # actions
@@ -196,7 +196,7 @@ process_args() {
     esac &&
 
     backup_db # if success, back up the GitPack database
-}
+)
 
 # DESCRIPTION:
 #   Processes a given action and its arguments. Expects the runtime environment
