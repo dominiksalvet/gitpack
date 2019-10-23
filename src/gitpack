@@ -53,7 +53,7 @@ check_sw_deps() (
 #   Initializes static constants.
 init_constants() {
     # the current version of GitPack
-    readonly VERSION=0.6.0
+    readonly VERSION=0.7.0
 
     # GitPack actions
     readonly ACTION_INSTALL=install
