@@ -156,7 +156,7 @@ init_core_config() {
     readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # fetch remote branches
 
     # other configuration
-    readonly BAD_URL_REGEX='((^|/)(\.|\.\.)($|/)| )' # bad URL regex
+    readonly BAD_URL_REGEX='(^$| |(^|/)(\.|\.\.)($|/))' # bad URL regex
     readonly DEP_PREFIX='+ ' # prefix for processing dependencies
 }
 

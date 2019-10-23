@@ -158,17 +158,18 @@ echo xfail6 >&2 && ! src/gitpack status -o 2>/dev/null && # no URL
 echo xfail7 >&2 && ! src/gitpack status -h 2>/dev/null && # no URL
 echo xfail8 >&2 && ! src/gitpack status -z github.com/dominiksalvet/gitpack 2>/dev/null && # invalid option
 # unsupported URLs
-echo xfail9 >&2 && ! src/gitpack status . 2>/dev/null &&
-echo xfail10 >&2 && ! src/gitpack status .. 2>/dev/null &&
-echo xfail11 >&2 && ! src/gitpack status xfail/. 2>/dev/null &&
-echo xfail12 >&2 && ! src/gitpack status xfail/.. 2>/dev/null &&
-echo xfail13 >&2 && ! src/gitpack status ./xfail 2>/dev/null &&
-echo xfail14 >&2 && ! src/gitpack status ../xfail 2>/dev/null &&
-echo xfail15 >&2 && ! src/gitpack status xfail/./xfail 2>/dev/null &&
-echo xfail16 >&2 && ! src/gitpack status xfail/../xfail 2>/dev/null &&
-echo xfail17 >&2 && ! src/gitpack status 'x fail' 2>/dev/null &&
-echo xfail18 >&2 && ! src/gitpack status 'x
+echo xfail9 >&2 && ! src/gitpack status 'x
 fail' 2>/dev/null &&
+echo xfail10 >&2 && ! src/gitpack status '' 2>/dev/null &&
+echo xfail11 >&2 && ! src/gitpack status 'x fail' 2>/dev/null &&
+echo xfail12 >&2 && ! src/gitpack status . 2>/dev/null &&
+echo xfail13 >&2 && ! src/gitpack status .. 2>/dev/null &&
+echo xfail14 >&2 && ! src/gitpack status xfail/. 2>/dev/null &&
+echo xfail15 >&2 && ! src/gitpack status xfail/.. 2>/dev/null &&
+echo xfail16 >&2 && ! src/gitpack status ./xfail 2>/dev/null &&
+echo xfail17 >&2 && ! src/gitpack status ../xfail 2>/dev/null &&
+echo xfail18 >&2 && ! src/gitpack status xfail/./xfail 2>/dev/null &&
+echo xfail19 >&2 && ! src/gitpack status xfail/../xfail 2>/dev/null &&
 
 #-------------------------------------------------------------------------------
 # FILES
@@ -200,11 +201,11 @@ echo cachefiles10 >&2 && test -r "$HOME"/.cache/gitpack/repo/github.com/dominiks
 echo cachefiles11 >&2 && test -w "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
 echo cachefiles12 >&2 && test -x "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
 # nonexistent cache files
-echo cachefiles13 >&2 && test ! -d "$HOME"/.cache/gitpack/repo/xfail/ &&
-echo cachefiles14 >&2 && test ! -d "$HOME"/.cache/gitpack/repo/xfail/xfail/ &&
-echo cachefiles15 >&2 && test ! -d "$HOME"/.cache/gitpack/repo/'x fail'/ &&
-echo cachefiles16 >&2 && test ! -d "$HOME"/.cache/gitpack/repo/'x
+echo cachefiles13 >&2 && test ! -d "$HOME"/.cache/gitpack/repo/'x
 fail'/ &&
+echo cachefiles14 >&2 && test ! -d "$HOME"/.cache/gitpack/repo/'x fail'/ &&
+echo cachefiles15 >&2 && test ! -d "$HOME"/.cache/gitpack/repo/xfail/ &&
+echo cachefiles16 >&2 && test ! -d "$HOME"/.cache/gitpack/repo/xfail/xfail/ &&
 
 # existence of state files
 echo statefiles1 >&2 && test -r "$HOME"/.local/share/gitpack/status &&
@@ -218,20 +219,20 @@ echo statefiles6 >&2 && test ! -x "$HOME"/.local/share/gitpack/status.bak &&
 echo status1 >&2 && test ! "$(cat "$HOME"/.local/share/gitpack/status)" &&
 
 # contents of log file
-echo log1 >&2 && test "$(grep -Fc '[log]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 36 &&
-echo log2 >&2 && test "$(grep -Fc '[fail]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 14 &&
+echo log1 >&2 && test "$(grep -Fc '[log]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 37 &&
+echo log2 >&2 && test "$(grep -Fc '[fail]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
 echo log3 >&2 && test "$(grep -Fc '[signal]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log4 >&2 && test "$(grep -Fc '[exit]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 36 &&
+echo log4 >&2 && test "$(grep -Fc '[exit]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 37 &&
 echo log5 >&2 && test "$(grep -Fc '[list]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 5 &&
 echo log6 >&2 && test "$(grep -Fc '[clean]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 1 &&
 echo log7 >&2 && test "$(grep -Fc '[paths]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 1 &&
 echo log8 >&2 && test "$(grep -Fc '[install]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 6 &&
 echo log9 >&2 && test "$(grep -Fc '[uninstall]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 2 &&
-echo log10 >&2 && test "$(grep -Fc '[status]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 17 &&
-echo log11 >&2 && test "$(grep -Fc '[url]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 25 &&
+echo log10 >&2 && test "$(grep -Fc '[status]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 18 &&
+echo log11 >&2 && test "$(grep -Fc '[url]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 26 &&
 echo log12 >&2 && test "$(grep -Fc '[repo]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
 echo log13 >&2 && test "$(grep -Fc '[deps]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log14 >&2 && test "$(grep -Fc '[db]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 36 &&
+echo log14 >&2 && test "$(grep -Fc '[db]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 37 &&
 echo log15 >&2 && test "$(grep -Fc '[get]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 15 &&
 echo log16 >&2 && test "$(grep -Fc '[insert]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
 echo log17 >&2 && test "$(grep -Fc '[delete]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
@@ -242,7 +243,7 @@ echo log21 >&2 && test "$(grep -Fc '[postcp]' "$HOME"/.local/share/gitpack/gitpa
 echo log22 >&2 && test "$(grep -Fc '[prerm]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
 echo log23 >&2 && test "$(grep -Fc '[rm]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 3 &&
 echo log24 >&2 && test "$(grep -Fc '[postrm]' "$HOME"/.local/share/gitpack/gitpack.log)" -eq 0 &&
-echo log25 >&2 && test "$(wc -l < "$HOME"/.local/share/gitpack/gitpack.log)" -eq 247 &&
+echo log25 >&2 && test "$(wc -l < "$HOME"/.local/share/gitpack/gitpack.log)" -eq 253 &&
 
 # clean files (it affects log and cache files)
 echo clean1 >&2 && src/gitpack clean &&
