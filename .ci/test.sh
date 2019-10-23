@@ -16,7 +16,7 @@
 } | tee "$HOME"/gitpack-tests-output >&2 && # store output
 
 tests_status="$(cat "$HOME"/gitpack-tests-status)" && # load exit status
-test "$tests_status" -ne 0 || exit # fail if there was a problem
+test "$tests_status" -eq 0 || exit # fail if there was a problem
 
 # check if there is an error message (ignoring a diagnostic message format)
 echo testtests1 >&2 && while IFS= read -r line; do
