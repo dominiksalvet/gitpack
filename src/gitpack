@@ -378,7 +378,7 @@ term_action() {
 list() (
     log "$COMMAND_LIST" "$STATUS_PATH" &&
     db="$(get_db)" &&
-    echo "$db" | while IFS= read -r db_record; do
+    echon "$db" | while IFS= read -r db_record; do
         url="$(get_db_record_url "$db_record")" && # extract URL
         hash="$(get_db_record_hash "$db_record")" && # extract commit hash
         version="$(beautify_hash "$url" "$hash")" && # beautify it
@@ -409,6 +409,14 @@ paths() {
     echo "log $LOG_DIR/" &&
     echo "cache $CACHE_DIR/" &&
     echo "state $STATE_DIR/"
+}
+
+# DESCRIPTION:
+#   An echo wrapper. It does not print a new line if the final string is empty.
+# PARAMETERS:
+#   $@ - echo arguments
+echon() {
+    if [ "$@" ]; then echo "$@"; fi
 }
 
 # DESCRIPTION:
@@ -681,14 +689,6 @@ next_dep_depth() {
     if [ "$dep_depth" -gt "$MAX_DEP_DEPTH" ]; then
         echof 'maximum dependency depth reached'; return 1
     fi
-}
-
-# DESCRIPTION:
-#   An echo wrapper. It does not print a new line if the final string is empty.
-# PARAMETERS:
-#   $@ - echo arguments
-echon() {
-    if [ "$@" ]; then echo "$@"; fi
 }
 
 # DESCRIPTION:
@@ -1028,7 +1028,7 @@ init_db() {
 get_db_record() (
     log "$LOGTYPE_GET" "$1" "$STATUS_PATH" &&
     db="$(get_db)" &&
-    echo "$db" | while IFS= read -r db_record; do # for each database record
+    echon "$db" | while IFS= read -r db_record; do # for each database record
         url="$(get_db_record_url "$db_record")" || return # get URL
         if [ "$url" = "$1" ]; then # once it matches, prints record and return
             echo "$db_record"; return
@@ -1062,7 +1062,7 @@ delete_db_records() (
 #   $1 - URL
 get_pruned_db() (
     db="$(get_db)" &&
-    echo "$db" | while IFS= read -r db_record; do # for each database record
+    echon "$db" | while IFS= read -r db_record; do # for each database record
         url="$(get_db_record_url "$db_record")" || return # get URL
         if [ "$url" != "$1" ]; then # do not print records with the given URL
             echo "$db_record"
