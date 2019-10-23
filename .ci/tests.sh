@@ -5,16 +5,10 @@
 # github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
-#   This script tests basic functionality and behavior of GitPack. The current
-#   state of execution is reported to stderr.
+#   This script tests basic functionality and behavior of GitPack. The commit
+#   being tested is defined by COMMIT and SHORT_COMMIT environment variables.
+#   The current state of execution is reported to stderr.
 #-------------------------------------------------------------------------------
-
-#-------------------------------------------------------------------------------
-# INITIALIZATION
-#-------------------------------------------------------------------------------
-
-# prepare constants used in the tests below
-echo inittests1 >&2 && SHORT_TRAVIS_COMMIT="$(echo "${TRAVIS_COMMIT:?}" | cut -c 1-7)" &&
 
 #-------------------------------------------------------------------------------
 # GLOBAL INSTALLATION
@@ -23,13 +17,12 @@ echo inittests1 >&2 && SHORT_TRAVIS_COMMIT="$(echo "${TRAVIS_COMMIT:?}" | cut -c
 #-------------------------------------------------------------------------------
 
 # install, check status and uninstall it
-echo global1 >&2 && gitpack_out="$(sudo src/gitpack install -h github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
-echo global2 >&2 && test "$gitpack_out" = "[install] github.com/dominiksalvet/gitpack $SHORT_TRAVIS_COMMIT" &&
-echo global3 >&2 && gitpack_out="$(sudo src/gitpack status -oh github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
-echo global4 >&2 && test "$gitpack_out" = "[ok] github.com/dominiksalvet/gitpack $SHORT_TRAVIS_COMMIT" &&
+echo global1 >&2 && gitpack_out="$(sudo src/gitpack install -h github.com/dominiksalvet/gitpack="${COMMIT:?}")" &&
+echo global2 >&2 && test "$gitpack_out" = "[install] github.com/dominiksalvet/gitpack ${SHORT_COMMIT:?}" &&
+echo global3 >&2 && gitpack_out="$(sudo src/gitpack status -oh github.com/dominiksalvet/gitpack="$COMMIT")" &&
+echo global4 >&2 && test "$gitpack_out" = "[ok] github.com/dominiksalvet/gitpack $SHORT_COMMIT" &&
 echo global5 >&2 && gitpack_out="$(sudo src/gitpack uninstall -oh github.com/dominiksalvet/gitpack)" &&
-echo global6 >&2 && test "$gitpack_out" = "[uninstall] github.com/dominiksalvet/gitpack $SHORT_TRAVIS_COMMIT" &&
-
+echo global6 >&2 && test "$gitpack_out" = "[uninstall] github.com/dominiksalvet/gitpack $SHORT_COMMIT" &&
 # clean all global GitPack files
 echo global7 >&2 && sudo rm -rf /var/cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
 echo global8 >&2 && sudo rmdir /var/cache/gitpack/repo/github.com/dominiksalvet/ &&
@@ -50,14 +43,13 @@ echo global17 >&2 && sudo rmdir /var/log/gitpack/ &&
 #-------------------------------------------------------------------------------
 
 # install, check status and uninstall it
-echo local1 >&2 && gitpack_out="$(src/gitpack install -h github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
-echo local2 >&2 && test "$gitpack_out" = "[install] github.com/dominiksalvet/gitpack $SHORT_TRAVIS_COMMIT" &&
-echo local3 >&2 && gitpack_out="$(src/gitpack status -oh github.com/dominiksalvet/gitpack="$TRAVIS_COMMIT")" &&
-echo local4 >&2 && test "$gitpack_out" = "[ok] github.com/dominiksalvet/gitpack $SHORT_TRAVIS_COMMIT" &&
+echo local1 >&2 && gitpack_out="$(src/gitpack install -h github.com/dominiksalvet/gitpack="$COMMIT")" &&
+echo local2 >&2 && test "$gitpack_out" = "[install] github.com/dominiksalvet/gitpack $SHORT_COMMIT" &&
+echo local3 >&2 && gitpack_out="$(src/gitpack status -oh github.com/dominiksalvet/gitpack="$COMMIT")" &&
+echo local4 >&2 && test "$gitpack_out" = "[ok] github.com/dominiksalvet/gitpack $SHORT_COMMIT" &&
 echo local5 >&2 && gitpack_out="$(src/gitpack uninstall -oh github.com/dominiksalvet/gitpack)" &&
-echo local6 >&2 && test "$gitpack_out" = "[uninstall] github.com/dominiksalvet/gitpack $SHORT_TRAVIS_COMMIT" &&
-
-# create all local GitPack files
+echo local6 >&2 && test "$gitpack_out" = "[uninstall] github.com/dominiksalvet/gitpack $SHORT_COMMIT" &&
+# clean all local GitPack files
 echo local7 >&2 && rm -rf "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/gitpack/ &&
 echo local8 >&2 && rmdir "$HOME"/.cache/gitpack/repo/github.com/dominiksalvet/ &&
 echo local9 >&2 && rmdir "$HOME"/.cache/gitpack/repo/github.com/ &&
@@ -247,7 +239,6 @@ echo log25 >&2 && test "$(wc -l < "$HOME"/.local/share/gitpack/gitpack.log)" -eq
 
 # clean files (it affects log and cache files)
 echo clean1 >&2 && src/gitpack clean &&
-
 # existence of log files
 echo clean2 >&2 && test -d "$HOME"/.local/share/gitpack/ &&
 echo clean3 >&2 && test -r "$HOME"/.local/share/gitpack/ &&
@@ -257,6 +248,5 @@ echo clean6 >&2 && test -f "$HOME"/.local/share/gitpack/gitpack.log &&
 echo clean7 >&2 && test -r "$HOME"/.local/share/gitpack/gitpack.log &&
 echo clean8 >&2 && test -w "$HOME"/.local/share/gitpack/gitpack.log &&
 echo clean9 >&2 && test ! -x "$HOME"/.local/share/gitpack/gitpack.log &&
-
 # existence of cache files
 echo clean10 >&2 && test ! -d "$HOME"/.cache/gitpack/

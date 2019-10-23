@@ -5,9 +5,22 @@
 # github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
-#   Runs GitPack tests and if they are successful, checks their output for
-#   potentially ignored error messages. The current state of execution is
-#   reported to stderr.
+#   Initializes and runs GitPack tests. If they are successful, it also analyses
+#   their output due possible issues. The current state of execution is reported
+#   to stderr.
+#-------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+# INITIALIZATION
+#-------------------------------------------------------------------------------
+
+# prepare and export constants used in actual tests
+echo inittests1 >&2 && export COMMIT="${TRAVIS_COMMIT:?}" &&
+echo inittests2 >&2 && SHORT_COMMIT="$(echo "$COMMIT" | cut -c 1-7)" &&
+echo inittests3 >&2 && export SHORT_COMMIT &&
+
+#-------------------------------------------------------------------------------
+# RUN TESTS
 #-------------------------------------------------------------------------------
 
 # run all tests and store their exit status and output for further analysis
@@ -17,6 +30,10 @@
 
 tests_status="$(cat "$HOME"/gitpack-tests-status)" && # load exit status
 test "$tests_status" -eq 0 || exit # fail if there was a problem
+
+#-------------------------------------------------------------------------------
+# CHECK TESTS OUTPUT
+#-------------------------------------------------------------------------------
 
 # check if there is an error message (ignoring a diagnostic message format)
 echo testtests1 >&2 && while IFS= read -r line; do
