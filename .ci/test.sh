@@ -26,6 +26,17 @@ if [ "$tests_status" -eq 0 ]; then # if tests were successful, check output
         if ! echo "$line" | grep -q '^[[:alpha:]]\+[[:digit:]]\+$'; then
             echo "error detected: $line" >&2; exit 1
         fi
+    done < "$HOME"/gitpack-tests-output &&
+
+    # check if test numbers are sorted
+    echo testtests2 >&2 && prev_testno=0 &&
+    while IFS= read -r line; do
+        testno="$(echo "$line" | tr -dC '[:digit:]')" && # extract test number
+        if [ "$testno" -eq "$((prev_testno + 1))" ] || [ "$testno" -eq 1 ]; then
+            prev_testno="$testno" # store current test number for next test
+        else
+            echo "$line is not sorted" >&2; exit 1
+        fi || exit
     done < "$HOME"/gitpack-tests-output
 else
     exit "$tests_status" # fail
