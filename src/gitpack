@@ -666,7 +666,7 @@ get_deps() (
     # if there is a file describing dependencies
     if [ -r .gitpack/deps ]; then
         log "$LOGTYPE_DEPS" "$1" "$2" &&
-        grepe '^[^#]' .gitpack/deps # remove empty and comment lines
+        grepe . .gitpack/deps # remove empty lines
     fi
 )
 
@@ -882,15 +882,13 @@ run_script() (
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
-#   For each given map route, it calls a given function. It also prepares the
-#   map by removing comments and empty lines before calling any function so that
-#   it contains only required routes.
+#   Calls a given function for each route of a given map.
 # PARAMETERS:
 #   $1 - map path
 #   $2 - function name
 for_each_route() (
     if [ -r "$1" ]; then # check whether the map file exists
-        grepe_out="$(grepe '^[^#]' "$1")" && # remove empty and comment lines
+        grepe_out="$(grepe . "$1")" && # remove empty lines
         # call a given function for each route
         echon "$grepe_out" | while IFS= read -r route; do
             eval "$2" "$route" || return
@@ -1071,7 +1069,7 @@ get_pruned_db() (
 # DESCRIPTION:
 #   Prints all records of the GitPack database.
 get_db() {
-    cat "$STATUS_PATH"
+    grepe . "$STATUS_PATH" # remove empty lines
 }
 
 # DESCRIPTION:
