@@ -15,8 +15,9 @@ GitPack works with the *.gitpack* directory of Git repositories matching the fol
   * To target a particular system, append its name as `-<system>`.
   * E.g., `local-Darwin` represents local installation for macOS.
 * *.gitpack/install/\<method\>/*`map` is a file:
-  * Describes **how project files are copied/removed** during installation/uninstallation.
-  * Has file paths to be copied and a target directory per line.
+  * Describes how project files are copied/removed during **installation/uninstallation**.
+  * Each nonempty line contains file paths to be copied and a target directory path.
+  * Each nonempty line is evaluated as a shell function argument. Be careful.
   * E.g., line `bin/vhdldep /usr/local/bin` copies *vhdldep* file to */usr/local/bin* directory.
 
 ## Optional files
@@ -32,7 +33,7 @@ GitPack also works with optional files located in the *.gitpack* directory as fo
   * E.g., it contains `.bash_completion` file, which is copied during *precp* script execution.
 * *.gitpack/*`deps` is a file:
   * It represents a list of the project's Git dependencies.
-  * Has one dependency per line in the same format as the GitPack URL arguments.
+  * Each nonempty line contains one dependency in the same format as GitPack URL arguments.
   * E.g., line `github.com/dominiksalvet/ux430ua-jack-volume=2.4.0` is a valid dependency.
 
 ## Environment variables
