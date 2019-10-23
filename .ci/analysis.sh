@@ -66,7 +66,8 @@ check_lines_length() (
 #   $1 - script path
 check_funcs_length() (
     # create function summaries '<lineno> <function> <lines>' and process them
-    summarize_funcs "$1" | while IFS= read -r line; do # for each function summary
+    funcs_summary="$(get_funcs_summary "$1")" &&
+    echo "$funcs_summary" | while IFS= read -r line; do # for each function summary
         lineno="$(echo "$line" | cut -f 1 -d ' ')" && # extract line number
         function="$(echo "$line" | cut -f 2 -d ' ')" && # extract function name
         lines="$(echo "$line" | cut -f 3 -d ' ')" || return # extract function length in lines
@@ -87,7 +88,7 @@ check_funcs_length() (
 #   the following format: '<lineno> <function> <lines>'.
 # PARAMETERS:
 #   $1 - script path
-summarize_funcs() (
+get_funcs_summary() (
     lineno=0 # line counter
     function_lineno=; function_name= # function details
     in_function=false # indicator whether the parses is in a function
@@ -103,7 +104,7 @@ summarize_funcs() (
         elif [ "$line" = '}' ] || [ "$line" = ')' ]; then # if end of function
             echo "$function_lineno $function_name $((lineno - function_lineno))"
             in_function=false
-        fi
+        fi || return
     done < "$1"
 )
 

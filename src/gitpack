@@ -377,7 +377,8 @@ term_action() {
 #   Prints all installed Git projects and their versions or commit hashes.
 list() (
     log "$COMMAND_LIST" "$STATUS_PATH" &&
-    get_db | while IFS= read -r db_record; do
+    db="$(get_db)" &&
+    echo "$db" | while IFS= read -r db_record; do
         url="$(get_db_record_url "$db_record")" && # extract URL
         hash="$(get_db_record_hash "$db_record")" && # extract commit hash
         version="$(beautify_hash "$url" "$hash")" && # beautify it
@@ -973,7 +974,8 @@ remove_dir_from_dir() (
 
     # scan the target directory to obtain a file mask (files and directories)
     files="$(cd -- "$1"/ && find ./ ! -type d)" &&
-    dirs="$(cd -- "$1"/ && find ./ -type d ! -path ./ | sort -r)" &&
+    dirs="$(cd -- "$1"/ && find ./ -type d ! -path ./)" &&
+    dirs="$(echo "$dirs" | sort -r)" && # sort from longest to shortest paths
 
     echon "$files" | while IFS= read -r file; do # remove files using mask
         rm -f -- "${2:?}"/"${dir_name:?}"/"${file:?}" || return
@@ -1025,7 +1027,8 @@ init_db() {
 #   $1 - URL
 get_db_record() (
     log "$LOGTYPE_GET" "$1" "$STATUS_PATH" &&
-    get_db | while IFS= read -r db_record; do # for each database record
+    db="$(get_db)" &&
+    echo "$db" | while IFS= read -r db_record; do # for each database record
         url="$(get_db_record_url "$db_record")" || return # get URL
         if [ "$url" = "$1" ]; then # once it matches, prints record and return
             echo "$db_record"; return
@@ -1058,7 +1061,8 @@ delete_db_records() (
 # PARAMETERS:
 #   $1 - URL
 get_pruned_db() (
-    get_db | while IFS= read -r db_record; do # for each database record
+    db="$(get_db)" &&
+    echo "$db" | while IFS= read -r db_record; do # for each database record
         url="$(get_db_record_url "$db_record")" || return # get URL
         if [ "$url" != "$1" ]; then # do not print records with the given URL
             echo "$db_record"
