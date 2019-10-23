@@ -211,7 +211,7 @@ echo cachefiles16 >&2 && test ! -d "$HOME"/.cache/gitpack/repo/xfail/xfail/ &&
 echo statefiles1 >&2 && test -r "$HOME"/.local/share/gitpack/status &&
 echo statefiles2 >&2 && test -w "$HOME"/.local/share/gitpack/status &&
 echo statefiles3 >&2 && test ! -x "$HOME"/.local/share/gitpack/status &&
-echo statefiles4 >&2 && test -r "$HOME"/.local/share/gitpack/status.bak &&
+echo statefiles5 >&2 && test -r "$HOME"/.local/share/gitpack/status.bak &&
 echo statefiles5 >&2 && test -w "$HOME"/.local/share/gitpack/status.bak &&
 echo statefiles6 >&2 && test ! -x "$HOME"/.local/share/gitpack/status.bak &&
 
