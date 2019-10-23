@@ -78,19 +78,19 @@ echo command7 >&2 && src/gitpack about &&
 echo command8 >&2 && src/gitpack help &&
 
 # install older version + test empty lines in status file
-echo install1 >&2 && echo > "$HOME"/.local/share/gitpack/status &&
+echo install1 >&2 && echo >> "$HOME"/.local/share/gitpack/status &&
 echo install2 >&2 && gitpack_out="$(src/gitpack status github.com/dominiksalvet/gitpack=0.1.0)" &&
 echo install3 >&2 && test "$gitpack_out" = '[nothing] github.com/dominiksalvet/gitpack -> 0.1.0' &&
-echo install4 >&2 && echo > "$HOME"/.local/share/gitpack/status &&
+echo install4 >&2 && echo >> "$HOME"/.local/share/gitpack/status &&
 echo install5 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack=0.1.0)" &&
 echo install6 >&2 && test "$gitpack_out" = '[install] github.com/dominiksalvet/gitpack 0.1.0' &&
-echo install7 >&2 && echo > "$HOME"/.local/share/gitpack/status &&
+echo install7 >&2 && echo >> "$HOME"/.local/share/gitpack/status &&
 echo install8 >&2 && gitpack_out="$(src/gitpack install -o github.com/dominiksalvet/gitpack=0.1.0)" &&
 echo install9 >&2 && test "$gitpack_out" = '[installed] github.com/dominiksalvet/gitpack 0.1.0' &&
-echo install10 >&2 && echo > "$HOME"/.local/share/gitpack/status &&
+echo install10 >&2 && echo >> "$HOME"/.local/share/gitpack/status &&
 echo install11 >&2 && gitpack_out="$(src/gitpack status -o github.com/dominiksalvet/gitpack=0.1.0)" &&
 echo install12 >&2 && test "$gitpack_out" = '[ok] github.com/dominiksalvet/gitpack 0.1.0' &&
-echo install13 >&2 && echo > "$HOME"/.local/share/gitpack/status &&
+echo install13 >&2 && echo >> "$HOME"/.local/share/gitpack/status &&
 echo install14 >&2 && gitpack_out="$(src/gitpack list)" &&
 echo install15 >&2 && test "$gitpack_out" = 'github.com/dominiksalvet/gitpack 0.1.0' &&
 # check installed files
