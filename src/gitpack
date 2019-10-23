@@ -852,6 +852,7 @@ uninstall() (
         log "$LOGTYPE_POSTRM" "$1" "$2" "$install_method" &&
         run_script "$install_dir"/postrm
     fi
+    false
 )
 
 # DESCRIPTION:
