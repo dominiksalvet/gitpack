@@ -249,4 +249,9 @@ echo clean7 >&2 && test -r "$HOME"/.local/share/gitpack/gitpack.log &&
 echo clean8 >&2 && test -w "$HOME"/.local/share/gitpack/gitpack.log &&
 echo clean9 >&2 && test ! -x "$HOME"/.local/share/gitpack/gitpack.log &&
 # existence of cache files
-echo clean10 >&2 && test ! -d "$HOME"/.cache/gitpack/
+echo clean10 >&2 && test ! -d "$HOME"/.cache/gitpack/ &&
+# clean all GitPack files
+echo clean11 >&2 && rm "$HOME"/.local/share/gitpack/status.bak &&
+echo clean12 >&2 && rm "$HOME"/.local/share/gitpack/status &&
+echo clean13 >&2 && rm "$HOME"/.local/share/gitpack/gitpack.log &&
+echo clean14 >&2 && rmdir "$HOME"/.local/share/gitpack/
