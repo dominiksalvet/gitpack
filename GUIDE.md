@@ -13,12 +13,12 @@ GitPack works with the *.gitpack* directory of Git repositories matching the fol
 * *.gitpack/install/*`<method>` is a directory:
   * Its name starts with either `global` or `local` based on **installation type**.
   * To target a particular system, append its name as `-<system>`.
-  * E.g., `local-Darwin` represents local installation for macOS.
+  * E.g., `global-Darwin` represents global installation for macOS.
 * *.gitpack/install/\<method\>/*`map` is a file:
   * Describes how project files are copied/removed during **installation/uninstallation**.
   * Each nonempty line contains file paths to be copied and a target directory path.
   * Each nonempty line is evaluated as a shell function argument. Be careful.
-  * E.g., line `bin/vhdldep /usr/local/bin` copies *vhdldep* file to */usr/local/bin* directory.
+  * E.g., line `bin/vhdldep ~/.local/bin` copies *vhdldep* file to *~/.local/bin* directory.
 
 ## Optional files
 
