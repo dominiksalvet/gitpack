@@ -18,6 +18,7 @@ The changes not yet present in any release are listed in this section.
 
 * GitPack resolves version name collisions in the following order: `HEAD`, tags, branches and commit hashes.
 * The report of a GitPack action never prints `HEAD` as a version.
+* Any URL not conflicting with necessary internal limitations is now supported.
 
 ## 0.6.0 (2019-10-08)
 
