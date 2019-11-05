@@ -22,7 +22,7 @@ The changes not yet present in any release are listed in this section.
 * GitPack output does not contain `HEAD` as a version.
 * Any URL not conflicting with necessary internal limitations is now supported.
 
-# Fixed
+### Fixed
 
 * Version name collisions are resolved in the following order: `HEAD`, tags, branches, commit hashes.
 
