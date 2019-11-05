@@ -14,13 +14,17 @@ The changes not yet present in any release are listed in this section.
 
 * The automatic default branch detection has been added.
 * The `paths` command to show all GitPack-specific paths has been added.
+* GitPack beautifies branch latest commit hashes by default.
 * Hash mode option `-h` forcing to always show commit hashes has been added.
 
 ### Changed
 
-* Version name collisions are resolved in the following order: `HEAD`, tags, branches and commit hashes.
-* The report of a GitPack action never prints `HEAD` as a version.
+* GitPack output does not contain `HEAD` as a version.
 * Any URL not conflicting with necessary internal limitations is now supported.
+
+# Fixed
+
+* Version name collisions are resolved in the following order: `HEAD`, tags, branches, commit hashes.
 
 ## 0.6.0 (2019-10-08)
 
@@ -60,7 +64,7 @@ The changes not yet present in any release are listed in this section.
 ### Added
 
 * A simple mechanism for cyclic dependencies prevention has been added.
-* GitPack now keeps one backup copy of *status* file and recovers from it when *status* file does not exist.
+* GitPack now keeps a backup copy of *status* file and recovers from it when *status* file does not exist.
 
 ### Changed
 
