@@ -2,7 +2,7 @@
 
 <p align="center">
     <a href="https://github.com/dominiksalvet/gitpack">
-        <img src="img/gitpack.png" alt="GitPack logo" height="256"></a>
+        <img src="img/gitpack.png" alt="GitPack logo" height="200"></a>
 </p>
 
 <p align="center">
