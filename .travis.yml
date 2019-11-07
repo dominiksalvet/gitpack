@@ -13,13 +13,9 @@ jobs:
 
     - stage: test
       os: linux
-      git:
-        depth: false
       script: .ci/test.sh
       after_failure: .ci/dump.sh
 
     - os: osx
-      git:
-        depth: false
       script: .ci/test.sh
       after_failure: .ci/dump.sh
