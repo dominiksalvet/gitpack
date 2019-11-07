@@ -9,7 +9,7 @@
     <a href="https://travis-ci.com/dominiksalvet/gitpack">
         <img src="https://travis-ci.com/dominiksalvet/gitpack.svg?branch=master" alt="Build Status"></a>
     <a href="https://github.com/dominiksalvet/gitpack">
-        <img src="https://img.shields.io/badge/Git-Pack-571997" alt="GitPack"></a>
+        <img src="https://img.shields.io/badge/-GitPack-571997" alt="GitPack"></a>
     <a href="https://github.com/RichardLitt/standard-readme">
         <img src="https://img.shields.io/badge/readme_style-standard-brightgreen" alt="standard-readme compliant"></a>
 </p>
@@ -115,14 +115,14 @@ Not sure? Take a look at [*.gitpack*](.gitpack) directory of GitPack itself. It 
 
 ### Badge
 
-GitPack projects work best with the following badge:
+GitPack projects work best with the following sleek badge:
 
-[![GitPack](https://img.shields.io/badge/Git-Pack-571997)](https://github.com/dominiksalvet/gitpack)
+[![GitPack](https://img.shields.io/badge/-GitPack-571997)](https://github.com/dominiksalvet/gitpack)
 
 Markdown:
 
 ```markdown
-[![GitPack](https://img.shields.io/badge/Git-Pack-571997)](https://github.com/dominiksalvet/gitpack)
+[![GitPack](https://img.shields.io/badge/-GitPack-571997)](https://github.com/dominiksalvet/gitpack)
 ```
 
 ## Thanks
