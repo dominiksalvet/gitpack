@@ -1,8 +1,7 @@
 # GitPack
 
 <p align="center">
-    <a href="https://github.com/dominiksalvet/gitpack">
-        <img src="img/gitpack.png" alt="GitPack logo" height="200"></a>
+    <img src="img/gitpack.png" alt="GitPack logo" height="200">
 </p>
 
 <p align="center">
