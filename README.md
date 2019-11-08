@@ -134,4 +134,4 @@ Do you want to contribute? Do you have any questions? Then the [*CONTRIBUTING.md
 
 ## License
 
-GitPack is licensed under the [MIT License](LICENSE.txt).
+GitPack is licensed under the [MIT License](LICENSE).
