@@ -1,4 +1,4 @@
-**GitPack is going to go through [significant changes](https://github.com/dominiksalvet/gitpack/projects/1) in the future.**
+**GitPack is going to go through [significant changes](https://github.com/dominiksalvet/gitpack/projects/1) in the future.** My [GitPack projects](https://github.com/topics/gitpack) will be compatible.
 
 ---
 
