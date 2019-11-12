@@ -1,3 +1,7 @@
+**GitPack is going to go through [significant changes](https://github.com/dominiksalvet/gitpack/projects/1) in the future.**
+
+---
+
 # GitPack
 
 <p align="center">
