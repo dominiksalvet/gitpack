@@ -18,5 +18,9 @@ if [ -r "$LOCAL_LOG_PATH" ]; then # print local if exists
 elif [ -r "$GLOBAL_LOG_PATH" ]; then # otherwise, print global
     cat "$GLOBAL_LOG_PATH"
 else
-    echo 'very bad'
+    echo "$GLOBAL_LOG_PATH"
+    echo "$LOCAL_LOG_PATH"
+    echo "$HOME"
+    ls -al /var/log/gitpack/
+    ls -al "$HOME"/.local/share/gitpack/
 fi
