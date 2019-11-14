@@ -35,4 +35,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v1
-    - run: .github/scripts/test
+
+    - name: Run all tests
+      run: .github/scripts/test
+
+    - name: Dump GitPack information
+      if: failure()
+      run: .github/scripts/dump
