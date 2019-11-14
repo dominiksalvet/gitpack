@@ -1,16 +1,15 @@
 #-------------------------------------------------------------------------------
 # Copyright 2019 Dominik Salvet
 # github.com/dominiksalvet/gitpack
-# just a try
 #-------------------------------------------------------------------------------
 
 name: CI
 on:
   push:
     paths:
-    - .github/scripts/*
-    - src/*
+    - .github/**
     - .gitpack/**
+    - src/*
 
 jobs:
   Analysis:
