@@ -11,6 +11,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
+    - run: .ci/analysis.sh
+  
+  TestLinux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - run: .ci/test.sh
+    - if: failure()
+      run: .ci/dump.sh
 
-    - name: Analysis
-      run: true
+  TestMacos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v1
+    - run: .ci/test.sh
+    - if: failure()
+      run: .ci/dump.sh
