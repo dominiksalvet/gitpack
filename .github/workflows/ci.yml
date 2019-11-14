@@ -16,12 +16,12 @@ jobs:
       run: shellcheck --version
 
     - name: Check CI scripts
-      run: shellcheck .github/scripts/*.sh
+      run: shellcheck .github/scripts/*
 
     - name: Check source files
       run: |
         shellcheck src/*
-        .github/scripts/stylecheck.sh src/*
+        .github/scripts/stylecheck src/*
 
     - name: Check GitPack files
       run: |
@@ -32,10 +32,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - run: .github/scripts/test.sh
+    - run: .github/scripts/test
 
   TestMacos:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v1
-    - run: .github/scripts/test.sh
+    - run: .github/scripts/test
