@@ -1,0 +1,16 @@
+#-------------------------------------------------------------------------------
+# Copyright 2019 Dominik Salvet
+# github.com/dominiksalvet/gitpack
+#-------------------------------------------------------------------------------
+
+name: CI
+on: push
+
+jobs:
+  Analysis:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Analysis
+      run: .ci/analysis.sh
