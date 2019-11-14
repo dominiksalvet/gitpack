@@ -4,7 +4,12 @@
 #-------------------------------------------------------------------------------
 
 name: CI
-on: push
+on:
+  push:
+    paths:
+    - .github/scripts/*
+    - src/*
+    - .gitpack/**
 
 jobs:
   Analysis:
