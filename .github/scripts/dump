@@ -17,4 +17,6 @@ if [ -r "$LOCAL_LOG_PATH" ]; then # print local if exists
     cat "$LOCAL_LOG_PATH"
 elif [ -r "$GLOBAL_LOG_PATH" ]; then # otherwise, print global
     cat "$GLOBAL_LOG_PATH"
+else
+    echo 'very bad'
 fi
