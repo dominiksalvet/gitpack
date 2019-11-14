@@ -390,7 +390,6 @@ list() (
 #   Cleans the GitPack cache and log performing checks for unintended removal.
 clean() (
     # log clean operation, also creates a log file if it does not exist
-    echo 'fictional fail' >&2 &&
     log "$COMMAND_CLEAN" "$CACHE_DIR"/ &&
 
     # clean log shortening it to a defined number of last lines
