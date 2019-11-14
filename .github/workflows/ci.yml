@@ -11,16 +11,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - run: .ci/analysis.sh
+    - run: .github/scripts/analysis.sh
   
   TestLinux:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - run: .ci/test.sh
+    - run: .github/scripts/test.sh
 
   TestMacos:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v1
-    - run: .ci/test.sh
+    - run: .github/scripts/test.sh
