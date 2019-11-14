@@ -23,6 +23,7 @@ main() {
     check_sw_deps &&
     init_constants &&
     init_strings &&
+    echo "$test" &&
     init_core_config &&
     init_config &&
     store_command "$0 $*" &&
