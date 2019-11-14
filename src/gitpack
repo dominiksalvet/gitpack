@@ -7,7 +7,7 @@
 # DESCRIPTION:
 #   This is GitPack, the simplest Git-based package manager.
 # PARAMETERS:
-#   All given arguments are processed as GitPack's help describes.
+#   All given arguments are processed as GitPack's help describes...
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
