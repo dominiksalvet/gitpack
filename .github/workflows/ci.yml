@@ -29,6 +29,7 @@ jobs:
         shellcheck .gitpack/install/local/precp
 
   Test:
+    needs: Analysis
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
