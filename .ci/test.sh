@@ -15,7 +15,7 @@
 #-------------------------------------------------------------------------------
 
 # prepare and export constants used in actual tests
-echo inittests1 >&2 && export COMMIT="${TRAVIS_COMMIT:?}" &&
+echo inittests1 >&2 && export COMMIT="${GITHUB_SHA:?}" &&
 echo inittests2 >&2 && SHORT_COMMIT="$(echo "$COMMIT" | cut -c 1-7)" &&
 echo inittests3 >&2 && export SHORT_COMMIT &&
 
