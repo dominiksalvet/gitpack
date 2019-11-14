@@ -11,7 +11,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - run: .github/scripts/analysis.sh
+
+    - name: Check shellcheck
+      run: shellcheck --version
+
+    - name: Check CI scripts
+      run: shellcheck .github/scripts/*.sh
+
+    - name: Check source files
+      run: |
+        shellcheck src/*
+        .gitpack/scripts/stylecheck.sh src/*
+
+    - name: Check GitPack files
+      run: |
+        shellcheck .gitpack/data/.bash_completion
+        shellcheck .gitpack/install/local/precp
   
   TestLinux:
     runs-on: ubuntu-latest

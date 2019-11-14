@@ -5,21 +5,23 @@
 # github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
-#   Checks whether GitPack source code files meet essential code style using a
-#   static code analysis.
+#   Checks whether all given shell script files meet a basic code style defined
+#   by constants below.
+# PARAMETERS:
+#   $@ - script paths
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
-# CODE STYLE
+# MAIN FUNCTION
 #-------------------------------------------------------------------------------
 
 # DESCRIPTION:
 #   Checks the code style of all given scripts against simple predefined rules.
-#   Runs in a subshell to imitate an external command.
+#   Calling of this function should be at the end of this script.
 # PARAMETERS:
 #   $@ - script paths
-check_code_style() (
-    init_code_style && # initialize the code style check
+main() (
+    init_style && # initialize the code style check
 
     # perform checks for each given script file
     for script_path in "$@"; do
@@ -30,7 +32,7 @@ check_code_style() (
 
 # DESCRIPTION:
 #   Initializes constants for code style check.
-init_code_style() {
+init_style() {
     readonly MAX_LINE_LENGTH=80 # maximum number of characters per each line
     readonly MAX_FUNC_LENGTH=20 # maximum number of lines per each function
     readonly IGNORED_FUNCS='init_constants init_strings' # function length exceptions
@@ -109,10 +111,7 @@ get_funcs_summary() (
 )
 
 #-------------------------------------------------------------------------------
-# ANALYZE
+# CALL MAIN
 #-------------------------------------------------------------------------------
 
-shellcheck .github/scripts/*.sh && # analyze CI scripts
-shellcheck src/* && # analyze source code
-check_code_style src/* && # check source code style
-shellcheck .gitpack/data/.bash_completion .gitpack/install/local/precp # analyze other scripts
+main "$@" # call the main function
