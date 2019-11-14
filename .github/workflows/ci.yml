@@ -27,15 +27,12 @@ jobs:
       run: |
         shellcheck .gitpack/data/.bash_completion
         shellcheck .gitpack/install/local/precp
-  
-  TestLinux:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - run: .github/scripts/test
 
-  TestMacos:
-    runs-on: macos-latest
+  Test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v1
     - run: .github/scripts/test
