@@ -58,7 +58,7 @@ echo local11 >&2 && rmdir "$HOME"/.cache/gitpack/ &&
 echo local12 >&2 && rm "$HOME"/.local/share/gitpack/status.bak &&
 echo local13 >&2 && test ! "$(cat "$HOME"/.local/share/gitpack/status)" &&
 echo local14 >&2 && rm "$HOME"/.local/share/gitpack/status &&
-echo local13 >&2 && rm "$HOME"/.local/share/gitpack/gitpack.log &&
+echo local15 >&2 && rm "$HOME"/.local/share/gitpack/gitpack.log &&
 echo local16 >&2 && rmdir "$HOME"/.local/share/gitpack/ &&
 
 #-------------------------------------------------------------------------------
