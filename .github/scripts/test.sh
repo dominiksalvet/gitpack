@@ -24,7 +24,7 @@ echo inittests3 >&2 && export SHORT_COMMIT &&
 #-------------------------------------------------------------------------------
 
 # run all tests and store their exit status and output for further analysis
-{   .ci/tests.sh 2>&1 1>/dev/null
+{   .github/scripts/tests.sh 2>&1 1>/dev/null
     echo "$?" > "$HOME"/gitpack-tests-status 2>/dev/null # store exit status
 } | tee "$HOME"/gitpack-tests-output >&2 && # store output
 

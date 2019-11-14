@@ -112,7 +112,7 @@ get_funcs_summary() (
 # ANALYZE
 #-------------------------------------------------------------------------------
 
-shellcheck .ci/*.sh && # analyze CI scripts
+shellcheck .github/scripts/*.sh && # analyze CI scripts
 shellcheck src/* && # analyze source code
 check_code_style src/* && # check source code style
 shellcheck .gitpack/data/.bash_completion .gitpack/install/local/precp # analyze other scripts
