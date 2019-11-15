@@ -15,7 +15,7 @@ jobs:
   Analysis:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout current commit
+    - name: Checkout commit
       uses: actions/checkout@v1
 
     - name: Check shellcheck
@@ -41,7 +41,7 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-    - name: Checkout current commit
+    - name: Checkout commit
       uses: actions/checkout@v1
 
     - name: Run all tests
