@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/dominiksalvet/gitpack/actions">
+    <a href="https://github.com/dominiksalvet/gitpack/commits">
         <img src="https://github.com/dominiksalvet/gitpack/workflows/CI/badge.svg" alt="CI status"></a>
     <a href="https://github.com/dominiksalvet/gitpack">
         <img src="https://img.shields.io/badge/-GitPack-571997" alt="GitPack"></a>
