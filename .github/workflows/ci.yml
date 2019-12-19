@@ -4,12 +4,7 @@
 #-------------------------------------------------------------------------------
 
 name: CI
-on:
-  push:
-    paths:
-    - .github/**
-    - .gitpack/**
-    - src/**
+on: [push, pull_request]
 
 jobs:
   Analysis:
