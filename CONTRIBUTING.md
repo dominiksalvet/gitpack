@@ -14,7 +14,7 @@ If you have any suggestions (or questions) about the development of GitPack, fol
 
 Except for pull requests with bug fixes, every pull request must be preceded by creating an issue as described in the [previous section](#suggestions) and must be approved by a GitPack developer. Then continue as described below:
 
-1. Fork GitPack.
+1. [Fork](https://github.com/dominiksalvet/gitpack/fork) GitPack.
 2. Create a new branch with a meaningful name.
 3. Make your changes in the branch.
 4. Add notable changes to the [*CHANGELOG.md*](CHANGELOG.md) file.
