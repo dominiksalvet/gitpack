@@ -5,7 +5,7 @@
 # github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
-#   This is GitPack, the simplest Git-based package manager.
+#   This is GitPack, simple Git-based package manager.
 # PARAMETERS:
 #   All given arguments are processed as GitPack's help describes.
 #-------------------------------------------------------------------------------
@@ -131,7 +131,7 @@ COMMAND:
   about  show information"
 
     readonly ABOUT_MESSAGE="GitPack $VERSION
-The simplest Git-based package manager.
+Simple Git-based package manager.
 
 Copyright 2019 Dominik Salvet
 github.com/dominiksalvet/gitpack"

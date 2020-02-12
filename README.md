@@ -17,7 +17,7 @@
         <img src="https://img.shields.io/badge/readme_style-standard-brightgreen" alt="standard-readme compliant"></a>
 </p>
 
-> The simplest Git-based package manager.
+> Simple Git-based package manager.
 
 Wouldn't it be great to **install and update** your favorite Git projects like this?
 
