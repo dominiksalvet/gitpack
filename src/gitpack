@@ -20,7 +20,7 @@
 # PARAMETERS:
 #   $@ - GitPack arguments
 main() {
-    check_sw_deps &&
+    check_commands &&
     init_constants &&
     init_strings &&
     init_core_config &&
@@ -30,20 +30,12 @@ main() {
 }
 
 # DESCRIPTION:
-#   Checks whether all software dependencies are satisfied.
-check_sw_deps() (
-    # a list of required software
-    sw_deps='command echo [ cd test pwd rm id mkdir touch grep git uname read cp
-             head cut true basename find rmdir tr date tail kill sort getopts
-             wc'
-
-    # check if any piece of software is missing
-    for sw_dep in $sw_deps; do
-        if ! command -v "$sw_dep" > /dev/null; then
-            echo "missing $sw_dep software" >&2; return 1
-        fi
-    done
-)
+#   Checks whether optional commands are present.
+check_commands() {
+    if ! command -v git > /dev/null; then # check only git
+        echo 'missing git command' >&2; return 1
+    fi
+}
 
 #-------------------------------------------------------------------------------
 # STATIC INITIALIZATION

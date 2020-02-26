@@ -11,6 +11,7 @@ The changes not yet present in any release are listed in this section.
 ### Changed
 
 * Travis CI has been replaced by GitHub Actions CI.
+* Only optional commands are checked for their existence before execution.
 
 ## 0.7.0 (2019-10-23)
 
