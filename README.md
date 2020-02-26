@@ -42,6 +42,7 @@ If you are in, then GitPack comes in pretty handy. All you need is a URL of a co
 ## Table of Contents
 
 * [Install](#install)
+  * [Dependencies](#dependencies)
 * [Usage](#usage)
   * [Example](#example)
 * [Developer](#developer)
@@ -69,6 +70,10 @@ git clone https://github.com/dominiksalvet/gitpack.git ./ && # clone repository
 git checkout "$(git describe --tags --abbrev=0)" && # use latest version
 src/gitpack install github.com/dominiksalvet/gitpack # install GitPack
 ```
+
+### Dependencies
+
+* **Git** software
 
 ## Usage
 
