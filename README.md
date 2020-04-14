@@ -47,7 +47,6 @@ If you are in, then GitPack comes in pretty handy. All you need is a URL of a co
   * [Example](#example)
 * [Developer](#developer)
   * [Badge](#badge)
-* [Thanks](#thanks)
 * [Contributing](#contributing)
 * [License](#license)
 
@@ -132,10 +131,6 @@ Markdown:
 ```markdown
 [![GitPack](https://img.shields.io/badge/-GitPack-571997)](https://github.com/dominiksalvet/gitpack)
 ```
-
-## Thanks
-
-GitPack was born out of [gim](https://github.com/dominiksalvet/gim) and has grown up a lot since then.
 
 ## Contributing
 
