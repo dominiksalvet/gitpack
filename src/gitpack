@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #-------------------------------------------------------------------------------
-# Copyright 2019 Dominik Salvet
+# Copyright 2019-2020 Dominik Salvet
 # github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
@@ -419,7 +419,7 @@ echon() {
 #   $1 - directory
 remove_dir() {
     test "$1" && # the directory path must not be empty
-    if [ ! -d "$1"/ ]; then return; fi && # the directory does not exist, return
+    if ! [ -d "$1"/ ]; then return; fi && # the directory does not exist, return
 
     (   # store physical path of the given directory
         cd -- "$1"/ && pwd_out="$(pwd -P)" &&
@@ -517,7 +517,7 @@ init_repo() (
     log "$LOGTYPE_REPO" "$1" "$repo_dir"/ &&
 
     if [ "$OFFLINE_MODE" = true ]; then # offline
-        if [ ! -d "$repo_dir"/ ]; then # fail if local repository does not exist
+        if ! [ -d "$repo_dir"/ ]; then # fail if local repository does not exist
             echof 'repository is not downloaded for offline usage'; return 1
         fi
     else # online
@@ -1008,7 +1008,7 @@ init_db() {
     fi &&
 
     # check access to GitPack status file
-    if [ ! -r "$STATUS_PATH" ] || [ ! -w "$STATUS_PATH" ]; then
+    if ! [ -r "$STATUS_PATH" ] || ! [ -w "$STATUS_PATH" ]; then
         echof 'cannot access status file'; return 1
     fi
 }
@@ -1162,7 +1162,7 @@ report() (
 #   $1 - URL
 #   $2 - hash (optional)
 beautify_hash() (
-    if [ ! "$2" ]; then return; fi # early return if no commit hash provided
+    if ! [ "$2" ]; then return; fi # early return if no commit hash provided
 
     # if hash mode disabled, check if any Git reference associated with the hash
     if [ "$hash_mode" = false ] && repo_cd "$1" 2>/dev/null &&
