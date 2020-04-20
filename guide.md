@@ -31,10 +31,6 @@ GitPack also works with optional files located in the *.gitpack* directory as fo
 * *.gitpack/*`data` is a directory:
   * It contains any additional data related to the installation.
   * E.g., it contains `.bash_completion` file, which is copied during *precp* script execution.
-* *.gitpack/*`deps` is a file:
-  * It represents a list of the project's Git dependencies.
-  * Each nonempty line contains one dependency in the same format as GitPack URL arguments.
-  * E.g., line `github.com/dominiksalvet/ux430ua-jack-volume=2.4.0` is a valid dependency.
 
 ## Environment variables
 

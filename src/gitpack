@@ -80,7 +80,6 @@ init_constants() {
     # action log types
     readonly LOGTYPE_URL=url # URL check
     readonly LOGTYPE_REPO=repo # repository initialization
-    readonly LOGTYPE_DEPS=deps # processing dependencies
     # database log types
     readonly LOGTYPE_DB=db # database initialization
     readonly LOGTYPE_GET=get # get database item
@@ -149,14 +148,12 @@ init_core_config() {
 
     # other configuration
     readonly BAD_URL_REGEX='(^$| |(^|/)(\.|\.\.)($|/))' # bad URL regex
-    readonly DEP_PREFIX='+ ' # prefix for processing dependencies
 }
 
 # DESCRIPTION:
 #   Initializes GitPack configuration constants.
 init_config() {
     readonly LOG_LINES_KEPT=1000 # keep those last lines when cleaning log
-    readonly MAX_DEP_DEPTH=20 # max depth of nested dependencies
 }
 
 # DESCRIPTION:
@@ -309,7 +306,6 @@ init_runtime_constants() {
 #   must be stated here even though its value is going to be overwritten.
 init_global_vars() {
     state= # the state of the processed project
-    dep_depth=0 # current dependency depth
 
     # command line options
     hash_mode=false # use only commit hashes as versions during reports
@@ -461,7 +457,7 @@ process_action() (
     } || {
         # all possible errors during action processing are caught here
         action_status="$?" # store the action exit status
-        echo "$(get_dep_prefix)<ERROR> $1 $2" >&2 # report GitPack information
+        echo "<ERROR> $1 $2" >&2 # report GitPack information
         return "$action_status" # propagate the status further
     }
 )
@@ -577,9 +573,6 @@ execute_action() (
     # get target (installation candidate) project information
     tar_hash="$(get_repo_hash "$2" "$3")" &&
 
-    # process dependencies first
-    process_deps "$1" "$2" "$tar_hash" &&
-
     # choose action and execute it
     case "$1" in
         "$ACTION_INSTALL") execute_install "$2" "$src_hash" "$tar_hash" ;;
@@ -626,76 +619,6 @@ repo_cd() {
         git checkout -qf "$2"
     fi
 }
-
-#-------------------------------------------------------------------------------
-# DEPENDENCIES
-#-------------------------------------------------------------------------------
-
-# DESCRIPTION:
-#   Prints the current prefix for dependency reports considering the current
-#   dependency depth value.
-get_dep_prefix() {
-    if [ "$dep_depth" -gt 0 ]; then echo "$DEP_PREFIX"; fi
-}
-
-# DESCRIPTION:
-#   Processes all dependencies of a given project considering a given action. It
-#   also checks whether a defined dependency depth was not exceeded.
-# PARAMETERS:
-#   $1 - action
-#   $2 - URL
-#   $3 - hash
-process_deps() (
-    # early return in the uninstall case
-    if [ "$1" = "$ACTION_UNINSTALL" ]; then return; fi
-
-    deps="$(get_deps "$2" "$3")" && # get all dependencies
-    # run the given action recursively for each dependency URL
-    echon "$deps" | while IFS= read -r dep; do
-            next_dep_depth && # register a new dependency depth level
-            process_action "$1" "$dep" || return
-    done
-)
-
-# DESCRIPTION:
-#   Prints all dependencies of a given project's URL and a commit hash.
-# PARAMETERS:
-#   $1 - URL
-#   $2 - hash
-get_deps() (
-    repo_cd "$1" "$2" &&
-    # if there is a file describing dependencies
-    if [ -r .gitpack/deps ]; then
-        log "$LOGTYPE_DEPS" "$1" "$2" &&
-        grepe . .gitpack/deps # remove empty lines
-    fi
-)
-
-# DESCRIPTION:
-#   Prepares the environment for a new dependency depth level. It also checks
-#   whether it is possible to continue processing dependencies.
-next_dep_depth() {
-    dep_depth="$((dep_depth + 1))" # increment dependency depth
-
-    # check whether the new dependency depth value is valid
-    if [ "$dep_depth" -gt "$MAX_DEP_DEPTH" ]; then
-        echof 'maximum dependency depth reached'; return 1
-    fi
-}
-
-# DESCRIPTION:
-#   This function is a grep wrapper. Succeeds even in the case of an empty grep
-#   selection.
-# PARAMETERS:
-#   $@ - grep arguments
-grepe() (
-    grep "$@" # execute the grep itself
-    grep_status="$?" # store its exit status
-
-    # suppress the empty selection error indicator (exit status of 1)
-    if [ "$grep_status" -eq 1 ]; then grep_status=0; fi
-    return "$grep_status" # return the modified exit status
-)
 
 #-------------------------------------------------------------------------------
 # EXECUTE ACTION
@@ -911,6 +834,20 @@ get_last_arg() {
     shift "$(($# - 1))" && # shift to the last argument
     echo "$1" # print it
 }
+
+# DESCRIPTION:
+#   This function is a grep wrapper. Succeeds even in the case of an empty grep
+#   selection.
+# PARAMETERS:
+#   $@ - grep arguments
+grepe() (
+    grep "$@" # execute the grep itself
+    grep_status="$?" # store its exit status
+
+    # suppress the empty selection error indicator (exit status of 1)
+    if [ "$grep_status" -eq 1 ]; then grep_status=0; fi
+    return "$grep_status" # return the modified exit status
+)
 
 #-------------------------------------------------------------------------------
 # REMOVE FILES
@@ -1137,7 +1074,7 @@ log() (
 #   $4 - target hash
 report() (
     # prepare given arguments
-    prefix="$(get_dep_prefix)[$1] $2" &&
+    prefix="[$1] $2" &&
     src_version="$(beautify_hash "$2" "$3")" &&
     tar_version="$(beautify_hash "$2" "$4")" &&
 
