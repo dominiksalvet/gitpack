@@ -124,7 +124,7 @@ COMMAND:
     readonly ABOUT_MESSAGE="GitPack $VERSION
 Simple Git-based package manager.
 
-Copyright 2019 Dominik Salvet
+Copyright 2019-2020 Dominik Salvet
 github.com/dominiksalvet/gitpack"
 }
 
