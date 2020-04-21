@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-# Copyright 2019 Dominik Salvet
+# Copyright 2019-2020 Dominik Salvet
 # github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout commit
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
 
     - name: Check shellcheck
       run: shellcheck --version
@@ -20,9 +20,7 @@ jobs:
       run: shellcheck .github/scripts/*
 
     - name: Check source files
-      run: |
-        shellcheck src/*
-        .github/scripts/stylecheck src/*
+      run: shellcheck src/*
 
     - name: Check GitPack files
       run: |
@@ -37,7 +35,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout commit
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
 
     - name: Run all tests
       run: .github/scripts/test
