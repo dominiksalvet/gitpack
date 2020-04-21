@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #-------------------------------------------------------------------------------
-# Copyright 2019 Dominik Salvet
+# Copyright 2019-2020 Dominik Salvet
 # github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
@@ -24,7 +24,7 @@ echo inittests3 >&2 && export SHORT_COMMIT &&
 #-------------------------------------------------------------------------------
 
 # run all tests and store their exit status and output for further analysis
-{   .github/scripts/tests 2>&1 1>/dev/null
+{   test/tests 2>&1 1>/dev/null
     echo "$?" > "$HOME"/gitpack-tests-status 2>/dev/null # store exit status
 } | tee "$HOME"/gitpack-tests-output >&2 && # store output
 

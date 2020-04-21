@@ -16,13 +16,13 @@ jobs:
     - name: Check shellcheck
       run: shellcheck --version
 
-    - name: Check CI scripts
-      run: shellcheck .github/scripts/*
-
     - name: Check source files
       run: shellcheck src/*
 
-    - name: Check GitPack files
+    - name: Check test files
+      run: shellcheck test/*
+
+    - name: Check install files
       run: |
         shellcheck .gitpack/data/.bash_completion
         shellcheck .gitpack/install/local/precp
@@ -37,9 +37,9 @@ jobs:
     - name: Checkout commit
       uses: actions/checkout@v2
 
-    - name: Run all tests
-      run: .github/scripts/test
+    - name: Run tests
+      run: test/test
 
-    - name: Dump GitPack information
+    - name: Print log
       if: failure()
-      run: .github/scripts/dump
+      run: test/dump
