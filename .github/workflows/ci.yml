@@ -19,27 +19,7 @@ jobs:
     - name: Check source files
       run: shellcheck src/*
 
-    - name: Check test files
-      run: shellcheck test/*
-
     - name: Check install files
       run: |
         shellcheck .gitpack/data/.bash_completion
         shellcheck .gitpack/install/local/precp
-
-  Test:
-    needs: Analysis
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-    - name: Checkout commit
-      uses: actions/checkout@v2
-
-    - name: Run tests
-      run: test/test
-
-    - name: Print log
-      if: failure()
-      run: test/dump
