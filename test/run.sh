@@ -51,7 +51,7 @@ export GITPACK_OLD_VERSION=0.1.0 && # older GitPack version
 # RUN TESTS
 #-------------------------------------------------------------------------------
 
-test/action/status.sh &&
-test/action/install.sh &&
-test/action/update.sh &&
-test/action/downgrade.sh
+run_test test/action/status.sh &&
+run_test test/action/install.sh &&
+run_test test/action/update.sh &&
+run_test test/action/downgrade.sh
