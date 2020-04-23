@@ -29,6 +29,7 @@ jobs:
         false
         shellcheck .gitpack/data/.bash_completion
         shellcheck .gitpack/install/local/precp
+        echo justatest
 
   Test:
     needs: Analysis
