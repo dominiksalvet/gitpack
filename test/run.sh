@@ -43,7 +43,7 @@ export SHORT_COMMIT &&
 # prepare GitPack related variables
 export GITPACK='sh -x src/gitpack' && # GitPack is run with tracing enabled
 export GITPACK_URL=github.com/dominiksalvet/gitpack # GitPack Git URL
-GITPACK_VERSION="$(git describe --tags --abbrev=0)" && # latest GitPack version
+GITPACK_VERSION=0.7.0 && # latest GitPack version
 export GITPACK_VERSION &&
 export GITPACK_OLD_VERSION=0.1.0 && # older GitPack version
 
