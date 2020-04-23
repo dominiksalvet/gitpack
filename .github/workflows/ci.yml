@@ -35,4 +35,4 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Run tests
-      run: sh -x test/run.sh
+      run: test/run.sh
