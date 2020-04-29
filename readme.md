@@ -47,6 +47,7 @@ If you are in, then GitPack comes in pretty handy. All you need is a URL of a co
   * [Example](#example)
 * [Developer](#developer)
   * [Badge](#badge)
+* [Questions](#questions)
 * [Contributing](#contributing)
 * [License](#license)
 
@@ -132,9 +133,13 @@ Markdown:
 [![GitPack](https://img.shields.io/badge/-GitPack-571997)](https://github.com/dominiksalvet/gitpack)
 ```
 
+## Questions
+
+If you have any questions, you can find out how to get them answered in [*support.md*](support.md) file.
+
 ## Contributing
 
-Do you want to contribute? Do you have any questions? Then the [*contributing.md*](contributing.md) file is here for you.
+Do you want to contribute somehow? Then [*contributing.md*](contributing.md) file is here for you.
 
 ## License
 
