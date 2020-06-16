@@ -20,7 +20,7 @@ GitPack works with the *.gitpack* directory of Git repositories matching the fol
   * Each nonempty line is evaluated as a shell function argument. Be careful.
   * E.g., line `bin/vhdldep ~/.local/bin` copies *vhdldep* file to *~/.local/bin* directory.
 
-## Optional files
+## Optional Files
 
 GitPack also works with optional files located in the *.gitpack* directory as follows:
 
@@ -32,7 +32,7 @@ GitPack also works with optional files located in the *.gitpack* directory as fo
   * It contains any additional data related to the installation.
   * E.g., it contains `.bash_completion` file, which is copied during *precp* script execution.
 
-## Environment variables
+## Environment Variables
 
 GitPack provides the following environment variables to all called scripts:
 
