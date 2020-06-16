@@ -7,7 +7,7 @@ The development of GitPack is published on [this website](https://github.com/dom
 If you have any suggestions or bug reports for GitPack, follow these steps:
 
 1. Make sure the same is not already reported in [issues](https://github.com/dominiksalvet/gitpack/issues).
-2. Open a [new issue](https://github.com/dominiksalvet/gitpack/issues/new/choose).
+2. Open a [new issue](https://github.com/dominiksalvet/gitpack/issues/new/choose). Choose an appropriate issue type.
 
 ## Pull Requests
 
