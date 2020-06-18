@@ -10,10 +10,9 @@ assignees: dominiksalvet
 State GitPack version and OS information.
 
 **Execution log**
-Attach the *gitpack.log* contents below. Use `gitpack paths` command to find its location.
+Attach the GitPack log below. Use `gitpack paths` command to find it.
 
-<details>
-    <summary><i>gitpack.log</i></summary>
+<details><summary>gitpack.log</summary>
 
 ```
 <gitpack.log contents>

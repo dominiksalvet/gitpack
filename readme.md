@@ -117,9 +117,9 @@ Why should you use GitPack in your projects?
 * Delta updates
 * POSIX-friendly
 
-How? The [*guide.md*](guide.md) file will show you the way. Then users can **immediately use GitPack to install your projects**.
+How? The [guide.md](guide.md) file will show you the way. Then users can **immediately use GitPack to install your projects**.
 
-Not sure? Take a look at [*.gitpack*](.gitpack) directory of GitPack itself. It can be that simple.
+Not sure? Take a look at [.gitpack](.gitpack) directory of GitPack itself. It can be that simple.
 
 ### Badge
 
@@ -135,11 +135,11 @@ Markdown:
 
 ## Questions
 
-If you have any questions, you can find out how to get them answered in [*support.md*](support.md) file.
+If you have any questions, you can find out how to get them answered in [support.md](support.md) file.
 
 ## Contributing
 
-Do you want to contribute somehow? Then [*contributing.md*](contributing.md) file is here for you.
+Do you want to contribute somehow? Then [contributing.md](contributing.md) file is here for you.
 
 ## License
 

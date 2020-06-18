@@ -1,6 +1,6 @@
 # Guide
 
-This file contains **everything you need to start** using GitPack in your awesome Git projects. Once you follow this guide, end users can immediately install, update or uninstall your projects. Immediately.
+This file contains **everything you need to start** using GitPack in your awesome Git projects. Once you have followed this guide, end users can immediately install, update or uninstall your projects. Immediately.
 
 ## General
 
@@ -8,29 +8,29 @@ In default, GitPack works with Git default branches using their either latest ta
 
 ## Files
 
-GitPack works with the *.gitpack* directory of Git repositories matching the following structure:
+GitPack works with the `.gitpack` directory of Git repositories matching the following structure:
 
-* *.gitpack/install/*`<method>` is a directory:
-  * Its name starts with either `global` or `local` based on **installation type**.
-  * To target a particular system, append its name as `-<system>`.
-  * E.g., `global-Darwin` represents global installation for macOS.
-* *.gitpack/install/\<method\>/*`map` is a file:
+* `.gitpack/install/`*`<method>`* is a directory:
+  * Its name starts with either *`global`* or *`local`* based on **installation type**.
+  * To target a particular system, append its name as *`-<system>`*.
+  * E.g., *`global-Darwin`* represents global installation for macOS.
+* `.gitpack/install/<method>/`*`map`* is a file:
   * Describes how project files are copied/removed during **installation/uninstallation**.
   * Each nonempty line contains file paths to be copied and a target directory path.
   * Each nonempty line is evaluated as a shell function argument. Be careful.
-  * E.g., line `bin/vhdldep ~/.local/bin` copies *vhdldep* file to *~/.local/bin* directory.
+  * E.g., line *`bin/vhdldep ~/.local/bin`* copies `vhdldep` file to `~/.local/bin` directory.
 
 ## Optional Files
 
-GitPack also works with optional files located in the *.gitpack* directory as follows:
+GitPack also works with optional files located in the `.gitpack` directory as follows:
 
-* *.gitpack/install/\<method\>/*`<script>` is an executable file:
-  * Its name is `precp`, `postcp`, `prerm`, or `postrm`.
+* `.gitpack/install/<method>/`*`<script>`* is an executable file:
+  * Its name is *`precp`*, *`postcp`*, *`prerm`*, or *`postrm`*.
   * It is run before the copying, after, before the removal, or after.
-  * E.g., `postcp` modifies */etc/rc.local* file to execute *asus-fan-control* after boot.
-* *.gitpack/*`data` is a directory:
+  * E.g., *`postcp`* modifies `/etc/rc.local` file to run asus-fan-control after boot.
+* `.gitpack/`*`data`* is a directory:
   * It contains any additional data related to the installation.
-  * E.g., it contains `.bash_completion` file, which is copied during *precp* script execution.
+  * E.g., it contains *`.bash_completion`* file, which is copied during `precp` script execution.
 
 ## Environment Variables
 
