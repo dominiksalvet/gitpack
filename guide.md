@@ -1,6 +1,6 @@
 # Guide
 
-This file contains **everything you need to start** using GitPack in your awesome Git projects. Once you have followed this guide, end users can immediately install, update or uninstall your projects. Immediately.
+This file contains **everything you need to start** using GitPack in your awesome projects. Once you have followed this guide, end users can immediately install, update or uninstall your projects. Immediately.
 
 ## General
 
