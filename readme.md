@@ -15,6 +15,8 @@ GitPack is going to go through [significant changes](https://github.com/dominiks
         <img src="https://img.shields.io/badge/-GitPack-571997" alt="GitPack"></a>
     <a href="https://github.com/RichardLitt/standard-readme">
         <img src="https://img.shields.io/badge/readme_style-standard-brightgreen" alt="standard-readme compliant"></a>
+    <a href="https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html">
+        <img src="https://img.shields.io/badge/POSIX-Shell-111111" alt="POSIX Shell"></a>
 </p>
 
 > Simple Git-based package manager.
