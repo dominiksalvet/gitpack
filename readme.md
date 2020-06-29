@@ -9,7 +9,7 @@ GitPack is going to go through [significant changes](https://github.com/dominiks
 </p>
 
 <p align="center">
-    <a href="https://github.com/dominiksalvet/gitpack/commits">
+    <a href="https://github.com/dominiksalvet/gitpack/actions">
         <img src="https://github.com/dominiksalvet/gitpack/workflows/CI/badge.svg" alt="CI status"></a>
     <a href="https://github.com/dominiksalvet/gitpack">
         <img src="https://img.shields.io/badge/-GitPack-571997" alt="GitPack"></a>
