@@ -2,7 +2,7 @@
 
 #-------------------------------------------------------------------------------
 # Copyright 2020 Dominik Salvet
-# github.com/dominiksalvet/gitpack
+# https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
 gitpack_out="$($GITPACK install -o "$GITPACK_URL")" &&

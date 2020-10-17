@@ -2,7 +2,7 @@
 
 #-------------------------------------------------------------------------------
 # Copyright 2019 Dominik Salvet
-# github.com/dominiksalvet/gitpack
+# https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
 # if there is no Bash completion file in home directory, create one

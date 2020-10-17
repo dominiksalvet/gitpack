@@ -2,7 +2,7 @@
 
 #-------------------------------------------------------------------------------
 # Copyright 2019-2020 Dominik Salvet
-# github.com/dominiksalvet/gitpack
+# https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
 #   Initializes test environment and manages running all GitPack tests. The

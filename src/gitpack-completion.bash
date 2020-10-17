@@ -2,7 +2,7 @@
 
 #-------------------------------------------------------------------------------
 # Copyright 2019 Dominik Salvet
-# github.com/dominiksalvet/gitpack
+# https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
 #   This file implements a prompting tab completion for GitPack in Bash shells.

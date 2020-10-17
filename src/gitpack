@@ -2,7 +2,7 @@
 
 #-------------------------------------------------------------------------------
 # Copyright 2019-2020 Dominik Salvet
-# github.com/dominiksalvet/gitpack
+# https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # DESCRIPTION:
 #   This is GitPack, simple Git-based package manager.
@@ -125,7 +125,7 @@ COMMAND:
 Simple Git-based package manager.
 
 Copyright 2019-2020 Dominik Salvet
-github.com/dominiksalvet/gitpack"
+https://github.com/dominiksalvet/gitpack"
 }
 
 #-------------------------------------------------------------------------------
