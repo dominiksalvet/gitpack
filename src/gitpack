@@ -62,6 +62,12 @@ https://github.com/dominiksalvet/gitpack"
 
 init_config() {
     readonly BAD_URL_REGEX='(^$| |(^|/)\.\.?($|/))' # ERE regex
+
+    # mapping remote references to local ones
+    readonly REMOTE_HEAD_REF=refs/HEAD
+    readonly HEAD_REFSPEC=+HEAD:"$REMOTE_HEAD_REF"
+    readonly TAGS_REFSPEC='+refs/tags/*:refs/tags/*'
+    readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # branches
 }
 
 #-------------------------------------------------------------------------------
@@ -187,6 +193,8 @@ perform_action() (
     url="$(minimize_url "$2")" &&
     version="$(url_to_version "$2")" &&
     check_murl "$url" &&
+    init_repo "$url" &&
+
     echo todo
 )
 
@@ -213,6 +221,40 @@ check_murl() (
         echo 'E6: unsupported URL delivered' >&2; return 1
     fi
 )
+
+#-------------------------------------------------------------------------------
+# REPOSITORY
+#-------------------------------------------------------------------------------
+
+# $1 - minimal URL
+init_repo() (
+    repo_dir="$(url_to_path "$1")" &&
+    fetch_repo "$1" "$repo_dir"
+)
+
+# $1 - minimal URL
+# $2 - repository directory
+fetch_repo() (
+    if [ -d "$2"/ ]; then # repository already exists
+        cd "$2"/
+    else # create and configure repository
+        mkdir -p "$2"/ && cd "$2"/ &&
+        # initialize Git repository manually
+        git init -q &&
+        git config gc.auto 0 && # disable garbage collector
+        git config remote.origin.url https://"$1".git &&
+        git config remote.origin.fetch "$HEAD_REFSPEC" &&
+        git config --add remote.origin.fetch "$TAGS_REFSPEC" &&
+        git config --add remote.origin.fetch "$HEADS_REFSPEC"
+    fi &&
+    # fetch remote updates (prune, do not fetch tags implicitly, update HEAD)
+    git fetch -pnuq origin
+)
+
+# $1 - minimal URL
+url_to_path() {
+    echo "$REPOS_DIR"/"$1"
+}
 
 #-------------------------------------------------------------------------------
 # CALL MAIN
