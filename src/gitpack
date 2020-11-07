@@ -18,6 +18,7 @@ main() {
     check_commands &&
     init_constants &&
     init_strings &&
+    init_config &&
     process_args "$@"
 }
 
@@ -57,6 +58,10 @@ Simple Git-based package manager.
 
 Copyright 2019-2020 Dominik Salvet
 https://github.com/dominiksalvet/gitpack"
+}
+
+init_config() {
+    readonly BAD_URL_REGEX='(^$| |(^|/)\.\.?($|/))' # ERE regex
 }
 
 #-------------------------------------------------------------------------------
@@ -178,9 +183,36 @@ remove_dir() {
 
 # $1 - action
 # $2 - URL
-perform_action() {
+perform_action() (
+    url="$(minimize_url "$2")" &&
+    version="$(url_to_version "$2")" &&
+    check_murl "$url" &&
     echo todo
-}
+)
+
+# $1 - URL
+minimize_url() (
+    url="${1%%=*}" # remove version if any
+    url="$(echo "$url" | tr '[:upper:]' '[:lower:]')" &&
+    url="${url#https://}" &&
+    echo "${url%.git}"
+)
+
+# $1 - URL
+url_to_version() (
+    version="${1#*=}" # remove URL and keep version
+    if [ "$version" != "$1" ]; then
+        echo "$version"
+    fi
+)
+
+# $1 - minimal URL
+check_murl() (
+    lineno="$(echo "$1" | wc -l)" &&
+    if [ "$lineno" -ne 1 ] || echo "$1" | grep -qE "$BAD_URL_REGEX"; then
+        echo 'E6: unsupported URL delivered' >&2; return 1
+    fi
+)
 
 #-------------------------------------------------------------------------------
 # CALL MAIN
