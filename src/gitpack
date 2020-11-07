@@ -8,3 +8,167 @@
 # for installing scripts across various platforms. This script is all you need
 # to have GitPack running. All arguments are processed as GitPack help explains.
 #-------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+# MAIN FUNCTION
+#-------------------------------------------------------------------------------
+
+# $@ - GitPack arguments
+main() {
+    check_commands &&
+    init_constants &&
+    init_strings &&
+    process_args "$@"
+}
+
+check_commands() {
+    if ! command -v git > /dev/null; then
+        echo 'E1: missing git command' >&2; return 1
+    fi
+}
+
+#-------------------------------------------------------------------------------
+# STATIC INITIALIZATION
+#-------------------------------------------------------------------------------
+
+init_constants() {
+    readonly VERSION=0.7.0 # current GitPack version
+}
+
+init_strings() {
+    readonly HELP_MESSAGE='USAGE:
+  gitpack ACTION URL[=VERSION]...
+  gitpack COMMAND
+
+ACTION:
+  install    install/update package
+  uninstall  uninstall package
+  status     get package status
+
+COMMAND:
+  list   list installed packages
+  clean  clean cache
+  paths  show file paths
+  help   show help
+  about  show information'
+
+    readonly ABOUT_MESSAGE="GitPack $VERSION
+Simple Git-based package manager.
+
+Copyright 2019-2020 Dominik Salvet
+https://github.com/dominiksalvet/gitpack"
+}
+
+#-------------------------------------------------------------------------------
+# ARGUMENT PROCESSING
+#-------------------------------------------------------------------------------
+
+# $@ - GitPack arguments
+process_args() (
+    case "$1" in
+        install | uninstall | status)
+            init_runtime && process_action_args "$@" ;;
+        list | clean | paths)
+            init_runtime && process_command_args "$@" ;;
+        help) echo "$HELP_MESSAGE" ;;
+        about) echo "$ABOUT_MESSAGE" ;;
+        '') echo 'E2: no argument provided' >&2; return 1 ;;
+        *) echo "E3: invalid argument $1" >&2; return 1 ;;
+    esac
+)
+
+# $1 - action
+# $@ - action arguments
+process_action_args() (
+    action="$1"
+    shift && # shift to action arguments
+
+    if [ "$#" -eq 0 ]; then
+        echo 'E4: no URL provided' >&2; return 1
+    fi &&
+
+    for url in "$@"; do
+        perform_action "$action" "$url" || return
+    done
+)
+
+# $1 - command
+# $@ - command arguments
+process_command_args() (
+    command="$1"
+    shift && # shift to command arguments
+
+    case "$command" in
+        list) run_list ;;
+        clean) run_clean ;;
+        paths) run_paths ;;
+    esac
+)
+
+#-------------------------------------------------------------------------------
+# DYNAMIC INITIALIZATION
+#-------------------------------------------------------------------------------
+
+init_runtime() {
+    init_runtime_constants &&
+    init_paths
+}
+
+init_runtime_constants() {
+    _user_id="$(id -u)" &&
+    if [ "$_user_id" -eq 0 ]; then
+        readonly ACCESS=global
+    else
+        readonly ACCESS=local
+    fi &&
+
+    _system_name="$(uname)" &&
+    readonly SYSTEM="$_system_name"
+}
+
+init_paths() {
+    if [ "$ACCESS" = global ]; then # respect FHS
+        readonly LOG_DIR=/var/log/gitpack
+        readonly CACHE_DIR=/var/cache/gitpack
+        readonly STATE_DIR=/var/lib/gitpack
+    else # respect XDG
+        readonly LOG_DIR="$HOME"/.local/share/gitpack
+        readonly CACHE_DIR="$HOME"/.cache/gitpack
+        readonly STATE_DIR="$HOME"/.local/share/gitpack
+    fi
+
+    readonly REPOS_DIR="$CACHE_DIR"/repos # cache for local repositories
+    readonly STATUS_PATH="$STATE_DIR"/status # database of installed packages
+}
+
+#-------------------------------------------------------------------------------
+# COMMAND PROCESSING
+#-------------------------------------------------------------------------------
+
+run_list() {
+    echo todo
+}
+
+run_clean() {
+    echo todo
+}
+
+run_paths() {
+    echo todo
+}
+
+#-------------------------------------------------------------------------------
+# ACTION PROCESSING
+#-------------------------------------------------------------------------------
+
+# $1 - action
+# $2 - URL
+perform_action() {
+    echo todo
+}
+
+#-------------------------------------------------------------------------------
+# CALL MAIN
+#-------------------------------------------------------------------------------
+
+main "$@"
