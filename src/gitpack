@@ -122,7 +122,8 @@ process_command_args() (
 
 init_runtime() {
     init_runtime_constants &&
-    init_paths
+    init_paths &&
+    init_db
 }
 
 init_runtime_constants() {
@@ -254,6 +255,21 @@ fetch_repo() (
 # $1 - minimal URL
 url_to_path() {
     echo "$REPOS_DIR"/"$1"
+}
+
+#-------------------------------------------------------------------------------
+# DATABASE
+#-------------------------------------------------------------------------------
+
+init_db() {
+    mkdir -p "$STATE_DIR"/ &&
+    if [ ! -e "$STATUS_PATH" ]; then
+        touch "$STATUS_PATH"
+    fi &&
+
+    if ! [ -r "$STATUS_PATH" ] || ! [ -w "$STATUS_PATH" ]; then
+        echo 'E7: cannot access status file' >&2; return 1
+    fi
 }
 
 #-------------------------------------------------------------------------------
