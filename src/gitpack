@@ -128,11 +128,9 @@ init_runtime_constants() {
 
 init_paths() {
     if [ "$ACCESS" = global ]; then # respect FHS
-        readonly LOG_DIR=/var/log/gitpack
         readonly CACHE_DIR=/var/cache/gitpack
         readonly STATE_DIR=/var/lib/gitpack
     else # respect XDG
-        readonly LOG_DIR="$HOME"/.local/share/gitpack
         readonly CACHE_DIR="$HOME"/.cache/gitpack
         readonly STATE_DIR="$HOME"/.local/share/gitpack
     fi
@@ -150,11 +148,28 @@ run_list() {
 }
 
 run_clean() {
-    echo todo
+    if ! remove_dir "$CACHE_DIR"; then
+        echo 'E5: failed to remove cache directory' >&2; return 1
+    fi
 }
 
 run_paths() {
-    echo todo
+    echo "cache-dir $CACHE_DIR" &&
+    echo "state-dir $STATE_DIR"
+}
+
+# $1 - directory path
+remove_dir() {
+    test "$1" && if ! [ -d "$1"/ ]; then return; fi &&
+
+    # do not remove any important directory
+    (   cd -- "$1"/ && real_path="$(pwd -P)" &&
+        test "$PWD" != / && test "$real_path" != / &&
+        test "$PWD" != // && test "$real_path" != // &&
+        test "$PWD" != "$HOME" && test "$real_path" != "$HOME"
+    ) &&
+
+    rm -rf -- "${1:?}"/
 }
 
 #-------------------------------------------------------------------------------

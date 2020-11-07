@@ -8,14 +8,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 The changes not yet present in any release are listed in this section.
 
+### Added
+
+* Error messages contain also a unique ID. No reuse allowed.
+
 ### Changed
 
 * Travis CI has been replaced by GitHub Actions CI.
 * Only optional commands are checked for their existence before execution.
+* The format of `paths` command output has been changed.
 
 ### Removed
 
 * The support for dependencies has been completely removed.
+* The support for logging has been removed.
 
 ## 0.7.0 (2019-10-23)
 
