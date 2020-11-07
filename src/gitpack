@@ -1,0 +1,10 @@
+#!/bin/sh
+
+#-------------------------------------------------------------------------------
+# Copyright 2019-2020 Dominik Salvet
+# https://github.com/dominiksalvet/gitpack
+#-------------------------------------------------------------------------------
+# This is GitPack, a simple Git-based package manager. It is particularly useful
+# for installing scripts across various platforms. This script is all you need
+# to have GitPack running. All arguments are processed as GitPack help explains.
+#-------------------------------------------------------------------------------
