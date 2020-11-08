@@ -19,6 +19,7 @@ main() {
     init_constants &&
     init_strings &&
     init_config &&
+    init_global_vars &&
     process_args "$@"
 }
 
@@ -34,6 +35,22 @@ check_commands() {
 
 init_constants() {
     readonly VERSION=0.7.0 # current GitPack version
+
+    # install action states
+    readonly STATE_INSTALL=install # just installed
+    readonly STATE_UPDATE=update # just updated
+    readonly STATE_DOWNGRADE=downgrade # just downgraded
+    readonly STATE_CHANGE=change # just changed
+    readonly STATE_INSTALLED=installed # already installed
+    # uninstall action states
+    readonly STATE_UNINSTALL=uninstall # just uninstalled
+    readonly STATE_UNINSTALLED=uninstalled # already uninstalled
+    # status action states
+    readonly STATE_NOTHING=nothing # package is not installed
+    readonly STATE_OLDER=older # current version is older than target version
+    readonly STATE_NEWER=newer # current version is newer than target version
+    readonly STATE_DIFF=diff # current version is incomparable to target version
+    readonly STATE_EQUAL=equal # current version is equal to target version
 }
 
 init_strings() {
@@ -68,6 +85,10 @@ init_config() {
     readonly HEAD_REFSPEC=+HEAD:"$REMOTE_HEAD" # default remote branch
     readonly TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # versions
     readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # branches
+}
+
+init_global_vars() {
+    state= # status of the processed package
 }
 
 #-------------------------------------------------------------------------------
@@ -201,10 +222,12 @@ perform_action() (
     tar_hash="$(get_repo_hash "$url" "$version")" &&
 
     case "$1" in
-        install) execute_install "$url" "$src_hash" "$tar_hash" ;;
-        uninstall) execute_uninstall "$url" "$src_hash" ;;
-        status) execute_status "$url" "$src_hash" "$tar_hash" ;;
-    esac
+        install) perform_install "$url" "$src_hash" "$tar_hash" ;;
+        uninstall) perform_uninstall "$url" "$src_hash" ;;
+        status) perform_status "$url" "$src_hash" "$tar_hash" ;;
+    esac &&
+
+    print_report "$state" "$2" "$src_hash" "$tar_hash"
 )
 
 # $1 - URL
@@ -300,20 +323,86 @@ url_to_path() {
 # $1 - minimal URL
 # $2 - source hash (optional)
 # $3 - target hash
-execute_install() {
-    echo todo
+perform_install() {
+    if ! [ "$2" ]; then # not installed yet
+        state="$STATE_INSTALL"
+        run_install "$1" "$3" &&
+        insert_db_record "$1" "$3"
+    elif [ "$2" = "$3" ]; then
+        state="$STATE_INSTALLED"
+    else
+        perform_change "$1" "$2" "$3"
+    fi
+}
+
+# $1 - minimal URL
+# $2 - source hash
+# $3 - target hash
+perform_change() {
+    if is_ancestor_commit "$1" "$2" "$3"; then # source version is older
+        state="$STATE_UPDATE"
+    elif is_ancestor_commit "$1" "$3" "$2"; then # source version is newer
+        state="$STATE_DOWNGRADE"
+    else # given versions are not comparable
+        state="$STATE_CHANGE"
+    fi &&
+
+    run_uninstall "$1" "$2" &&
+    delete_db_records "$1" &&
+    run_install "$1" "$3" &&
+    insert_db_record "$1" "$3"
 }
 
 # $1 - minimal URL
 # $2 - source hash (optional)
-execute_uninstall() {
-    echo todo
+perform_uninstall() {
+    if [ "$2" ]; then # if installed
+        state="$STATE_UNINSTALL" &&
+        run_uninstall "$1" "$2" &&
+        delete_db_records "$1"
+    else
+        state="$STATE_UNINSTALLED"
+    fi
 }
 
 # $1 - minimal URL
 # $2 - source hash (optional)
 # $3 - target hash
-execute_status() {
+perform_status() {
+    if ! [ "$2" ]; then # no source version
+        state="$STATE_NOTHING"
+    elif [ "$2" = "$3" ]; then # given versions are equal
+        state="$STATE_EQUAL"
+    elif is_ancestor_commit "$1" "$2" "$3"; then # source version is older
+        state="$STATE_OLDER"
+    elif is_ancestor_commit "$1" "$3" "$2"; then # source version is newer
+        state="$STATE_NEWER"
+    else # given versions are not comparable
+        state="$STATE_DIFF"
+    fi
+}
+
+# $1 - minimal URL
+# $2 - first hash
+# $3 - second hash
+is_ancestor_commit() (
+    repo_cd "$1" &&
+    git merge-base --is-ancestor "$2" "$3"
+)
+
+#-------------------------------------------------------------------------------
+# INSTALLATION AND UNINSTALLATION
+#-------------------------------------------------------------------------------
+
+# $1 - minimal URL
+# $2 - hash
+run_install() {
+    echo todo
+}
+
+# $1 - minimal URL
+# $2 - hash
+run_uninstall() {
     echo todo
 }
 
@@ -339,6 +428,19 @@ get_db_record() (
     echo "$records" | head -n 1 # select only first match
 )
 
+# $1 - minimal URL
+# $2 - hash
+insert_db_record() {
+    echo "$1 $2" >> "$STATUS_PATH"
+}
+
+# $1 - minimal URL
+delete_db_records() (
+    db="$(get_db)" &&
+    records="$(echo "$db" | grepe -Fv "$1")" &&
+    echon "$records" > "$STATUS_PATH"
+)
+
 get_db() {
     sed '/^$/d' "$STATUS_PATH" # remove empty lines
 }
@@ -354,6 +456,14 @@ grepe() (
     return "$grep_status"
 )
 
+# $@ - echo arguments
+echon() {
+    # no newline if empty string
+    if [ "$@" ]; then
+        echo "$@"
+    fi
+}
+
 # $1 - database record
 get_db_record_url() {
     echo "${1%% *}" # remove hash
@@ -362,6 +472,18 @@ get_db_record_url() {
 # $1 - database record
 get_db_record_hash() {
     echo "${1#* }" # remove URL
+}
+
+#-------------------------------------------------------------------------------
+# REPORT
+#-------------------------------------------------------------------------------
+
+# $1 - state
+# $2 - minimal URL
+# $3 - source hash
+# $4 - target hash
+print_report() {
+    echo todo
 }
 
 #-------------------------------------------------------------------------------
