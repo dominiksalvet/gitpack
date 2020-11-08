@@ -313,13 +313,24 @@ init_db() {
 # $1 - minimal URL
 get_db_record() (
     db="$(get_db)" &&
-    records="$(echo "$db" | grep -F "$1")" &&
+    records="$(echo "$db" | grepe -F "$1")" &&
     echo "$records" | head -n 1 # select only first match
 )
 
 get_db() {
     sed '/^$/d' "$STATUS_PATH" # remove empty lines
 }
+
+# $@ - grep arguments
+grepe() (
+    grep "$@"
+    grep_status="$?" # store grep exit status
+
+    if [ "$grep_status" -eq 1 ]; then
+        grep_status=0 # suppress empty selection indicator
+    fi
+    return "$grep_status"
+)
 
 # $1 - database record
 get_db_record_url() {
