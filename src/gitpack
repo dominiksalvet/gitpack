@@ -396,15 +396,50 @@ is_ancestor_commit() (
 
 # $1 - minimal URL
 # $2 - hash
-run_install() {
-    echo todo
-}
+run_install() (
+    repo_cd "$1" "$2" &&
+    install_script="$(get_install_script)" &&
+    get_uninstall_path > /dev/null && # GitPack must be able to uninstall it
+    run_script "$install_script"
+)
 
 # $1 - minimal URL
 # $2 - hash
-run_uninstall() {
-    echo todo
+run_uninstall() (
+    repo_cd "$1" "$2" &&
+    uninstall_script="$(get_uninstall_script)" &&
+    run_script "$uninstall_script"
+)
+
+get_install_script() {
+    if [ -x .install/install-"${ACCESS}-$SYSTEM" ]; then
+        echo .install/install-"${ACCESS}-$SYSTEM"
+    elif [ -x .install/install-"$ACCESS" ]; then
+        echo .install/install-"$ACCESS"
+    else
+        echo 'E9: missing installation script' >&2; return 1
+    fi
 }
+
+get_uninstall_script() {
+    if [ -x .install/uninstall-"${ACCESS}-$SYSTEM" ]; then
+        echo .install/uninstall-"${ACCESS}-$SYSTEM"
+    elif [ -x .install/uninstall-"$ACCESS" ]; then
+        echo .install/uninstall-"$ACCESS"
+    else
+        echo 'E10: missing uninstallation script' >&2; return 1
+    fi
+}
+
+# $1 - script path
+run_script() (
+    "$1" && return # return if success
+
+    script_status="$?"
+    script_name="$(basename -- "$1")" &&
+    echo "E11: $script_name script failed with $script_status" >&2
+    return 1 # indicate error but do not propagate the exit status further
+)
 
 #-------------------------------------------------------------------------------
 # DATABASE

@@ -18,12 +18,15 @@ The changes not yet present in any release are listed in this section.
 * Only optional commands are checked for their existence before execution.
 * The format of `paths` command output has been changed.
 * Warnings of ambiguous references are no longer suppressed.
+* GitPack repository directory `.gitpack` was renamed to `.install`.
+* Installation and uninstallation are accomplished exclusively using GitPack scripts.
 
 ### Removed
 
 * The support for dependencies has been completely removed.
 * The support for logging has been removed.
 * Support for *status* backup mechanism has been removed.
+* Support for GitPack *map* has been removed.
 
 ## 0.7.0 (2019-10-23)
 
