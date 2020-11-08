@@ -477,7 +477,7 @@ delete_db_records() (
 )
 
 get_db() {
-    sed '/^$/d' "$STATUS_PATH" # remove empty lines
+    grepe . "$STATUS_PATH" # remove empty lines
 }
 
 # $@ - grep arguments
