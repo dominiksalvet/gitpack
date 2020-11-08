@@ -17,7 +17,7 @@ The changes not yet present in any release are listed in this section.
 * Travis CI has been replaced by GitHub Actions CI.
 * Only optional commands are checked for their existence before execution.
 * The format of `paths` command output has been changed.
-* Repositories with ambiguous references are rejected.
+* Warnings of ambiguous references are no longer suppressed.
 
 ### Removed
 
