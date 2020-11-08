@@ -63,11 +63,11 @@ https://github.com/dominiksalvet/gitpack"
 init_config() {
     readonly BAD_URL_REGEX='(^$| |(^|/)\.\.?($|/))' # ERE regex
 
-    # mapping remote references to local ones
-    readonly REMOTE_HEAD_REF=refs/HEAD
-    readonly HEAD_REFSPEC=+HEAD:"$REMOTE_HEAD_REF"
-    readonly TAGS_REFSPEC='+refs/tags/*:refs/tags/*'
-    readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # branches
+    # map all remote references to a single local space
+    readonly GITPACK_REF=refs/gitpack
+    readonly HEADS_REFSPEC='+refs/heads/*':"$GITPACK_REF"'/*' # branches
+    readonly TAGS_REFSPEC='+refs/tags/*':"$GITPACK_REF"'/*' # versions
+    readonly HEAD_REFSPEC=+HEAD:"$GITPACK_REF"/HEAD # default remote branch
 }
 
 #-------------------------------------------------------------------------------
@@ -244,9 +244,9 @@ fetch_repo() (
         git init -q &&
         git config gc.auto 0 && # disable garbage collector
         git config remote.origin.url https://"$1".git &&
-        git config remote.origin.fetch "$HEAD_REFSPEC" &&
+        git config remote.origin.fetch "$HEADS_REFSPEC" &&
         git config --add remote.origin.fetch "$TAGS_REFSPEC" &&
-        git config --add remote.origin.fetch "$HEADS_REFSPEC"
+        git config --add remote.origin.fetch "$HEAD_REFSPEC"
     fi &&
     # fetch remote updates (prune, do not fetch tags implicitly, update HEAD)
     git fetch -pnuq origin
