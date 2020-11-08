@@ -264,8 +264,19 @@ fetch_repo() (
 # $2 - version (optional)
 get_repo_hash() (
     repo_cd "$1" &&
+    if [ "$2" = HEAD ]; then # HEAD reference must point to remote HEAD
+        set -- "$1" "$REMOTE_HEAD"
+    fi &&
 
-    echo todo
+    if [ "$2" ]; then
+        # print the commit hash of the version if it is a valid Git reference
+        if ! git rev-parse -q --verify "$2"^0; then
+            echo "E8: version $2 does not exist" >&2; return 1
+        fi
+    else # use latest tag (preferred) or latest commit of default branch
+        ref="$(git describe --tags --abbrev=0 --always "$REMOTE_HEAD")" &&
+        git rev-parse --verify "$ref"^0 # get commit hash
+    fi
 )
 
 # $1 - minimal URL
