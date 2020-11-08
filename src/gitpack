@@ -242,11 +242,6 @@ init_repo() (
 )
 
 # $1 - minimal URL
-url_to_path() {
-    echo "$REPOS_DIR"/"$1"
-}
-
-# $1 - minimal URL
 # $2 - repository directory
 fetch_repo() (
     if [ -d "$2"/ ]; then # repository already exists
@@ -267,8 +262,24 @@ fetch_repo() (
 
 # $1 - minimal URL
 # $2 - version (optional)
-get_repo_hash() {
+get_repo_hash() (
+    repo_cd "$1" &&
+
     echo todo
+)
+
+# $1 - minimal URL
+# $2 - hash (optional)
+repo_cd() {
+    cd "$(url_to_path "$1")"/ &&
+    if [ "$2" ]; then
+        git checkout -qf "$2"
+    fi
+}
+
+# $1 - minimal URL
+url_to_path() {
+    echo "$REPOS_DIR"/"$1"
 }
 
 #-------------------------------------------------------------------------------
