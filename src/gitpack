@@ -81,7 +81,7 @@ init_config() {
     readonly BAD_URL_REGEX='(^$| |(^|/)\.\.?($|/))' # ERE regex
 
     # map remote references to local ones
-    readonly REMOTE_HEAD=refs/gitpack/HEAD
+    readonly REMOTE_HEAD=refs/remote/HEAD # full remote HEAD reference path
     readonly HEAD_REFSPEC=+HEAD:"$REMOTE_HEAD" # default remote branch
     readonly TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # versions
     readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # branches
@@ -273,7 +273,7 @@ fetch_repo() (
         echo '  updating local repository' >&2 &&
         cd "$2"/
     else # create and configure repository
-        echo '  creating local repository' >&2 &&
+        echo '  downloading local repository' >&2 &&
         mkdir -p "$2"/ && cd "$2"/ &&
         # initialize Git repository manually
         git init -q &&
