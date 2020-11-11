@@ -11,6 +11,7 @@ The changes not yet present in any release are listed in this section.
 ### Added
 
 * Error messages contain also a unique ID. No reuse allowed.
+* Added diagnostic messages to ease watching the progress of GitPack execution.
 
 ### Changed
 

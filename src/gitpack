@@ -193,6 +193,7 @@ run_paths() {
 
 # $1 - directory path
 remove_dir() {
+    echo "removing directory $1" >&2 &&
     test "$1" && if ! [ -d "$1"/ ]; then return; fi &&
 
     # do not remove any important directory
@@ -212,6 +213,7 @@ remove_dir() {
 # $1 - action
 # $2 - URL
 perform_action() (
+    echo "running $1 for $2" >&2 &&
     url="$(minimize_url "$2")" &&
     version="$(url_to_version "$2")" && # may be empty
     check_murl "$url" && # check minimal URL
@@ -268,8 +270,10 @@ init_repo() (
 # $2 - repository directory
 fetch_repo() (
     if [ -d "$2"/ ]; then # repository already exists
+        echo '  updating local repository' >&2 &&
         cd "$2"/
     else # create and configure repository
+        echo '  creating local repository' >&2 &&
         mkdir -p "$2"/ && cd "$2"/ &&
         # initialize Git repository manually
         git init -q &&
@@ -292,11 +296,13 @@ get_repo_hash() (
     fi &&
 
     if [ "$2" ]; then
+        echo '  using given version' >&2 &&
         # print the commit hash of the version if it is a valid Git reference
         if ! git rev-parse -q --verify "$2"^0; then
             echo "E8: version $2 does not exist" >&2; return 1
         fi
     else # use latest tag (preferred) or latest commit of default branch
+        echo '  using latest version' >&2 &&
         ref="$(git describe --tags --abbrev=0 --always "$REMOTE_HEAD")" &&
         git rev-parse --verify "$ref"^0 # get commit hash
     fi
@@ -399,7 +405,7 @@ is_ancestor_commit() (
 run_install() (
     repo_cd "$1" "$2" &&
     install_script="$(get_install_script)" &&
-    get_uninstall_path > /dev/null && # GitPack must be able to uninstall it
+    get_uninstall_script > /dev/null && # GitPack must be able to uninstall it
     run_script "$install_script"
 )
 
@@ -433,6 +439,7 @@ get_uninstall_script() {
 
 # $1 - script path
 run_script() (
+    echo "  running script $1" >&2 &&
     "$1" && return # return if success
 
     script_status="$?"
@@ -442,7 +449,7 @@ run_script() (
 )
 
 #-------------------------------------------------------------------------------
-# DATABASE
+# PACKAGE DATABASE
 #-------------------------------------------------------------------------------
 
 init_db() {
@@ -458,6 +465,7 @@ init_db() {
 
 # $1 - minimal URL
 get_db_record() (
+    echo '  reading package database' >&2 &&
     db="$(get_db)" &&
     records="$(echo "$db" | grepe -F "$1")" &&
     echo "$records" | head -n 1 # select only first match
