@@ -81,8 +81,8 @@ init_config() {
     readonly BAD_URL_REGEX='(^$| |(^|/)\.\.?($|/))' # ERE regex
 
     # map remote references to local ones
-    readonly REMOTE_HEAD=refs/remote/HEAD # full remote HEAD reference path
-    readonly HEAD_REFSPEC=+HEAD:"$REMOTE_HEAD" # default remote branch
+    readonly ORIGIN_HEAD=refs/origin/HEAD # full remote HEAD reference path
+    readonly HEAD_REFSPEC=+HEAD:"$ORIGIN_HEAD" # default remote branch
     readonly TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # versions
     readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # branches
 }
@@ -292,7 +292,7 @@ fetch_repo() (
 get_repo_hash() (
     repo_cd "$1" &&
     if [ "$2" = HEAD ]; then # HEAD reference must point to remote HEAD
-        set -- "$1" "$REMOTE_HEAD"
+        set -- "$1" "$ORIGIN_HEAD"
     fi &&
 
     if [ "$2" ]; then
@@ -303,7 +303,7 @@ get_repo_hash() (
         fi
     else # use latest tag (preferred) or latest commit of default branch
         echo '  using latest version' >&2 &&
-        ref="$(git describe --tags --abbrev=0 --always "$REMOTE_HEAD")" &&
+        ref="$(git describe --tags --abbrev=0 --always "$ORIGIN_HEAD")" &&
         git rev-parse --verify "$ref"^0 # get commit hash
     fi
 )
