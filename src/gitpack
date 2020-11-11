@@ -81,7 +81,7 @@ init_config() {
     readonly BAD_URL_REGEX='(^$| |(^|/)\.\.?($|/))' # ERE regex
 
     # map remote references to local ones
-    readonly ORIGIN_HEAD=refs/origin/HEAD # full remote HEAD reference path
+    readonly ORIGIN_HEAD=refs/remotes/origin/HEAD # remote HEAD reference path
     readonly HEAD_REFSPEC=+HEAD:"$ORIGIN_HEAD" # default remote branch
     readonly TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # versions
     readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # branches
