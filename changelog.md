@@ -28,6 +28,7 @@ The changes not yet present in any release are listed in this section.
 * The support for logging has been removed.
 * Support for `status` backup mechanism has been removed.
 * Support for GitPack `map` has been removed.
+* The formatted output to stdout of the action result has been removed.
 
 ## 0.7.0 (2019-10-23)
 
