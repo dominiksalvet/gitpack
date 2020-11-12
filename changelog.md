@@ -11,7 +11,7 @@ The changes not yet present in any release are listed in this section.
 ### Added
 
 * Error messages contain also a unique ID. No reuse allowed.
-* Added diagnostic messages to ease watching the progress of GitPack execution.
+* Added messages to ease watching the progress of GitPack execution.
 
 ### Changed
 
@@ -21,6 +21,7 @@ The changes not yet present in any release are listed in this section.
 * Warnings of ambiguous references are no longer suppressed.
 * GitPack repository directory `.gitpack` was renamed to `.install`.
 * Installation and uninstallation are accomplished exclusively using GitPack scripts.
+* The output of actions is no longer formatted for easier further processing.
 
 ### Removed
 
@@ -28,7 +29,6 @@ The changes not yet present in any release are listed in this section.
 * The support for logging has been removed.
 * Support for `status` backup mechanism has been removed.
 * Support for GitPack `map` has been removed.
-* The formatted output to stdout of the action result has been removed.
 
 ## 0.7.0 (2019-10-23)
 
