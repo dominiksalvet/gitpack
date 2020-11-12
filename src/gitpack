@@ -160,9 +160,15 @@ init_paths() {
 # COMMAND PROCESSING
 #-------------------------------------------------------------------------------
 
-run_list() {
-    echo todo
-}
+run_list() (
+    db="$(get_db)" &&
+    echon "$db" | while IFS= read -r db_record; do
+        url="$(get_db_record_url "$db_record")" &&
+        hash="$(get_db_record_hash "$db_record")" &&
+        version="$(beautify_hash "$url" "$hash")" &&
+        echo "$url $version" || return
+    done
+)
 
 run_clean() {
     if ! remove_dir "$CACHE_DIR"; then
@@ -174,6 +180,27 @@ run_paths() {
     echo "cache-dir $CACHE_DIR" &&
     echo "state-dir $STATE_DIR"
 }
+
+# $@ - echo arguments
+echon() {
+    # no newline if empty string
+    if [ "$@" ]; then
+        echo "$@"
+    fi
+}
+
+# $1 - minimal URL
+# $2 - hash (optional)
+beautify_hash() (
+    if [ "$2" ]; then
+        if repo_cd "$1" 2>/dev/null &&
+           ref="$(git describe --all --exact-match "$2" 2>/dev/null)"; then
+            echo "${ref##*/}" # remove reference path prefix
+        else
+            echo "$2" | cut -c 1-7 # if previous failed, return short hash
+        fi
+    fi
+)
 
 # $1 - directory path
 remove_dir() {
@@ -386,19 +413,6 @@ is_ancestor_commit() (
     git merge-base --is-ancestor "$2" "$3"
 )
 
-# $1 - minimal URL
-# $2 - hash (optional)
-beautify_hash() (
-    if [ "$2" ]; then
-        if repo_cd "$1" 2>/dev/null &&
-           ref="$(git describe --all --exact-match "$2" 2>/dev/null)"; then
-            echo "${ref##*/}" # remove reference path prefix
-        else
-            echo "$2" | cut -c 1-7 # if previous failed, return short hash
-        fi
-    fi
-)
-
 #-------------------------------------------------------------------------------
 # INSTALLATION AND UNINSTALLATION
 #-------------------------------------------------------------------------------
@@ -509,14 +523,6 @@ grepe() (
     fi
     return "$grep_status"
 )
-
-# $@ - echo arguments
-echon() {
-    # no newline if empty string
-    if [ "$@" ]; then
-        echo "$@"
-    fi
-}
 
 # $1 - database record
 get_db_record_url() {
