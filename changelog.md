@@ -21,7 +21,7 @@ The changes not yet present in any release are listed in this section.
 * Warnings of ambiguous references are no longer suppressed.
 * GitPack repository directory `.gitpack` was renamed to `.install`.
 * Installation and uninstallation are accomplished exclusively using GitPack scripts.
-* The output of actions is no longer formatted for easier further processing.
+* The output of actions uses significantly different format.
 
 ### Removed
 
