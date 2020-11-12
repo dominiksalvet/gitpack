@@ -80,23 +80,24 @@ init_env_vars() {
 #-------------------------------------------------------------------------------
 
 # $@ - GitPack arguments
-process_args() (
+process_args() {
     case "$1" in
         install | uninstall | status)
-            init_runtime && process_action_args "$@" ;;
+            process_action_args "$@" ;;
         list | clean | paths)
-            init_runtime && process_command_args "$@" ;;
+            process_command_args "$@" ;;
         help) echo "$HELP_MESSAGE" ;;
         about) echo "$ABOUT_MESSAGE" ;;
         '') echo 'E2: no argument provided' >&2; return 1 ;;
         *) echo "E3: invalid argument $1" >&2; return 1 ;;
     esac
-)
+}
 
 # $1 - action
 # $@ - action arguments
 process_action_args() (
-    action="$1"
+    init_runtime &&
+    action="$1" &&
     shift && # shift to action arguments
 
     if [ "$#" -eq 0 ]; then
@@ -111,7 +112,8 @@ process_action_args() (
 # $1 - command
 # $@ - command arguments
 process_command_args() (
-    command="$1"
+    init_runtime &&
+    command="$1" &&
     shift && # shift to command arguments
 
     case "$command" in
