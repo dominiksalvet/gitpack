@@ -312,13 +312,13 @@ get_repo_hash() (
     fi &&
 
     if [ "$2" ]; then
-        echod 'using given version' &&
+        echod 'using given candidate version' &&
         # print the commit hash of the version if it is a valid Git reference
         if ! git rev-parse -q --verify "$2"^0; then
             echo "E8: version $2 does not exist" >&2; return 1
         fi
     else # use latest tag (preferred) or latest commit of default branch
-        echod 'using latest version' &&
+        echod 'using latest candidate version' &&
         ref="$(git describe --tags --abbrev=0 --always "$ORIGIN_HEAD")" &&
         git rev-parse --verify "$ref"^0 # get commit hash
     fi
