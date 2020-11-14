@@ -12,6 +12,7 @@ The changes not yet present in any release are listed in this section.
 
 * Error messages contain also a unique ID. No reuse allowed.
 * Added messages to ease watching the progress of GitPack execution.
+* Added package index – fetch repositories updates only once an hour, otherwise use cache.
 
 ### Changed
 

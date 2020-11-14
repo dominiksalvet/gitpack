@@ -130,7 +130,8 @@ process_command_args() (
 init_runtime() {
     init_runtime_constants &&
     init_paths &&
-    init_db
+    init_db &&
+    init_index
 }
 
 init_runtime_constants() {
@@ -155,6 +156,7 @@ init_paths() {
     fi
 
     readonly REPOS_DIR="$CACHE_DIR"/repos # cache for local repositories
+    readonly FETCHED_PATH="$CACHE_DIR"/fetched # repositories fetch timestamps
     readonly STATUS_PATH="$STATE_DIR"/status # database of installed packages
 }
 
@@ -280,8 +282,13 @@ check_murl() (
 
 # $1 - minimal URL
 init_repo() (
-    repo_dir="$(url_to_path "$1")" &&
-    fetch_repo "$1" "$repo_dir"
+    if is_index_fresh "$1"; then
+        echod 'local repository fresh'
+    else
+        repo_dir="$(url_to_path "$1")" &&
+        fetch_repo "$1" "$repo_dir" &&
+        update_index "$1" # mark as fresh
+    fi
 )
 
 # $1 - minimal URL
@@ -541,6 +548,69 @@ get_db_record_url() {
 # $1 - database record
 get_db_record_hash() {
     echo "${1#* }" # remove URL
+}
+
+#-------------------------------------------------------------------------------
+# PACKAGE INDEX
+#-------------------------------------------------------------------------------
+
+init_index() {
+    mkdir -p "$CACHE_DIR"/ &&
+    if ! [ -e "$FETCHED_PATH" ]; then
+        touch "$FETCHED_PATH"
+    fi &&
+
+    if ! [ -r "$FETCHED_PATH" ] || ! [ -w "$FETCHED_PATH" ]; then
+        echo 'E12: cannot access fetched file' >&2; return 1
+    fi
+}
+
+# $1 - minimal URL
+is_index_fresh() (
+    current_time="$(get_current_time)" &&
+
+    index="$(get_index)" &&
+    item="$(echo "$index" | grepe -F "$1")" &&
+    item="$(echo "$item" | head -n 1)" && # just for sure
+    item_time="$(get_index_item_time "$item")" &&
+
+    test "$item_time" = "$current_time"
+)
+
+# $1 - minimal URL
+update_index() (
+    current_time="$(get_current_time)" &&
+
+    index="$(get_index)" &&
+    items="$(echo "$index" | grepe -Fv "$1")" && # remove item from the index
+
+    # append item with updated time
+    items="$(append_line "$items" "$1 $current_time")" &&
+    echo "$items" > "$FETCHED_PATH"
+)
+
+get_current_time() {
+    date -u '+%Y%m%d%H' # UTC as <year><month><day><hour>
+}
+
+get_index() {
+    grepe . "$FETCHED_PATH" # remove empty lines
+}
+
+# $1 - index item
+get_index_item_time() {
+    echo "${1#* }" # remove URL
+}
+
+# $1 - original string
+# $2 - appended string
+append_line() {
+    if [ "$1" ]; then
+        echo "$1
+$2"
+    else # empty original string
+        echo "$2" # do not print leading empty line
+    fi
 }
 
 #-------------------------------------------------------------------------------
