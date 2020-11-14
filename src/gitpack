@@ -486,7 +486,7 @@ run_script() (
 
 init_db() {
     mkdir -p "$STATE_DIR"/ &&
-    if [ ! -e "$STATUS_PATH" ]; then
+    if ! [ -e "$STATUS_PATH" ]; then
         touch "$STATUS_PATH"
     fi &&
 
