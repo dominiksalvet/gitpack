@@ -88,8 +88,8 @@ process_args() {
             process_command_args "$@" ;;
         help) echo "$HELP_MESSAGE" ;;
         about) echo "$ABOUT_MESSAGE" ;;
-        '') echo 'E2: no argument provided' >&2; return 1 ;;
-        *) echo "E3: invalid argument $1" >&2; return 1 ;;
+        '') echoh 'E2: no argument provided'; return 1 ;;
+        *) echoh "E3: invalid argument $1"; return 1 ;;
     esac
 }
 
@@ -101,7 +101,7 @@ process_action_args() (
     shift && # shift to action arguments
 
     if [ "$#" -eq 0 ]; then
-        echo 'E4: no URL provided' >&2; return 1
+        echoh 'E4: no URL provided'; return 1
     fi &&
 
     for url in "$@"; do
@@ -122,6 +122,12 @@ process_command_args() (
         paths) run_paths ;;
     esac
 )
+
+# $@ - echo arguments
+echoh() {
+    echo "$@" >&2 &&
+    echo "try 'gitpack help' for more information" >&2 # print also a hint
+}
 
 #-------------------------------------------------------------------------------
 # DYNAMIC INITIALIZATION
