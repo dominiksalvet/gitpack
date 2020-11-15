@@ -1,23 +1,21 @@
 #!/bin/bash
 
 #-------------------------------------------------------------------------------
-# Copyright 2019 Dominik Salvet
+# Copyright 2019-2020 Dominik Salvet
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
-# DESCRIPTION:
-#   This file implements a prompting tab completion for GitPack in Bash shells.
-#   It works with all mandatory GitPack arguments. It is expected to be sourced.
+# This file represents a GitPack extension, which incorporates a prompting tab
+# completion of GitPak arguments into Bash shells. It is expected to be sourced.
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
 # COMPLETION GENERATOR
 #-------------------------------------------------------------------------------
 
-# DESCRIPTION:
-#   Prepares the next word hint based on the current part of the word.
 _gitpack() {
-    local -r FIRST_WORDS='install uninstall status list clean paths help
-                          about' && # the list of possible first arguments
+    # the list of possible first arguments
+    local -r FIRST_WORDS='install uninstall status
+                          list clean paths help about' &&
     local first_word="${COMP_WORDS[1]}" &&
     local cur_word="${COMP_WORDS[COMP_CWORD]}" && # the current part of the word
 
@@ -31,20 +29,15 @@ _gitpack() {
     fi
 }
 
-# DESCRIPTION:
-#   Prepares the next URL hint based on the current one.
 _gitpack_url() {
-    local cached_urls &&
-    # collect global and local cached repository paths (URLs)
-    cached_urls="$(
-        cd /var/cache/gitpack/repo/ 2>/dev/null &&
-        find ./ -maxdepth 3 -mindepth 3 -type d | sed 's|^./||'
-        cd "$HOME"/.cache/gitpack/repo/ 2>/dev/null &&
-        find ./ -maxdepth 3 -mindepth 3 -type d | sed 's|^./||'
+    local fetched_urls &&
+    # collect global and local fetched URLs
+    fetched_urls="$(
+        cut -f 1 -d ' ' /var/cache/gitpack/fetched 2>/dev/null
+        cut -f 1 -d ' ' "$HOME"/.cache/gitpack/fetched 2>/dev/null
         true
     )" &&
-    # prepare hints based on given arguments
-    mapfile -t COMPREPLY < <(compgen -W "$cached_urls" -- "$cur_word")
+    mapfile -t COMPREPLY < <(compgen -W "$fetched_urls" -- "$cur_word")
 }
 
 #-------------------------------------------------------------------------------

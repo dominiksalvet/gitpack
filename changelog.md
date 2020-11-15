@@ -23,6 +23,11 @@ The changes not yet present in any release are listed in this section.
 * GitPack repository directory `.gitpack` was renamed to `.install`.
 * Installation and uninstallation are accomplished exclusively using GitPack scripts.
 * The output of actions uses significantly different format.
+* The Bash tab completion now uses `fetched` files to create URL hints.
+
+### Fixed
+
+* When fetching a repository fails, it is no longer present in Bash tab completion hints.
 
 ### Removed
 
