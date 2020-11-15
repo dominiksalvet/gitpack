@@ -52,8 +52,8 @@ COMMAND:  list   list installed packages
           help   show help
           about  show information
 
-OPTION:   -h  short hash mode
-          -H  long hash mode'
+OPTION:   -h  show short version hashes
+          -H  show full version hashes'
 
     readonly ABOUT_MESSAGE="GitPack $VERSION
 Simple Git-based package manager.
@@ -78,7 +78,7 @@ init_env_vars() {
 
 init_opts() {
     # global variables
-    hash_mode= # short, long
+    hash_mode= # short, full
 }
 
 #-------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ process_opts() {
     while getopts :hH _opt; do
         case "$_opt" in
             h) hash_mode=short ;;
-            H) hash_mode=long ;;
+            H) hash_mode=full ;;
             ?) echoh "E13: invalid option -$OPTARG"; return 1 ;;
         esac || return
     done
@@ -223,7 +223,7 @@ beautify_hash() (
         if ! [ "$hash_mode" ] && repo_cd "$1" 2>/dev/null &&
            ref="$(git describe --all --exact-match "$2" 2>/dev/null)"; then
             echo "${ref##*/}" # remove reference path prefix
-        elif [ "$hash_mode" = long ]; then
+        elif [ "$hash_mode" = full ]; then
             echo "$2" # return full hash
         else
             echo "$2" | cut -c 1-7 # return short hash
