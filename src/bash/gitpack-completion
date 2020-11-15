@@ -13,26 +13,45 @@
 #-------------------------------------------------------------------------------
 
 _gitpack() {
-    # the list of possible first arguments
-    local -r FIRST_WORDS='install uninstall status
+    # the list of possible subcommands
+    local -r SUBCOMMANDS='install uninstall status
                           list clean paths help about' &&
-    local first_word="${COMP_WORDS[1]}" &&
     local cur_word="${COMP_WORDS[COMP_CWORD]}" && # the current part of the word
+    local subcommand_index &&
+    subcommand_index="$(_gitpack_subcommand_index "${COMP_WORDS[@]}")" &&
 
-    if [ "$COMP_CWORD" -eq 1 ]; then # actions and commands
-        # prepare hints based on given arguments
-        mapfile -t COMPREPLY < <(compgen -W "$FIRST_WORDS" -- "$cur_word")
+    if ! [ "$subcommand_index" ]; then # no action or command so far
+        mapfile -t COMPREPLY < <(compgen -W "$SUBCOMMANDS" -- "$cur_word")
     else # repository URLs
-        case "$first_word" in # print them only for actions
+        local item="${COMP_WORDS[subcommand_index]}" &&
+        case "$item" in # only for actions
             install | uninstall | status) _gitpack_url ;;
         esac
     fi
 }
 
+# $@ - completion words array
+_gitpack_subcommand_index() {
+    local arr=("$@") && # interpret input as an array
+    local accept_next=false &&
+
+    local item &&
+    for ((i=1; i<COMP_CWORD; i++)); do # ignore first and last items
+        item="${arr[i]}" &&
+        if [ "$accept_next" = true ]; then
+            echo "$i"; return
+        fi &&
+        if [ "$item" = "${item#-}" ]; then # no dash prefix
+            echo "$i"; return
+        elif [ "$item" = '--' ]; then
+            accept_next=true
+        fi || return
+    done
+}
+
 _gitpack_url() {
-    local fetched_urls &&
     # collect global and local fetched URLs
-    fetched_urls="$(
+    local fetched_urls && fetched_urls="$(
         cut -f 1 -d ' ' /var/cache/gitpack/fetched 2>/dev/null
         cut -f 1 -d ' ' "$HOME"/.cache/gitpack/fetched 2>/dev/null
         true
