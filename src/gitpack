@@ -20,6 +20,7 @@ main() {
     init_strings &&
     init_config &&
     init_env_vars &&
+    init_opts &&
     process_args "$@"
 }
 
@@ -38,8 +39,8 @@ init_constants() {
 }
 
 init_strings() {
-    readonly HELP_MESSAGE='USAGE:    gitpack ACTION URL[=VERSION]...
-          gitpack COMMAND
+    readonly HELP_MESSAGE='USAGE:    gitpack [OPTION...] ACTION URL[=VERSION]...
+          gitpack [OPTION...] COMMAND
 
 ACTION:   install    install/update package
           uninstall  uninstall package
@@ -49,7 +50,10 @@ COMMAND:  list   list installed packages
           clean  clean cache
           paths  show file paths
           help   show help
-          about  show information'
+          about  show information
+
+OPTION:   -h  short hash mode
+          -H  long hash mode'
 
     readonly ABOUT_MESSAGE="GitPack $VERSION
 Simple Git-based package manager.
@@ -72,12 +76,20 @@ init_env_vars() {
     export DIAG_PREFIX= # prefix for diagnostic messages (exported to scripts)
 }
 
+init_opts() {
+    # global variables
+    hash_mode= # short, long
+}
+
 #-------------------------------------------------------------------------------
 # ARGUMENT PROCESSING
 #-------------------------------------------------------------------------------
 
 # $@ - GitPack arguments
 process_args() {
+    process_opts "$@" &&
+    shift "$((OPTIND - 1))" && # shift to an actual subcommand
+
     case "$1" in
         install | uninstall | status)
             process_action_args "$@" ;;
@@ -85,9 +97,20 @@ process_args() {
             process_command_args "$@" ;;
         help) echo "$HELP_MESSAGE" ;;
         about) echo "$ABOUT_MESSAGE" ;;
-        '') echoh 'E2: no argument provided'; return 1 ;;
-        *) echoh "E3: invalid argument $1"; return 1 ;;
+        '') echoh 'E2: no subcommand provided'; return 1 ;;
+        *) echoh "E3: invalid subcommand $1"; return 1 ;;
     esac
+}
+
+# $@ - GitPack options
+process_opts() {
+    while getopts :hH _opt; do
+        case "$_opt" in
+            h) hash_mode=short ;;
+            H) hash_mode=long ;;
+            ?) echoh "E13: invalid option -$OPTARG"; return 1 ;;
+        esac || return
+    done
 }
 
 # $1 - action
@@ -200,11 +223,13 @@ echon() {
 # $2 - hash (optional)
 beautify_hash() (
     if [ "$2" ]; then
-        if repo_cd "$1" 2>/dev/null &&
+        if ! [ "$hash_mode" ] && repo_cd "$1" 2>/dev/null &&
            ref="$(git describe --all --exact-match "$2" 2>/dev/null)"; then
             echo "${ref##*/}" # remove reference path prefix
+        elif [ "$hash_mode" = long ]; then
+            echo "$2" # return full hash
         else
-            echo "$2" | cut -c 1-7 # if previous failed, return short hash
+            echo "$2" | cut -c 1-7 # return short hash
         fi
     fi
 )
@@ -509,7 +534,7 @@ init_db() {
 get_db_record() (
     echod 'reading package database' &&
     db="$(get_db)" &&
-    records="$(echo "$db" | grepe -F "$1")" &&
+    records="$(echo "$db" | grepe -F -- "$1")" &&
     echo "$records" | head -n 1 # select only first match
 )
 
@@ -524,7 +549,7 @@ insert_db_record() {
 delete_db_records() (
     echod 'removing from package database' &&
     db="$(get_db)" &&
-    records="$(echo "$db" | grepe -Fv "$1")" &&
+    records="$(echo "$db" | grepe -Fv -- "$1")" &&
     echon "$records" > "$STATUS_PATH"
 )
 
@@ -573,7 +598,7 @@ is_index_fresh() (
     current_time="$(get_current_time)" &&
 
     index="$(get_index)" &&
-    item="$(echo "$index" | grepe -F "$1")" &&
+    item="$(echo "$index" | grepe -F -- "$1")" &&
     item="$(echo "$item" | head -n 1)" && # just for sure
     item_time="$(get_index_item_time "$item")" &&
 
@@ -585,7 +610,7 @@ update_index() (
     current_time="$(get_current_time)" &&
 
     index="$(get_index)" &&
-    items="$(echo "$index" | grepe -Fv "$1")" && # remove item from the index
+    items="$(echo "$index" | grepe -Fv -- "$1")" && # remove item from the index
 
     # append item with updated time
     items="$(append_line "$items" "$1 $current_time")" &&

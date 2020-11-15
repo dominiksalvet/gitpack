@@ -14,6 +14,7 @@ The changes not yet present in any release are listed in this section.
 * Added messages to ease watching the progress of GitPack execution.
 * Added package index – fetch repositories updates only once an hour, otherwise use cache.
 * Added a hint message when bad arguments passed to ease finding GitPack's help.
+* Added long hash mode option `-H` forcing to always show full commit hashes.
 
 ### Changed
 
@@ -25,6 +26,7 @@ The changes not yet present in any release are listed in this section.
 * Installation and uninstallation are accomplished exclusively using GitPack scripts.
 * The output of actions uses significantly different format.
 * The Bash tab completion now uses `fetched` files to create URL hints.
+* All options have been moved to right after `gitpack` command, not per action/command basis.
 
 ### Fixed
 
