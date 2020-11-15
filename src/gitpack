@@ -133,10 +133,7 @@ process_action_args() (
 # $@ - command arguments
 process_command_args() (
     init_runtime &&
-    command="$1" &&
-    shift && # shift to command arguments
-
-    case "$command" in
+    case "$1" in # other arguments are ignored
         list) run_list ;;
         clean) run_clean ;;
         paths) run_paths ;;
