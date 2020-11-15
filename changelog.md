@@ -15,6 +15,7 @@ The changes not yet present in any release are listed in this section.
 * Added package index – fetch repositories updates only once an hour, otherwise use cache.
 * Added a hint message when bad arguments passed to ease finding GitPack's help.
 * Added long hash mode option `-H` forcing to always show full commit hashes.
+* Added fetch mode option `-f` forcing GitPack to always fetch updates from remote.
 
 ### Changed
 
