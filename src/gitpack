@@ -38,21 +38,18 @@ init_constants() {
 }
 
 init_strings() {
-    readonly HELP_MESSAGE='USAGE:
-  gitpack ACTION URL[=VERSION]...
-  gitpack COMMAND
+    readonly HELP_MESSAGE='USAGE:    gitpack ACTION URL[=VERSION]...
+          gitpack COMMAND
 
-ACTION:
-  install    install/update package
-  uninstall  uninstall package
-  status     get package status
+ACTION:   install    install/update package
+          uninstall  uninstall package
+          status     get package status
 
-COMMAND:
-  list   list installed packages
-  clean  clean cache
-  paths  show file paths
-  help   show help
-  about  show information'
+COMMAND:  list   list installed packages
+          clean  clean cache
+          paths  show file paths
+          help   show help
+          about  show information'
 
     readonly ABOUT_MESSAGE="GitPack $VERSION
 Simple Git-based package manager.
