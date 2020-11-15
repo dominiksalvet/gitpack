@@ -1,2 +1,0 @@
-src/gitpack "$HOME"/.local/bin
-src/gitpack-completion.bash "$HOME"/.bash_completion.d
