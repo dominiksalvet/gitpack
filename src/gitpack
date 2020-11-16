@@ -80,7 +80,7 @@ init_env_vars() {
 init_opts() {
     # global variables
     hash_mode= # short, full
-    fetch_mode=false
+    fetch_always_mode=false
 }
 
 #-------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ process_opts() {
         case "$_opt" in
             h) hash_mode=short ;;
             H) hash_mode=full ;;
-            f) fetch_mode=true ;;
+            f) fetch_always_mode=true ;;
             ?) echoh "E13: invalid option -$OPTARG"; return 1 ;;
         esac || return
     done
@@ -310,7 +310,7 @@ check_murl() (
 
 # $1 - minimal URL
 init_repo() (
-    if [ "$fetch_mode" = false ] && is_index_fresh "$1"; then
+    if [ "$fetch_always_mode" = false ] && is_index_fresh "$1"; then
         echod 'local repository fresh'
     else
         repo_dir="$(url_to_path "$1")" &&
