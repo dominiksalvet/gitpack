@@ -25,7 +25,7 @@ _gitpack() {
     else # repository URLs
         local item="${COMP_WORDS[subcommand_index]}" &&
         case "$item" in # only for actions
-            install | uninstall | status) _gitpack_url ;;
+            install | uninstall | status) _gitpack_url "$cur_word" ;;
         esac
     fi
 }
@@ -49,14 +49,17 @@ _gitpack_subcommand_index() {
     done
 }
 
+# $1 - current URL word
 _gitpack_url() {
-    # collect global and local fetched URLs
-    local fetched_urls && fetched_urls="$(
+    # collect global and local GitPack URL references to form a hint
+    local urls && urls="$(
+        cut -f 1 -d ' ' /var/lib/gitpack/status 2>/dev/null
         cut -f 1 -d ' ' /var/cache/gitpack/fetched 2>/dev/null
+        cut -f 1 -d ' ' "$HOME"/.local/share/gitpack/status 2>/dev/null
         cut -f 1 -d ' ' "$HOME"/.cache/gitpack/fetched 2>/dev/null
         true
     )" &&
-    mapfile -t COMPREPLY < <(compgen -W "$fetched_urls" -- "$cur_word")
+    mapfile -t COMPREPLY < <(compgen -W "$urls" -- "$1")
 }
 
 #-------------------------------------------------------------------------------
