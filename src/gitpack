@@ -63,7 +63,7 @@ https://github.com/dominiksalvet/gitpack"
 
 init_config() {
     # URLs matching this regular expression are rejected
-    readonly BAD_URL_REGEX='(^$| |\t|(^|/)\.\.?($|/))' # ERE regex
+    readonly BAD_URL_REGEX='(^$| |	|(^|/)\.\.?($|/))' # ERE regex
 
     # map remote references to local ones
     readonly ORIGIN_HEAD=refs/remotes/origin/HEAD # remote HEAD reference path
