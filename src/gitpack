@@ -70,6 +70,10 @@ init_config() {
     readonly HEAD_REFSPEC=+HEAD:"$ORIGIN_HEAD" # default remote branch
     readonly TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # versions
     readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # branches
+
+    # field column numbers of GitPack databases
+    readonly STATUS_COL_URL=1 STATUS_COL_HASH=2
+    readonly FETCHED_COL_URL=1 FETCHED_COL_TIME=2
 }
 
 init_env_vars() {
@@ -196,10 +200,10 @@ init_files() {
 #-------------------------------------------------------------------------------
 
 run_list() (
-    db="$(get_db)" &&
-    echon "$db" | while IFS= read -r db_record; do
-        url="$(get_db_record_url "$db_record")" &&
-        hash="$(get_db_record_hash "$db_record")" &&
+    db="$(get_db "$STATUS_PATH")" &&
+    echon "$db" | while IFS= read -r record; do
+        url="$(status_record_url "$record")" &&
+        hash="$(status_record_hash "$record")" &&
         version="$(beautify_hash "$url" "$hash")" &&
         echo "$url $version" || return
     done
@@ -274,8 +278,8 @@ perform_action() (
     check_url "$url" &&
 
     init_repo "$url" &&
-    src_db_record="$(get_db_record "$url")" && # get package local information
-    src_hash="$(get_db_record_hash "$src_db_record")" &&
+    record="$(get_status_record "$url")" && # get package local information
+    src_hash="$(status_record_hash "$record")" &&
     tar_hash="$(get_repo_hash "$url" "$version")" &&
 
     case "$1" in
@@ -320,12 +324,12 @@ check_url() (
 
 # $1 - URL
 init_repo() (
-    if [ "$fetch_always_mode" = false ] && is_index_fresh "$1"; then
+    if [ "$fetch_always_mode" = false ] && fetched_recently "$1"; then
         echod 'local repository fresh'
     else
         repo_dir="$(url_to_path "$1")" &&
         fetch_repo "$1" "$repo_dir" &&
-        update_index "$1" # mark as fresh
+        mark_as_fetched_now "$1"
     fi
 )
 
@@ -404,7 +408,7 @@ url_to_path() {
 perform_install() {
     if ! [ "$2" ]; then # not installed yet
         run_install "$1" "$3" &&
-        insert_db_record "$1" "$3" &&
+        insert_status_record "$1" "$3" &&
         echo 'done; successfully installed'
     elif [ "$2" = "$3" ]; then
         echo 'already installed'
@@ -429,9 +433,9 @@ perform_change() (
     fi &&
 
     run_uninstall "$1" "$2" &&
-    delete_db_records "$1" &&
+    delete_status_records "$1" &&
     run_install "$1" "$3" &&
-    insert_db_record "$1" "$3" &&
+    insert_status_record "$1" "$3" &&
     echo "$report"
 )
 
@@ -440,7 +444,7 @@ perform_change() (
 perform_uninstall() {
     if [ "$2" ]; then # if installed
         run_uninstall "$1" "$2" &&
-        delete_db_records "$1" &&
+        delete_status_records "$1" &&
         echo 'done; successfully uninstalled'
     else
         echo 'already uninstalled'
@@ -539,51 +543,33 @@ run_script() (
 #-------------------------------------------------------------------------------
 
 # $1 - URL
-get_db_record() (
+get_status_record() {
     echod 'reading package database' &&
-    db="$(get_db)" &&
-    records="$(echo "$db" | grepe -F -- "$1")" &&
-    echo "$records" | head -n 1 # select only first match
-)
+    db_select_first "$STATUS_PATH" "$STATUS_COL_URL" "$1"
+}
 
 # $1 - URL
 # $2 - hash
-insert_db_record() {
+insert_status_record() {
     echod 'adding to package database' &&
     echo "$1 $2" >> "$STATUS_PATH"
 }
 
 # $1 - URL
-delete_db_records() (
+delete_status_records() (
     echod 'removing from package database' &&
-    db="$(get_db)" &&
-    records="$(echo "$db" | grepe -Fv -- "$1")" &&
-    echon "$records" > "$STATUS_PATH"
+    db="$(db_select_except "$STATUS_PATH" "$STATUS_COL_URL" "$1")" &&
+    echon "$db" > "$STATUS_PATH"
 )
 
-get_db() {
-    grepe . "$STATUS_PATH" # remove empty lines
+# $1 - status record
+status_record_url() {
+    echo "$1" | cut -f "$STATUS_COL_URL" -d ' '
 }
 
-# $@ - grep arguments
-grepe() (
-    grep "$@"
-    grep_status="$?" # store grep exit status
-
-    if [ "$grep_status" -eq 1 ]; then
-        grep_status=0 # suppress empty selection indicator
-    fi
-    return "$grep_status"
-)
-
-# $1 - database record
-get_db_record_url() {
-    echo "$1" | cut -f 1 -d ' '
-}
-
-# $1 - database record
-get_db_record_hash() {
-    echo "$1" | cut -f 2 -d ' '
+# $1 - status record
+status_record_hash() {
+    echo "$1" | cut -f "$STATUS_COL_HASH" -d ' '
 }
 
 #-------------------------------------------------------------------------------
@@ -591,51 +577,28 @@ get_db_record_hash() {
 #-------------------------------------------------------------------------------
 
 # $1 - URL
-is_index_fresh() (
+fetched_recently() (
     current_time="$(get_current_time)" &&
-
-    index="$(get_index)" &&
-    item="$(echo "$index" | grepe -F -- "$1")" &&
-    item="$(echo "$item" | head -n 1)" && # just for sure
-    item_time="$(get_index_item_time "$item")" &&
-
-    test "$item_time" = "$current_time"
+    record="$(db_select_first "$FETCHED_PATH" "$FETCHED_COL_URL" "$1")" &&
+    record_time="$(fetched_record_time "$record")" &&
+    test "$record_time" = "$current_time"
 )
 
 # $1 - URL
-update_index() (
+mark_as_fetched_now() (
     current_time="$(get_current_time)" &&
-
-    index="$(get_index)" &&
-    items="$(echo "$index" | grepe -Fv -- "$1")" && # remove item from the index
-
-    # append item with updated time
-    items="$(append_line "$items" "$1 $current_time")" &&
-    echo "$items" > "$FETCHED_PATH"
+    db="$(db_select_except "$FETCHED_PATH" "$FETCHED_COL_URL" "$1")" &&
+    db="$(db_append_record "$db" "$1 $current_time")" &&
+    echo "$db" > "$FETCHED_PATH"
 )
 
 get_current_time() {
     date -u '+%Y%m%d%H' # UTC as <year><month><day><hour>
 }
 
-get_index() {
-    grepe . "$FETCHED_PATH" # remove empty lines
-}
-
-# $1 - index item
-get_index_item_time() {
-    echo "$1" | cut -f 2 -d ' '
-}
-
-# $1 - original string
-# $2 - appended string
-append_line() {
-    if [ "$1" ]; then
-        echo "$1
-$2"
-    else # empty original string
-        echo "$2" # do not print leading empty line
-    fi
+# $1 - fetched record
+fetched_record_time() {
+    echo "$1" | cut -f "$FETCHED_COL_TIME" -d ' '
 }
 
 #-------------------------------------------------------------------------------
@@ -657,6 +620,59 @@ init_db() (
         return 1
     fi
 )
+
+# $1 - database path
+# $2 - key column
+# $3 - expected value
+db_select_first() (
+    db="$(get_db "$1")" &&
+    echon "$db" | while IFS= read -r record; do
+        field="$(echo "$record" | cut -f "$2" -d ' ')" || return
+        if [ "$field" = "$3" ]; then
+            echo "$record"; return
+        fi
+    done
+)
+
+# $1 - database path
+# $2 - key column
+# $3 - filtered value
+db_select_except() (
+    db="$(get_db "$1")" &&
+    echon "$db" | while IFS= read -r record; do
+        field="$(echo "$record" | cut -f "$2" -d ' ')" || return
+        if [ "$field" != "$3" ]; then
+            echo "$record"
+        fi
+    done
+)
+
+# $1 - database path
+get_db() {
+    grepe . "$1" # remove empty lines
+}
+
+# $@ - grep arguments
+grepe() (
+    grep "$@"
+    grep_status="$?" # store grep exit status
+
+    if [ "$grep_status" -eq 1 ]; then
+        grep_status=0 # suppress empty selection indicator
+    fi
+    return "$grep_status"
+)
+
+# $1 - database
+# $2 - record
+db_append_record() {
+    if [ "$1" ]; then
+        echo "$1
+$2"
+    else
+        echo "$2"
+    fi
+}
 
 #-------------------------------------------------------------------------------
 # CALL MAIN
