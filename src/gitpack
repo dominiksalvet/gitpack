@@ -74,6 +74,8 @@ init_config() {
     # field column numbers of GitPack databases
     readonly STATUS_COL_URL=1 STATUS_COL_HASH=2
     readonly FETCHED_COL_URL=1 FETCHED_COL_TIME=2
+
+    readonly DB_DELIMITER=' ' # internal delimiter for database data
 }
 
 init_env_vars() {
@@ -564,12 +566,12 @@ delete_status_records() (
 
 # $1 - status record
 status_record_url() {
-    echo "$1" | cut -f "$STATUS_COL_URL" -d ' '
+    echo "$1" | cut -f "$STATUS_COL_URL" -d "$DB_DELIMITER"
 }
 
 # $1 - status record
 status_record_hash() {
-    echo "$1" | cut -f "$STATUS_COL_HASH" -d ' '
+    echo "$1" | cut -f "$STATUS_COL_HASH" -d "$DB_DELIMITER"
 }
 
 #-------------------------------------------------------------------------------
@@ -598,7 +600,7 @@ get_current_time() {
 
 # $1 - fetched record
 fetched_record_time() {
-    echo "$1" | cut -f "$FETCHED_COL_TIME" -d ' '
+    echo "$1" | cut -f "$FETCHED_COL_TIME" -d "$DB_DELIMITER"
 }
 
 #-------------------------------------------------------------------------------
@@ -627,7 +629,7 @@ init_db() (
 db_select_first() (
     db="$(get_db "$1")" &&
     echon "$db" | while IFS= read -r record; do
-        field="$(echo "$record" | cut -f "$2" -d ' ')" || return
+        field="$(echo "$record" | cut -f "$2" -d "$DB_DELIMITER")" || return
         if [ "$field" = "$3" ]; then
             echo "$record"; return
         fi
@@ -640,7 +642,7 @@ db_select_first() (
 db_select_except() (
     db="$(get_db "$1")" &&
     echon "$db" | while IFS= read -r record; do
-        field="$(echo "$record" | cut -f "$2" -d ' ')" || return
+        field="$(echo "$record" | cut -f "$2" -d "$DB_DELIMITER")" || return
         if [ "$field" != "$3" ]; then
             echo "$record"
         fi
