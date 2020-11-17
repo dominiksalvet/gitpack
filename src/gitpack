@@ -63,7 +63,7 @@ https://github.com/dominiksalvet/gitpack"
 
 init_config() {
     # URLs matching this regular expression are rejected
-    readonly BAD_URL_REGEX='(^$| |	|(^|/)\.\.?($|/))' # ERE regex
+    readonly BAD_URL_REGEX='(^$| |(^|/)\.\.?($|/))' # ERE regex
 
     # map remote references to local ones
     readonly ORIGIN_HEAD=refs/remotes/origin/HEAD # remote HEAD reference path
@@ -649,19 +649,8 @@ db_select_except() (
 
 # $1 - database path
 get_db() {
-    grepe . "$1" # remove empty lines
+    cat "$1"
 }
-
-# $@ - grep arguments
-grepe() (
-    grep "$@"
-    grep_status="$?" # store grep exit status
-
-    if [ "$grep_status" -eq 1 ]; then
-        grep_status=0 # suppress empty selection indicator
-    fi
-    return "$grep_status"
-)
 
 # $1 - database
 # $2 - record
