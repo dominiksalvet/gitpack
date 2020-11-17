@@ -225,7 +225,7 @@ run_paths() {
 # $@ - echo arguments
 echon() {
     # no newline if empty string
-    if [ "$@" ]; then
+    if [ "$*" ]; then
         echo "$@"
     fi
 }
@@ -340,10 +340,10 @@ init_repo() (
 fetch_repo() (
     if [ -d "$2"/ ]; then # repository already exists
         echod 'updating local repository' &&
-        cd "$2"/
+        cd -- "$2"/
     else # create and configure repository
         echod 'downloading local repository' &&
-        mkdir -p "$2"/ && cd "$2"/ &&
+        mkdir -p -- "$2"/ && cd -- "$2"/ &&
         # initialize Git repository manually
         git init -q &&
         git config gc.auto 0 && # disable garbage collector
@@ -651,7 +651,7 @@ db_select_except() (
 
 # $1 - database path
 get_db() {
-    cat "$1"
+    cat -- "$1"
 }
 
 # $1 - database
