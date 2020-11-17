@@ -54,7 +54,8 @@ COMMAND:  list   list installed packages
 
 OPTION:   -h  show short version hashes
           -H  show full version hashes
-          -f  always fetch remote updates'
+          -f  always fetch remote updates
+          -r  raw URL mode; use with caution'
 
     readonly ABOUT_MESSAGE="GitPack $VERSION
 Simple Git-based package manager.
@@ -81,6 +82,7 @@ init_opts() {
     # global variables
     hash_mode= # short, full
     fetch_always_mode=false
+    raw_url_mode=false
 }
 
 #-------------------------------------------------------------------------------
@@ -106,11 +108,12 @@ process_args() {
 
 # $@ - GitPack options
 process_opts() {
-    while getopts :hHf _opt; do
+    while getopts :hHfr _opt; do
         case "$_opt" in
             h) hash_mode=short ;;
             H) hash_mode=full ;;
             f) fetch_always_mode=true ;;
+            r) raw_url_mode=true ;;
             ?) echoh "E13: invalid option -$OPTARG"; return 1 ;;
         esac || return
     done
@@ -121,14 +124,14 @@ process_opts() {
 process_action_args() (
     init_runtime &&
     action="$1" &&
-    shift && # shift to action arguments
+    shift && # shift to URL arguments
 
     if [ "$#" -eq 0 ]; then
         echoh 'E4: no URL provided'; return 1
     fi &&
 
-    for url in "$@"; do
-        perform_action "$action" "$url" || return
+    for url_arg in "$@"; do
+        perform_action "$action" "$url_arg" || return
     done
 )
 
@@ -219,7 +222,7 @@ echon() {
     fi
 }
 
-# $1 - minimal URL
+# $1 - URL
 # $2 - hash (optional)
 beautify_hash() (
     if [ "$2" ]; then
@@ -260,13 +263,13 @@ echod() {
 #-------------------------------------------------------------------------------
 
 # $1 - action
-# $2 - URL
+# $2 - URL argument
 perform_action() (
     echo "running $1 for $2" &&
     DIAG_PREFIX='  ' && # increase prefix indentation
-    url="$(minimize_url "$2")" &&
-    version="$(url_to_version "$2")" && # may be empty
-    check_murl "$url" && # check minimal URL
+    url="$(url_arg_to_url "$2")" &&
+    version="$(url_arg_to_version "$2")" && # may be empty
+    check_url "$url" &&
 
     init_repo "$url" &&
     src_db_record="$(get_db_record "$url")" && # get package local information
@@ -280,24 +283,29 @@ perform_action() (
     esac
 )
 
-# $1 - URL
-minimize_url() (
-    url="${1%%=*}" # remove version if any
-    url="$(echo "$url" | tr '[:upper:]' '[:lower:]')" &&
-    url="${url#https://}" &&
-    echo "${url%.git}"
+# $1 - URL argument
+url_arg_to_url() (
+    url="${1%=*}" # remove version if any
+
+    if [ "$raw_url_mode" = false ]; then
+        url="$(echo "$url" | tr '[:upper:]' '[:lower:]')" &&
+        url="${url#https://}" &&
+        url="${url%.git}"
+    fi &&
+
+    echo "$url"
 )
 
-# $1 - URL
-url_to_version() (
-    version="${1#*=}" # remove URL and keep version
+# $1 - URL argument
+url_arg_to_version() (
+    version="${1##*=}" # remove URL and keep version
     if [ "$version" != "$1" ]; then
         echo "$version"
     fi
 )
 
-# $1 - minimal URL
-check_murl() (
+# $1 - URL
+check_url() (
     lineno="$(echo "$1" | wc -l)" &&
     if [ "$lineno" -ne 1 ] || echo "$1" | grep -qE "$BAD_URL_REGEX"; then
         echo 'E6: unsupported URL delivered' >&2; return 1
@@ -308,7 +316,7 @@ check_murl() (
 # REPOSITORY
 #-------------------------------------------------------------------------------
 
-# $1 - minimal URL
+# $1 - URL
 init_repo() (
     if [ "$fetch_always_mode" = false ] && is_index_fresh "$1"; then
         echod 'local repository fresh'
@@ -319,7 +327,7 @@ init_repo() (
     fi
 )
 
-# $1 - minimal URL
+# $1 - URL
 # $2 - repository directory
 fetch_repo() (
     if [ -d "$2"/ ]; then # repository already exists
@@ -331,7 +339,7 @@ fetch_repo() (
         # initialize Git repository manually
         git init -q &&
         git config gc.auto 0 && # disable garbage collector
-        git config remote.origin.url https://"$1".git &&
+        git config remote.origin.url "$(url_to_git_url "$1")" &&
         git config remote.origin.fetch "$HEAD_REFSPEC" &&
         git config --add remote.origin.fetch "$TAGS_REFSPEC" &&
         git config --add remote.origin.fetch "$HEADS_REFSPEC"
@@ -340,7 +348,16 @@ fetch_repo() (
     git fetch -pnuq origin
 )
 
-# $1 - minimal URL
+# $1 - URL
+url_to_git_url() {
+    if [ "$raw_url_mode" = true ]; then
+        echo "$1"
+    else
+        echo https://"$1".git
+    fi
+}
+
+# $1 - URL
 # $2 - version (optional)
 get_repo_hash() (
     repo_cd "$1" &&
@@ -361,7 +378,7 @@ get_repo_hash() (
     fi
 )
 
-# $1 - minimal URL
+# $1 - URL
 # $2 - hash (optional)
 repo_cd() {
     cd "$(url_to_path "$1")"/ &&
@@ -370,7 +387,7 @@ repo_cd() {
     fi
 }
 
-# $1 - minimal URL
+# $1 - URL
 url_to_path() {
     echo "$REPOS_DIR"/"$1"
 }
@@ -379,7 +396,7 @@ url_to_path() {
 # EXECUTE ACTION
 #-------------------------------------------------------------------------------
 
-# $1 - minimal URL
+# $1 - URL
 # $2 - source hash (optional)
 # $3 - target hash
 perform_install() {
@@ -394,7 +411,7 @@ perform_install() {
     fi
 }
 
-# $1 - minimal URL
+# $1 - URL
 # $2 - source hash
 # $3 - target hash
 perform_change() (
@@ -416,7 +433,7 @@ perform_change() (
     echo "$report"
 )
 
-# $1 - minimal URL
+# $1 - URL
 # $2 - source hash (optional)
 perform_uninstall() {
     if [ "$2" ]; then # if installed
@@ -428,7 +445,7 @@ perform_uninstall() {
     fi
 }
 
-# $1 - minimal URL
+# $1 - URL
 # $2 - source hash (optional)
 # $3 - target hash
 perform_status() (
@@ -448,7 +465,7 @@ perform_status() (
     fi
 )
 
-# $1 - minimal URL
+# $1 - URL
 # $2 - first hash
 # $3 - second hash
 is_ancestor_commit() (
@@ -460,7 +477,7 @@ is_ancestor_commit() (
 # INSTALLATION AND UNINSTALLATION
 #-------------------------------------------------------------------------------
 
-# $1 - minimal URL
+# $1 - URL
 # $2 - hash
 run_install() (
     version="$(beautify_hash "$1" "$2")" &&
@@ -472,7 +489,7 @@ run_install() (
     run_script "$install_script"
 )
 
-# $1 - minimal URL
+# $1 - URL
 # $2 - hash
 run_uninstall() (
     version="$(beautify_hash "$1" "$2")" &&
@@ -530,7 +547,7 @@ init_db() {
     fi
 }
 
-# $1 - minimal URL
+# $1 - URL
 get_db_record() (
     echod 'reading package database' &&
     db="$(get_db)" &&
@@ -538,14 +555,14 @@ get_db_record() (
     echo "$records" | head -n 1 # select only first match
 )
 
-# $1 - minimal URL
+# $1 - URL
 # $2 - hash
 insert_db_record() {
     echod 'adding to package database' &&
     echo "$1 $2" >> "$STATUS_PATH"
 }
 
-# $1 - minimal URL
+# $1 - URL
 delete_db_records() (
     echod 'removing from package database' &&
     db="$(get_db)" &&
@@ -593,7 +610,7 @@ init_index() {
     fi
 }
 
-# $1 - minimal URL
+# $1 - URL
 is_index_fresh() (
     current_time="$(get_current_time)" &&
 
@@ -605,7 +622,7 @@ is_index_fresh() (
     test "$item_time" = "$current_time"
 )
 
-# $1 - minimal URL
+# $1 - URL
 update_index() (
     current_time="$(get_current_time)" &&
 
