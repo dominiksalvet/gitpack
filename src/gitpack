@@ -159,8 +159,8 @@ echoh() {
 init_runtime() {
     init_runtime_constants &&
     init_paths &&
-    init_db &&
-    init_index
+    init_db "$STATUS_PATH" &&
+    init_db "$FETCHED_PATH"
 }
 
 init_runtime_constants() {
@@ -533,19 +533,8 @@ run_script() (
 )
 
 #-------------------------------------------------------------------------------
-# PACKAGE DATABASE
+# STATUS DATABASE
 #-------------------------------------------------------------------------------
-
-init_db() {
-    mkdir -p "$STATE_DIR"/ &&
-    if ! [ -e "$STATUS_PATH" ]; then
-        touch "$STATUS_PATH"
-    fi &&
-
-    if ! [ -r "$STATUS_PATH" ] || ! [ -w "$STATUS_PATH" ]; then
-        echo 'E7: cannot access status file' >&2; return 1
-    fi
-}
 
 # $1 - URL
 get_db_record() (
@@ -596,19 +585,8 @@ get_db_record_hash() {
 }
 
 #-------------------------------------------------------------------------------
-# PACKAGE INDEX
+# FETCHED DATABASE
 #-------------------------------------------------------------------------------
-
-init_index() {
-    mkdir -p "$CACHE_DIR"/ &&
-    if ! [ -e "$FETCHED_PATH" ]; then
-        touch "$FETCHED_PATH"
-    fi &&
-
-    if ! [ -r "$FETCHED_PATH" ] || ! [ -w "$FETCHED_PATH" ]; then
-        echo 'E12: cannot access fetched file' >&2; return 1
-    fi
-}
 
 # $1 - URL
 is_index_fresh() (
@@ -657,6 +635,26 @@ $2"
         echo "$2" # do not print leading empty line
     fi
 }
+
+#-------------------------------------------------------------------------------
+# DATABASE FUNCTIONS
+#-------------------------------------------------------------------------------
+
+# $1 - database path
+init_db() (
+    db_dir="$(dirname -- "$1")" &&
+    mkdir -p "$db_dir"/ &&
+
+    if ! [ -e "$1" ]; then
+        touch "$1"
+    fi &&
+
+    if ! [ -r "$1" ] || ! [ -w "$1" ]; then
+        db_name="$(basename -- "$1")" &&
+        echo "E14: cannot access $db_name database" >&2
+        return 1
+    fi
+)
 
 #-------------------------------------------------------------------------------
 # CALL MAIN
