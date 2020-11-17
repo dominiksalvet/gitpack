@@ -587,12 +587,12 @@ grepe() (
 
 # $1 - database record
 get_db_record_url() {
-    echo "${1%% *}" # remove hash
+    echo "$1" | cut -f 1 -d ' '
 }
 
 # $1 - database record
 get_db_record_hash() {
-    echo "${1#* }" # remove URL
+    echo "$1" | cut -f 2 -d ' '
 }
 
 #-------------------------------------------------------------------------------
@@ -644,7 +644,7 @@ get_index() {
 
 # $1 - index item
 get_index_item_time() {
-    echo "${1#* }" # remove URL
+    echo "$1" | cut -f 2 -d ' '
 }
 
 # $1 - original string
