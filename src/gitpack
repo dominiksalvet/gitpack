@@ -159,8 +159,7 @@ echoh() {
 init_runtime() {
     init_runtime_constants &&
     init_paths &&
-    init_db "$STATUS_PATH" &&
-    init_db "$FETCHED_PATH"
+    init_files
 }
 
 init_runtime_constants() {
@@ -187,6 +186,11 @@ init_paths() {
     readonly REPOS_DIR="$CACHE_DIR"/repos # cache for local repositories
     readonly FETCHED_PATH="$CACHE_DIR"/fetched # repositories fetch timestamps
     readonly STATUS_PATH="$STATE_DIR"/status # database of installed packages
+}
+
+init_files() {
+    init_db "$STATUS_PATH" &&
+    init_db "$FETCHED_PATH"
 }
 
 #-------------------------------------------------------------------------------
@@ -643,10 +647,10 @@ $2"
 # $1 - database path
 init_db() (
     db_dir="$(dirname -- "$1")" &&
-    mkdir -p "$db_dir"/ &&
+    mkdir -p -- "$db_dir"/ &&
 
     if ! [ -e "$1" ]; then
-        touch "$1"
+        touch -- "$1"
     fi &&
 
     if ! [ -r "$1" ] || ! [ -w "$1" ]; then
