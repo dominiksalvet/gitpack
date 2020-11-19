@@ -53,10 +53,11 @@ _gitpack_subcommand_index() {
 _gitpack_url() {
     # collect global and local GitPack URL references to form a hint
     local urls && urls="$(
-        cut -f 1 -d ' ' /var/lib/gitpack/status 2>/dev/null
-        cut -f 1 -d ' ' /var/cache/gitpack/fetched 2>/dev/null
-        cut -f 1 -d ' ' "$HOME"/.local/share/gitpack/status 2>/dev/null
-        cut -f 1 -d ' ' "$HOME"/.cache/gitpack/fetched 2>/dev/null
+        cut -f 1 -d ' ' \
+            /var/lib/gitpack/status \
+            /var/cache/gitpack/fetched \
+            "$HOME"/.local/share/gitpack/status \
+            "$HOME"/.cache/gitpack/fetched 2>/dev/null
         true
     )" &&
     mapfile -t COMPREPLY < <(compgen -W "$urls" -- "$1")
