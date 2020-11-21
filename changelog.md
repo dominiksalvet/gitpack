@@ -34,6 +34,7 @@ The changes not yet present in any release are listed in this section.
 ### Fixed
 
 * When fetching a repository fails, it is no longer present in Bash tab completion hints.
+* Only one instance of GitPack may be running at a time.
 
 ### Removed
 
