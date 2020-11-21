@@ -15,18 +15,11 @@
 
 # $@ - GitPack arguments
 main() {
-    check_commands &&
     init_constants &&
     init_config &&
     init_env_vars &&
     init_opts &&
     process_args "$@"
-}
-
-check_commands() {
-    if ! command -v git > /dev/null; then
-        echo 'E1: missing git command' >&2; return 1
-    fi
 }
 
 #-------------------------------------------------------------------------------
@@ -94,7 +87,7 @@ init_opts() {
 #-------------------------------------------------------------------------------
 
 # $@ - GitPack arguments
-process_args() {
+process_args() (
     process_opts "$@" &&
     shift "$((OPTIND - 1))" && # shift to an actual subcommand
 
@@ -108,7 +101,7 @@ process_args() {
         '') echoh 'E2: no subcommand provided'; return 1 ;;
         *) echoh "E3: invalid subcommand $1"; return 1 ;;
     esac
-}
+)
 
 # $@ - GitPack options
 process_opts() {
@@ -161,9 +154,16 @@ echoh() {
 #-------------------------------------------------------------------------------
 
 init_runtime() {
+    check_commands &&
     init_runtime_constants &&
     init_paths &&
     init_files
+}
+
+check_commands() {
+    if ! command -v git > /dev/null; then
+        echo 'E1: missing git command' >&2; return 1
+    fi
 }
 
 init_runtime_constants() {
