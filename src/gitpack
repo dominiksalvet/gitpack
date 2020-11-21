@@ -189,9 +189,13 @@ beautify_hash() (
 
 # $1 - directory path
 remove_dir() {
-    echod "removing directory $1" &&
-    test "$1" && if ! [ -d "$1"/ ]; then return; fi &&
+    if ! [ "$1" ]; then
+        echo 'E16: cannot remove directory with empty path' >&2; return 1
+    elif ! [ -d "$1"/ ]; then
+        return # already removed, success
+    fi
 
+    echod "removing directory $1" &&
     # do not remove any important directory
     (   cd -- "$1"/ && real_path="$(pwd -P)" &&
         test "$PWD" != / && test "$real_path" != / &&
