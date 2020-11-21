@@ -92,10 +92,8 @@ process_args() (
     shift "$((OPTIND - 1))" && # shift to an actual subcommand
 
     case "$1" in
-        install | uninstall | status)
-            process_action_args "$@" ;;
-        list | clean | paths)
-            process_command_args "$@" ;;
+        install | uninstall | status) process_action_args "$@" ;;
+        list | clean | paths) run_"$1" ;; # ignore other arguments
         help) echo "$HELP_MESSAGE" ;;
         about) echo "$ABOUT_MESSAGE" ;;
         '') echoh 'E2: no subcommand provided'; return 1 ;;
@@ -119,7 +117,6 @@ process_opts() {
 # $1 - action
 # $@ - action arguments
 process_action_args() (
-    init_runtime &&
     action="$1" &&
     shift && # shift to URL arguments
 
@@ -127,20 +124,10 @@ process_action_args() (
         echoh 'E4: no URL provided'; return 1
     fi &&
 
+    init_runtime g c p f &&
     for url_arg in "$@"; do
         perform_action "$action" "$url_arg" || return
     done
-)
-
-# $1 - command
-# $@ - command arguments
-process_command_args() (
-    init_runtime &&
-    case "$1" in # other arguments are ignored
-        list) run_list ;;
-        clean) run_clean ;;
-        paths) run_paths ;;
-    esac
 )
 
 # $@ - echo arguments
@@ -150,58 +137,11 @@ echoh() {
 }
 
 #-------------------------------------------------------------------------------
-# DYNAMIC INITIALIZATION
-#-------------------------------------------------------------------------------
-
-init_runtime() {
-    check_git &&
-    init_runtime_constants &&
-    init_paths &&
-    init_files
-}
-
-check_git() {
-    if ! command -v git > /dev/null; then
-        echo 'E1: missing git command' >&2; return 1
-    fi
-}
-
-init_runtime_constants() {
-    _user_id="$(id -u)" &&
-    if [ "$_user_id" -eq 0 ]; then
-        readonly ACCESS=global
-    else
-        readonly ACCESS=local
-    fi &&
-
-    SYSTEM="$(uname)" &&
-    readonly SYSTEM
-}
-
-init_paths() {
-    if [ "$ACCESS" = global ]; then # respect FHS
-        readonly STATE_DIR=/var/lib/gitpack
-        readonly CACHE_DIR=/var/cache/gitpack
-    else # respect XDG
-        readonly STATE_DIR="$HOME"/.local/share/gitpack
-        readonly CACHE_DIR="$HOME"/.cache/gitpack
-    fi
-
-    readonly STATUS_PATH="$STATE_DIR"/status # database of installed packages
-    readonly REPOS_DIR="$CACHE_DIR"/repos # cache for local repositories
-    readonly FETCHED_PATH="$CACHE_DIR"/fetched # repositories fetch timestamps
-}
-
-init_files() {
-    init_db "$STATUS_PATH" &&
-    init_db "$FETCHED_PATH"
-}
-
-#-------------------------------------------------------------------------------
 # COMMAND PROCESSING
 #-------------------------------------------------------------------------------
 
 run_list() (
+    init_runtime g c p f &&
     db="$(get_db "$STATUS_PATH")" &&
     echon "$db" | while IFS= read -r record; do
         url="$(status_record_url "$record")" &&
@@ -211,16 +151,18 @@ run_list() (
     done
 )
 
-run_clean() {
+run_clean() (
+    init_runtime c p &&
     if ! remove_dir "$CACHE_DIR"; then
         echo 'E5: failed to remove cache directory' >&2; return 1
     fi
-}
+)
 
-run_paths() {
+run_paths() (
+    init_runtime c p &&
     echo "state-dir $STATE_DIR" &&
     echo "cache-dir $CACHE_DIR"
-}
+)
 
 # $@ - echo arguments
 echon() {
@@ -264,6 +206,60 @@ remove_dir() {
 echod() {
     # print diagnostic message with defined prefix (progress reporting)
     echo "${DIAG_PREFIX}$1" >&2
+}
+
+#-------------------------------------------------------------------------------
+# DYNAMIC INITIALIZATION
+#-------------------------------------------------------------------------------
+
+# $@ - init flags
+init_runtime() {
+    for _flag in "$@"; do # order matters
+        case "$_flag" in
+            g) check_git ;;
+            c) init_runtime_constants ;;
+            p) init_paths ;;
+            f) init_files ;;
+            *) echo "E15: invalid runtime init flag $_flag" >&2; return 1 ;;
+        esac || return
+    done
+}
+
+check_git() {
+    if ! command -v git > /dev/null; then
+        echo 'E1: missing git command' >&2; return 1
+    fi
+}
+
+init_runtime_constants() {
+    _user_id="$(id -u)" &&
+    if [ "$_user_id" -eq 0 ]; then
+        readonly ACCESS=global
+    else
+        readonly ACCESS=local
+    fi &&
+
+    SYSTEM="$(uname)" &&
+    readonly SYSTEM
+}
+
+init_paths() {
+    if [ "$ACCESS" = global ]; then # respect FHS
+        readonly STATE_DIR=/var/lib/gitpack
+        readonly CACHE_DIR=/var/cache/gitpack
+    else # respect XDG
+        readonly STATE_DIR="$HOME"/.local/share/gitpack
+        readonly CACHE_DIR="$HOME"/.cache/gitpack
+    fi
+
+    readonly STATUS_PATH="$STATE_DIR"/status # database of installed packages
+    readonly REPOS_DIR="$CACHE_DIR"/repos # cache for local repositories
+    readonly FETCHED_PATH="$CACHE_DIR"/fetched # repositories fetch timestamps
+}
+
+init_files() {
+    init_db "$STATUS_PATH" &&
+    init_db "$FETCHED_PATH"
 }
 
 #-------------------------------------------------------------------------------
