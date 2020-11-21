@@ -174,8 +174,8 @@ init_runtime_constants() {
         readonly ACCESS=local
     fi &&
 
-    _system_name="$(uname)" &&
-    readonly SYSTEM="$_system_name"
+    SYSTEM="$(uname)" &&
+    readonly SYSTEM
 }
 
 init_paths() {
@@ -535,7 +535,7 @@ run_script() (
     "$1" 1>&2 && return # return if success, stdout considered diagnostic output
 
     script_status="$?"
-    script_name="$(basename -- "$1")" &&
+    script_name="$(basename -- "$1")"
     echo "E11: $script_name script failed with $script_status" >&2
     return 1 # indicate error but do not propagate the exit status further
 )
@@ -617,7 +617,7 @@ init_db() (
     fi &&
 
     if ! [ -r "$1" ] || ! [ -w "$1" ]; then
-        db_name="$(basename -- "$1")" &&
+        db_name="$(basename -- "$1")"
         echo "E14: cannot access $db_name database" >&2
         return 1
     fi
