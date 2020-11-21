@@ -154,13 +154,13 @@ echoh() {
 #-------------------------------------------------------------------------------
 
 init_runtime() {
-    check_commands &&
+    check_git &&
     init_runtime_constants &&
     init_paths &&
     init_files
 }
 
-check_commands() {
+check_git() {
     if ! command -v git > /dev/null; then
         echo 'E1: missing git command' >&2; return 1
     fi
