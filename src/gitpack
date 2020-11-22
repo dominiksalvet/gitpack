@@ -347,13 +347,13 @@ init_repo() (
 # $1 - URL
 # $2 - repository directory
 fetch_repo() (
-    if [ -d "$2"/ ]; then # repository already exists
-        echo 'updating local repository' >&2 &&
-        cd -- "$2"/
-    else # create and configure repository
+    mkdir -p -- "$2"/ && # make sure directory for repository is created
+    cd -- "$2"/ &&
+
+    if [ -d .git/ ]; then # current directory is repository
+        echo 'updating local repository' >&2
+    else # initialize and configure repository
         echo 'downloading local repository' >&2 &&
-        mkdir -p -- "$2"/ && cd -- "$2"/ &&
-        # initialize Git repository manually
         git init -q &&
         git config gc.auto 0 && # disable garbage collector
         git config remote.origin.fetch "$HEAD_REFSPEC" &&
@@ -361,6 +361,7 @@ fetch_repo() (
         git config --add remote.origin.fetch "$HEADS_REFSPEC" &&
         git config remote.origin.url "$(url_to_git_url "$1")"
     fi &&
+
     # fetch remote updates (prune, do not fetch tags implicitly, update HEAD)
     git fetch -pnuq origin
 )
