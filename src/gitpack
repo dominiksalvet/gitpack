@@ -356,10 +356,10 @@ fetch_repo() (
         # initialize Git repository manually
         git init -q &&
         git config gc.auto 0 && # disable garbage collector
-        git config remote.origin.url "$(url_to_git_url "$1")" &&
         git config remote.origin.fetch "$HEAD_REFSPEC" &&
         git config --add remote.origin.fetch "$TAGS_REFSPEC" &&
-        git config --add remote.origin.fetch "$HEADS_REFSPEC"
+        git config --add remote.origin.fetch "$HEADS_REFSPEC" &&
+        git config remote.origin.url "$(url_to_git_url "$1")"
     fi &&
     # fetch remote updates (prune, do not fetch tags implicitly, update HEAD)
     git fetch -pnuq origin
