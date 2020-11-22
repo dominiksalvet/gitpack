@@ -17,7 +17,6 @@
 main() {
     init_constants &&
     init_config &&
-    init_env_vars &&
     init_opts &&
     process_args "$@"
 }
@@ -71,10 +70,6 @@ init_config() {
     readonly DB_DELIMITER=' ' # internal delimiter for database data
 }
 
-init_env_vars() {
-    export DIAG_PREFIX= # prefix for diagnostic messages (exported to scripts)
-}
-
 init_opts() {
     # global variables
     hash_mode= # short, full
@@ -96,8 +91,8 @@ process_args() (
         list | clean | paths) run_"$1" ;; # ignore other arguments
         help) echo "$HELP_MESSAGE" ;;
         about) echo "$ABOUT_MESSAGE" ;;
-        '') echoh 'E2: no subcommand provided'; return 1 ;;
-        *) echoh "E3: invalid subcommand $1"; return 1 ;;
+        '') echoh 'E2: no subcommand provided' >&2; return 1 ;;
+        *) echoh "E3: invalid subcommand $1" >&2; return 1 ;;
     esac
 )
 
@@ -109,7 +104,7 @@ process_opts() {
             H) hash_mode=full ;;
             f) fetch_always_mode=true ;;
             r) raw_url_mode=true ;;
-            ?) echoh "E13: invalid option -$OPTARG"; return 1 ;;
+            ?) echoh "E13: invalid option -$OPTARG" >&2; return 1 ;;
         esac || return
     done
 }
@@ -121,7 +116,7 @@ process_action_args() (
     shift && # shift to URL arguments
 
     if [ "$#" -eq 0 ]; then
-        echoh 'E4: no URL provided'; return 1
+        echoh 'E4: no URL provided' >&2; return 1
     fi &&
 
     init_runtime g c p l f &&
@@ -132,8 +127,8 @@ process_action_args() (
 
 # $@ - echo arguments
 echoh() {
-    echo "$@" >&2 &&
-    echo "try 'gitpack help' for more information" >&2 # print also a hint
+    echo "$@" &&
+    echo "try 'gitpack help' for more information" # print also a hint
 }
 
 #-------------------------------------------------------------------------------
@@ -187,7 +182,7 @@ remove_dir() {
         return # already removed, success
     fi
 
-    echod "removing directory $1" &&
+    echo "removing directory $1" >&2 &&
     # do not remove any important directory
     (   cd -- "$1"/ && real_path="$(pwd -P)" &&
         test "$PWD" != / && test "$real_path" != / &&
@@ -196,12 +191,6 @@ remove_dir() {
     ) &&
 
     rm -rf -- "${1:?}"/
-}
-
-# $1 - string
-echod() {
-    # print diagnostic message with defined prefix (progress reporting)
-    echo "${DIAG_PREFIX}$1" >&2
 }
 
 #-------------------------------------------------------------------------------
@@ -295,7 +284,6 @@ exit_action() (
 # $2 - URL argument
 perform_action() (
     echo "running $1 for $2" &&
-    DIAG_PREFIX='  ' && # increase prefix indentation
     url="$(url_arg_to_url "$2")" &&
     version="$(url_arg_to_version "$2")" && # may be empty
     check_url "$url" &&
@@ -348,7 +336,7 @@ check_url() (
 # $1 - URL
 init_repo() (
     if [ "$fetch_always_mode" = false ] && fetched_recently "$1"; then
-        echod 'local repository fresh'
+        echo 'local repository fresh' >&2
     else
         repo_dir="$(url_to_path "$1")" &&
         fetch_repo "$1" "$repo_dir" &&
@@ -360,10 +348,10 @@ init_repo() (
 # $2 - repository directory
 fetch_repo() (
     if [ -d "$2"/ ]; then # repository already exists
-        echod 'updating local repository' &&
+        echo 'updating local repository' >&2 &&
         cd -- "$2"/
     else # create and configure repository
-        echod 'downloading local repository' &&
+        echo 'downloading local repository' >&2 &&
         mkdir -p -- "$2"/ && cd -- "$2"/ &&
         # initialize Git repository manually
         git init -q &&
@@ -395,13 +383,13 @@ get_repo_hash() (
     fi &&
 
     if [ "$2" ]; then
-        echod 'using given candidate version' &&
+        echo 'using given candidate version' >&2 &&
         # print the commit hash of the version if it is a valid Git reference
         if ! git rev-parse -q --verify "$2"^0; then
             echo "E8: version $2 does not exist" >&2; return 1
         fi
     else # use latest tag (preferred) or latest commit of default branch
-        echod 'using latest candidate version' &&
+        echo 'using latest candidate version' >&2 &&
         ref="$(git describe --tags --abbrev=0 --always "$ORIGIN_HEAD")" &&
         git rev-parse --verify "$ref"^0 # get commit hash
     fi
@@ -477,13 +465,13 @@ perform_status() (
 # $3 - target hash
 perform_change() (
     if is_ancestor_commit "$1" "$2" "$3"; then # source version is older
-        echod 'updating package' &&
+        echo 'updating package' >&2 &&
         report='done; successfully updated'
     elif is_ancestor_commit "$1" "$3" "$2"; then # source version is newer
-        echod 'downgrading package' &&
+        echo 'downgrading package' >&2 &&
         report='done; successfully downgraded'
     else # given versions are not comparable
-        echod 'changing package version' &&
+        echo 'changing package version' >&2 &&
         report='done; successfully changed'
     fi &&
 
@@ -510,7 +498,7 @@ is_ancestor_commit() (
 # $2 - hash
 run_install() (
     version="$(beautify_hash "$1" "$2")" &&
-    echod "installing version $version" &&
+    echo "installing version $version" >&2 &&
 
     repo_cd "$1" "$2" &&
     install_script="$(get_install_script)" &&
@@ -522,7 +510,7 @@ run_install() (
 # $2 - hash
 run_uninstall() (
     version="$(beautify_hash "$1" "$2")" &&
-    echod "uninstalling version $version" &&
+    echo "uninstalling version $version" >&2 &&
 
     repo_cd "$1" "$2" &&
     uninstall_script="$(get_uninstall_script)" &&
@@ -551,8 +539,7 @@ get_uninstall_script() {
 
 # $1 - script path
 run_script() (
-    echod "running script $1" &&
-    DIAG_PREFIX='    ' &&
+    echo "running script $1" >&2 &&
     "$1" 1>&2 && return # return if success, stdout considered diagnostic output
 
     script_status="$?"
@@ -567,14 +554,14 @@ run_script() (
 
 # $1 - URL
 get_status_record() {
-    echod 'reading package database' &&
+    echo 'reading package database' >&2 &&
     db_select_first "$STATUS_PATH" "$STATUS_COL_URL" "$1"
 }
 
 # $1 - URL
 # $2 - hash
 insert_status_record() {
-    echod 'adding to package database' &&
+    echo 'adding to package database' >&2 &&
     cp "$STATUS_PATH" "$STATUS_PATH".tmp &&
     echo "$1 $2" >> "$STATUS_PATH".tmp &&
     mv "$STATUS_PATH".tmp "$STATUS_PATH" # should be signal-safe
@@ -582,7 +569,7 @@ insert_status_record() {
 
 # $1 - URL
 delete_status_records() (
-    echod 'removing from package database' &&
+    echo 'removing from package database' >&2 &&
     db="$(db_select_except "$STATUS_PATH" "$STATUS_COL_URL" "$1")" &&
     echon "$db" > "$STATUS_PATH".tmp &&
     mv "$STATUS_PATH".tmp "$STATUS_PATH"
