@@ -142,13 +142,12 @@ echoh() {
 
 run_list() (
     init_runtime g c p l f &&
-    db="$(get_db "$STATUS_PATH")" &&
-    echon "$db" | while IFS= read -r record; do
+    while IFS= read -r record; do
         url="$(status_record_url "$record")" &&
         hash="$(status_record_hash "$record")" &&
         version="$(beautify_hash "$url" "$hash")" &&
         echo "$url $version" || return
-    done
+    done < "$STATUS_PATH"
 )
 
 run_clean() (
@@ -164,14 +163,6 @@ run_paths() (
     echo "cache-dir $CACHE_DIR" &&
     echo "lock-path $LOCK_PATH"
 )
-
-# $@ - echo arguments
-echon() {
-    # no newline if empty string
-    if [ "$*" ]; then
-        echo "$@"
-    fi
-}
 
 # $1 - URL
 # $2 - hash (optional)
@@ -597,6 +588,14 @@ delete_status_records() (
     mv "$STATUS_PATH".tmp "$STATUS_PATH"
 )
 
+# $@ - echo arguments
+echon() {
+    # no newline if empty string
+    if [ "$*" ]; then
+        echo "$@"
+    fi
+}
+
 # $1 - status record
 status_record_url() {
     echo "$1" | cut -f "$STATUS_COL_URL" -d "$DB_DELIMITER"
@@ -661,32 +660,25 @@ init_db() (
 # $2 - key column
 # $3 - expected value
 db_select_first() (
-    db="$(get_db "$1")" &&
-    echon "$db" | while IFS= read -r record; do
+    while IFS= read -r record; do
         field="$(echo "$record" | cut -f "$2" -d "$DB_DELIMITER")" || return
         if [ "$field" = "$3" ]; then
             echo "$record"; return
         fi
-    done
+    done < "$1"
 )
 
 # $1 - database path
 # $2 - key column
 # $3 - filtered value
 db_select_except() (
-    db="$(get_db "$1")" &&
-    echon "$db" | while IFS= read -r record; do
+    while IFS= read -r record; do
         field="$(echo "$record" | cut -f "$2" -d "$DB_DELIMITER")" || return
         if [ "$field" != "$3" ]; then
             echo "$record"
         fi
-    done
+    done < "$1"
 )
-
-# $1 - database path
-get_db() {
-    cat -- "$1"
-}
 
 # $1 - database
 # $2 - record
