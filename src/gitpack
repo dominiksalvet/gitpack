@@ -583,14 +583,17 @@ get_status_record() {
 # $2 - hash
 insert_status_record() {
     echod 'adding to package database' &&
-    echo "$1 $2" >> "$STATUS_PATH"
+    cp "$STATUS_PATH" "$STATUS_PATH".tmp &&
+    echo "$1 $2" >> "$STATUS_PATH".tmp &&
+    mv "$STATUS_PATH".tmp "$STATUS_PATH" # should be signal-safe
 }
 
 # $1 - URL
 delete_status_records() (
     echod 'removing from package database' &&
     db="$(db_select_except "$STATUS_PATH" "$STATUS_COL_URL" "$1")" &&
-    echon "$db" > "$STATUS_PATH"
+    echon "$db" > "$STATUS_PATH".tmp &&
+    mv "$STATUS_PATH".tmp "$STATUS_PATH"
 )
 
 # $1 - status record
@@ -620,7 +623,8 @@ mark_as_fetched_now() (
     current_time="$(get_current_time)" &&
     db="$(db_select_except "$FETCHED_PATH" "$FETCHED_COL_URL" "$1")" &&
     db="$(db_append_record "$db" "$1 $current_time")" &&
-    echo "$db" > "$FETCHED_PATH"
+    echo "$db" > "$FETCHED_PATH".tmp &&
+    mv "$FETCHED_PATH".tmp "$FETCHED_PATH"
 )
 
 get_current_time() {
