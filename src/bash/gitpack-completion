@@ -9,35 +9,51 @@
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
-# COMPLETION GENERATOR
+# ENTRY POINT
 #-------------------------------------------------------------------------------
 
 _gitpack() {
-    # the list of possible subcommands
     local -r SUBCOMMANDS='install uninstall status
                           list clean paths help about' &&
-    local cur_word="${COMP_WORDS[COMP_CWORD]}" && # the current part of the word
-    local subcommand_index &&
-    subcommand_index="$(_gitpack_subcommand_index "${COMP_WORDS[@]}")" &&
+    local cur words cword subcommand_index &&
+
+    _gitpack_init_comp &&
+    subcommand_index="$(_gitpack_subcommand_index)" &&
 
     if ! [ "$subcommand_index" ]; then # no action or command so far
-        mapfile -t COMPREPLY < <(compgen -W "$SUBCOMMANDS" -- "$cur_word")
+        mapfile -t COMPREPLY < <(compgen -W "$SUBCOMMANDS" -- "$cur")
     else # repository URLs
         local item="${COMP_WORDS[subcommand_index]}" &&
         case "$item" in # only for actions
-            install | uninstall | status) _gitpack_url "$cur_word" ;;
+            install | uninstall | status) _gitpack_url ;;
         esac
     fi
 }
 
-# $@ - completion words array
-_gitpack_subcommand_index() {
-    local arr=("$@") && # interpret input as an array
-    local accept_next=false &&
+#-------------------------------------------------------------------------------
+# INITIALIZATION
+#-------------------------------------------------------------------------------
 
-    local item &&
-    for ((i=1; i<COMP_CWORD; i++)); do # ignore first and last items
-        item="${arr[i]}" &&
+# write cur, words, cword
+_gitpack_init_comp() {
+    if command -v _get_comp_words_by_ref > /dev/null; then # more features
+        _get_comp_words_by_ref cur words cword
+    else # less features as a fallback
+        cur="${COMP_WORDS[COMP_CWORD]}" &&
+        words=("${COMP_WORDS[@]}") &&
+        cword="$COMP_CWORD"
+    fi
+}
+
+#-------------------------------------------------------------------------------
+# HELPER FUNCTIONS
+#-------------------------------------------------------------------------------
+
+# read words, cword
+_gitpack_subcommand_index() {
+    local accept_next=false item &&
+    for ((i=1; i<cword; i++)); do # ignore first and last items
+        item="${words[i]}" &&
         if [ "$accept_next" = true ]; then
             echo "$i"; return
         fi &&
@@ -49,7 +65,7 @@ _gitpack_subcommand_index() {
     done
 }
 
-# $1 - current URL word
+# read cur
 _gitpack_url() {
     # collect global and local GitPack URL references to form a hint
     local urls && urls="$(
@@ -60,12 +76,12 @@ _gitpack_url() {
             "$HOME"/.cache/gitpack/fetched 2>/dev/null
         true
     )" &&
-    mapfile -t COMPREPLY < <(compgen -W "$urls" -- "$1")
+    mapfile -t COMPREPLY < <(compgen -W "$urls" -- "$cur")
 }
 
 #-------------------------------------------------------------------------------
-# APPLY COMPLETION
+# REGISTER COMPLETION
 #-------------------------------------------------------------------------------
 
-# register the gitpack completion to the current shell environment
+# load the gitpack completion into the current Bash environment
 complete -F _gitpack gitpack
