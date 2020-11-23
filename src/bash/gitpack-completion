@@ -13,20 +13,23 @@
 #-------------------------------------------------------------------------------
 
 _gitpack() {
-    local -r SUBCOMMANDS='install uninstall status
-                          list clean paths help about' &&
-    local cur words cword subcommand_index &&
+    local -r COMMANDS='install uninstall status list clean paths help about' &&
+    local native_mode cur words cword command_index &&
 
     _gitpack_init_comp &&
-    subcommand_index="$(_gitpack_subcommand_index)" &&
+    command_index="$(_gitpack_subcommand_index)" &&
 
-    if ! [ "$subcommand_index" ]; then # no action or command so far
-        mapfile -t COMPREPLY < <(compgen -W "$SUBCOMMANDS" -- "$cur")
+    if ! [ "$command_index" ]; then # no action or command so far
+        mapfile -t COMPREPLY < <(compgen -W "$COMMANDS" -- "$cur")
     else # repository URLs
-        local item="${COMP_WORDS[subcommand_index]}" &&
-        case "$item" in # only for actions
+        local command="${COMP_WORDS[command_index]}" &&
+        case "$command" in # only for GitPack actions
             install | uninstall | status) _gitpack_url ;;
         esac
+    fi &&
+
+    if [ "$native_mode" = true ]; then
+        __ltrim_colon_completions "$cur" # make hints with colon in word work
     fi
 }
 
@@ -34,13 +37,15 @@ _gitpack() {
 # INITIALIZATION
 #-------------------------------------------------------------------------------
 
-# write cur, words, cword
 _gitpack_init_comp() {
-    if command -v _get_comp_words_by_ref > /dev/null; then # more features
-        _get_comp_words_by_ref cur words cword
+    if command -v _get_comp_words_by_ref > /dev/null &&
+       command -v __ltrim_colon_completions > /dev/null; then # more features
+        native_mode=true
+        _get_comp_words_by_ref -n : cur words cword # do not split by colons
     else # less features as a fallback
-        cur="${COMP_WORDS[COMP_CWORD]}" &&
-        words=("${COMP_WORDS[@]}") &&
+        native_mode=false
+        cur="${COMP_WORDS[COMP_CWORD]}"
+        words=("${COMP_WORDS[@]}")
         cword="$COMP_CWORD"
     fi
 }
@@ -49,7 +54,6 @@ _gitpack_init_comp() {
 # HELPER FUNCTIONS
 #-------------------------------------------------------------------------------
 
-# read words, cword
 _gitpack_subcommand_index() {
     local accept_next=false item &&
     for ((i=1; i<cword; i++)); do # ignore first and last items
@@ -65,7 +69,6 @@ _gitpack_subcommand_index() {
     done
 }
 
-# read cur
 _gitpack_url() {
     # collect global and local GitPack URL references to form a hint
     local urls && urls="$(
