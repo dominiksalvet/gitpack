@@ -57,15 +57,15 @@ _gitpack_init_comp() {
 _gitpack_subcommand_index() {
     local accept_next=false item &&
     for ((i=1; i<cword; i++)); do # ignore first and last items
-        item="${words[i]}" &&
+        item="${words[i]}"
         if [ "$accept_next" = true ]; then
             echo "$i"; return
-        fi &&
+        fi
         if [ "$item" = "${item#-}" ]; then # no dash prefix
             echo "$i"; return
         elif [ "$item" = '--' ]; then
             accept_next=true
-        fi || return
+        fi
     done
 }
 
