@@ -20,7 +20,7 @@ _gitpack() {
     command_index="$(_gitpack_subcommand_index)" &&
 
     if ! [ "$command_index" ]; then # no action or command so far
-        mapfile -t COMPREPLY < <(compgen -W "$COMMANDS" -- "$cur")
+        _gitpack_set_compreply -W "$COMMANDS" -- "$cur"
     else # repository URLs
         local command="${COMP_WORDS[command_index]}" &&
         case "$command" in # only for GitPack actions
@@ -51,7 +51,7 @@ _gitpack_init_comp() {
 }
 
 #-------------------------------------------------------------------------------
-# HELPER FUNCTIONS
+# URL COMPLETION
 #-------------------------------------------------------------------------------
 
 _gitpack_subcommand_index() {
@@ -79,7 +79,16 @@ _gitpack_url() {
             "$HOME"/.cache/gitpack/fetched 2>/dev/null
         true
     )" &&
-    mapfile -t COMPREPLY < <(compgen -W "$urls" -- "$cur")
+    _gitpack_set_compreply -W "$urls" -- "$cur"
+}
+
+# $@ - compgen arguments
+_gitpack_set_compreply() {
+    local line &&
+    COMPREPLY=() && # initialize as an empty array
+    while IFS= read -r line; do
+        COMPREPLY+=("$line")
+    done < <(compgen "$@")
 }
 
 #-------------------------------------------------------------------------------
