@@ -13,24 +13,34 @@
 #-------------------------------------------------------------------------------
 
 _gitpack() {
+    # GitPack actions and commands are collectively referred to as commands here
     local -r COMMANDS='install uninstall status list clean paths help about' &&
     local native_mode cur words cword command_index &&
 
     _gitpack_init_comp &&
-    command_index="$(_gitpack_subcommand_index)" &&
+    command_index="$(_gitpack_get_command_index)" &&
 
-    if ! [ "$command_index" ]; then # no action or command so far
+    if ! [ "$command_index" ]; then # no command so far
         _gitpack_set_compreply -W "$COMMANDS" -- "$cur"
-    else # repository URLs
+    else # URL arguments
         local command="${COMP_WORDS[command_index]}" &&
         case "$command" in # only for GitPack actions
-            install | uninstall | status) _gitpack_url ;;
+            install | uninstall | status) _gitpack_hint_url_arg ;;
         esac
     fi &&
 
     if [ "$native_mode" = true ]; then
         __ltrim_colon_completions "$cur" # make hints with colon in word work
     fi
+}
+
+# $@ - compgen arguments
+_gitpack_set_compreply() {
+    local line &&
+    COMPREPLY=() && # initialize as an empty array
+    while IFS= read -r line; do
+        COMPREPLY+=("$line")
+    done < <(compgen "$@")
 }
 
 #-------------------------------------------------------------------------------
@@ -50,12 +60,8 @@ _gitpack_init_comp() {
     fi
 }
 
-#-------------------------------------------------------------------------------
-# URL COMPLETION
-#-------------------------------------------------------------------------------
-
-_gitpack_subcommand_index() {
-    local accept_next=false item &&
+_gitpack_get_command_index() {
+    local i accept_next=false item &&
     for ((i=1; i<cword; i++)); do # ignore first and last items
         item="${words[i]}"
         if [ "$accept_next" = true ]; then
@@ -69,26 +75,25 @@ _gitpack_subcommand_index() {
     done
 }
 
-_gitpack_url() {
-    # collect global and local GitPack URL references to form a hint
-    local urls && urls="$(
-        cut -f 1 -d ' ' \
-            /var/lib/gitpack/status \
-            /var/cache/gitpack/fetched \
-            "$HOME"/.local/share/gitpack/status \
-            "$HOME"/.cache/gitpack/fetched 2>/dev/null
-        true
-    )" &&
+#-------------------------------------------------------------------------------
+# URL COMPLETION
+#-------------------------------------------------------------------------------
+
+_gitpack_hint_url_arg() {
+    # collect global and local URL references to form a hint
+    local urls && urls="$(_gitpack_get_urls)" &&
     _gitpack_set_compreply -W "$urls" -- "$cur"
 }
 
-# $@ - compgen arguments
-_gitpack_set_compreply() {
-    local line &&
-    COMPREPLY=() && # initialize as an empty array
-    while IFS= read -r line; do
-        COMPREPLY+=("$line")
-    done < <(compgen "$@")
+_gitpack_get_urls() {
+    cut -f 1 -d ' ' /var/lib/gitpack/status \
+                    "$HOME"/.local/share/gitpack/status 2>/dev/null
+    # print only installed packages for uninstall
+    if [ "$command" != uninstall ]; then
+        cut -f 1 -d ' ' /var/cache/gitpack/fetched \
+                        "$HOME"/.cache/gitpack/fetched 2>/dev/null
+    fi
+    true # always successful
 }
 
 #-------------------------------------------------------------------------------
