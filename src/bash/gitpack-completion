@@ -86,7 +86,8 @@ _gitpack_hint_url_arg() {
 
     if [ "$version" = "$cur" ]; then # URL hints (no URL prefix removed)
         local urls && urls="$(_gitpack_get_urls)" &&
-        _gitpack_set_compreply -W "$urls" -- "$cur"
+        _gitpack_set_compreply -W "$urls" -- "$cur" &&
+        compopt -o nospace # do not insert space after URL hint applied
     else # version hints
         local versions && versions="$(_gitpack_get_versions "$url")" &&
         _gitpack_set_compreply -W "$versions" -- "$version"
