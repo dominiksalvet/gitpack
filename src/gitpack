@@ -255,7 +255,7 @@ init_lock() {
         trap exit_action EXIT && # function to call on an exit
         trap exit HUP INT QUIT TERM && # call exit on these signals
         echo "$$" > "$LOCK_PID_PATH"
-    else # fail to acquire lock
+    else # failed to acquire lock
         _lockfile="$(basename "$LOCK_PATH")"
         _pid="$(cat "$LOCK_PID_PATH")" # may not exist yet, not a problem though
         echo "E17: lockfile $_lockfile is owned by process $_pid" >&2
