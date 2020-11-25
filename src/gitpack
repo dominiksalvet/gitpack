@@ -251,11 +251,11 @@ init_paths() {
 init_lock() {
     mkdir -p "$LOCK_DIR"/ && # first create a directory for locks
 
-    if mkdir "$LOCK_PATH"/ 2>/dev/null; then # try to lock
+    if mkdir "$LOCK_PATH"/ 2>/dev/null; then # acquire lock
         trap exit_action EXIT && # function to call on an exit
         trap exit HUP INT QUIT TERM && # call exit on these signals
         echo "$$" > "$LOCK_PID_PATH"
-    else
+    else # fail to acquire lock
         _lockfile="$(basename "$LOCK_PATH")"
         _pid="$(cat "$LOCK_PID_PATH")" # may not exist yet, not a problem though
         echo "E17: lockfile $_lockfile is owned by process $_pid" >&2
@@ -272,7 +272,7 @@ init_files() {
 exit_action() (
     status="$?" # store exit status of last executed command
     rm -f "$LOCK_PID_PATH"
-    rmdir "$LOCK_PATH"/
+    rmdir "$LOCK_PATH"/ # release lock
     return "$status"
 )
 
