@@ -51,7 +51,7 @@ _gitpack_init_comp() {
     if command -v _get_comp_words_by_ref > /dev/null &&
        command -v __ltrim_colon_completions > /dev/null; then # more features
         native_mode=true
-        _get_comp_words_by_ref -n : -n = cur words cword # no colons splitting
+        _get_comp_words_by_ref -n ':=' cur words cword # no colons splitting
     else # less features as a fallback
         native_mode=false
         cur="${COMP_WORDS[COMP_CWORD]}"
