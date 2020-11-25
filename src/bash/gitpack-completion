@@ -97,11 +97,9 @@ _gitpack_hint_url_arg() {
 _gitpack_get_urls() {
     cut -f 1 -d ' ' /var/lib/gitpack/status \
                     "$HOME"/.local/share/gitpack/status 2>/dev/null
-    # print only installed packages for uninstall
-    if [ "$command" != uninstall ]; then
-        cut -f 1 -d ' ' /var/cache/gitpack/fetched \
-                        "$HOME"/.cache/gitpack/fetched 2>/dev/null
-    fi
+    test "$command" != uninstall && # only installed packages for uninstall
+    cut -f 1 -d ' ' /var/cache/gitpack/fetched \
+                    "$HOME"/.cache/gitpack/fetched 2>/dev/null
     true # always successful
 }
 
