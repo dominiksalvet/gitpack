@@ -306,9 +306,8 @@ url_arg_to_url() (
 
     if [ "$raw_url_mode" = false ]; then
         url="$(echo "$url" | tr '[:upper:]' '[:lower:]')" &&
-        url="${url#https://}" &&
-        url="$(echo "$url" | sed 's|/*$||')" &&
-        url="${url%.git}"
+        url="$(echo "${url#https://}" | sed 's|/\+|/|g')" &&
+        url="$(echo "$url" | sed 's|/$||; s/.git$//; s|/$||')"
     fi &&
 
     echo "$url"
