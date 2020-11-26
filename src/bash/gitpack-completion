@@ -15,10 +15,11 @@
 _gitpack() {
     # GitPack actions and commands are collectively referred to as commands here
     local -r COMMANDS='install uninstall status list clean paths help about' &&
-    local native_mode words cword cur command_index &&
+    local native_mode words cword cur command_index raw_url_mode &&
 
     _gitpack_init_comp &&
     command_index="$(_gitpack_get_command_index)" &&
+    raw_url_mode="$(_gitpack_get_raw_url_mode)" &&
 
     if ! [ "$command_index" ]; then # no command so far
         _gitpack_set_compreply -W "$COMMANDS" -- "$cur"
@@ -75,11 +76,22 @@ _gitpack_get_command_index() {
     done
 }
 
+_gitpack_get_raw_url_mode() {
+    local i &&
+    for ((i=1; i<command_index; i++)); do # ignore first and command item
+        if [[ "${words[i]}" =~ r ]]; then
+            echo true; return # raw URL mode option found
+        fi
+    done &&
+    echo false
+}
+
 #-------------------------------------------------------------------------------
-# URL COMPLETION
+# URL ARGUMENTS
 #-------------------------------------------------------------------------------
 
 _gitpack_hint_url_arg() {
+    local -r RAW_URL_REGEX='//|.git$|/$' && # raw URLs heuristic pattern
     local url version &&
     url="${cur%=*}" && # remove version if any
     version="${cur##*=}" && # remove URL and keep version
@@ -95,6 +107,14 @@ _gitpack_hint_url_arg() {
 }
 
 _gitpack_get_urls() {
+    if [ "$raw_url_mode" = false ]; then
+        _gitpack_get_db_urls | grep -vE "$RAW_URL_REGEX" # exclude raw URLs
+    else
+        _gitpack_get_db_urls # in raw URL mode, show all
+    fi
+}
+
+_gitpack_get_db_urls() {
     cut -f 1 -d ' ' /var/lib/gitpack/status \
                     "$HOME"/.local/share/gitpack/status 2>/dev/null
     test "$command" != uninstall && # only installed packages for uninstall
@@ -105,14 +125,17 @@ _gitpack_get_urls() {
 
 # $1 - URL
 _gitpack_get_versions() {
-    if [ "$command" != uninstall ]; then # uninstall does not care
-        (   cd "$HOME"/.cache/gitpack/repos/"$1"/ 2>/dev/null &&
-            test -d .git/ && git show-ref
-            cd /var/cache/gitpack/repos/"$1"/ 2>/dev/null &&
-            test -d .git/ && git show-ref
-            true # just for sure
-        ) | sed 's/^.* //; s|^.*/||; s/\^{}$//' # beautify show-ref output
+    if [ "$command" = uninstall ] || # uninstall does not care
+       [[ "$raw_url_mode" = false && "$1" =~ $RAW_URL_REGEX ]]; then # raw URLs
+        return # do not generate any hint
     fi
+
+    (   cd "$HOME"/.cache/gitpack/repos/"$1"/ 2>/dev/null &&
+        test -d .git/ && git show-ref
+        cd /var/cache/gitpack/repos/"$1"/ 2>/dev/null &&
+        test -d .git/ && git show-ref
+        true # just for sure
+    ) | sed 's/^.* //; s|^.*/||; s/\^{}$//' # beautify show-ref output
 }
 
 #-------------------------------------------------------------------------------
