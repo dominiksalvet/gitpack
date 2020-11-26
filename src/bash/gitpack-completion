@@ -39,7 +39,7 @@ _gitpack() {
 _gitpack_set_compreply() {
     local line &&
     COMPREPLY=() && # initialize as an empty array
-    while IFS= read -r line; do
+    while IFS= read -r line; do # use this instead of mapfile due compatibility
         COMPREPLY+=("$line")
     done < <(compgen "$@")
 }
