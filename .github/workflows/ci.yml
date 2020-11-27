@@ -17,7 +17,9 @@ jobs:
       run: shellcheck --version
 
     - name: Check source files
-      run: shellcheck src/*
+      run: |
+        shellcheck src/gitpack
+        shellcheck src/bash/gitpack-completion
 
     - name: Check test files
       run: |
