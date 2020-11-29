@@ -1,0 +1,10 @@
+#!/bin/sh
+
+#-------------------------------------------------------------------------------
+# Copyright 2020 Dominik Salvet
+# https://github.com/dominiksalvet/gitpack
+#-------------------------------------------------------------------------------
+
+echo 'removing files' &&
+rm /usr/local/bin/gitpack &&
+rm /etc/bash_completion.d/gitpack-completion

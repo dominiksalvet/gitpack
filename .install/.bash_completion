@@ -1,0 +1,14 @@
+#!/bin/bash
+
+#-------------------------------------------------------------------------------
+# Copyright 2019 Dominik Salvet
+# https://github.com/dominiksalvet/gitpack
+#-------------------------------------------------------------------------------
+
+# source each completion file in home directory
+for completion_file in "$HOME"/.bash_completion.d/*; do
+    if [ -r "$completion_file" ]; then
+        # shellcheck source=/dev/null
+        . "$completion_file"
+    fi
+done
