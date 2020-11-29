@@ -26,6 +26,9 @@ jobs:
         shellcheck test/run.sh
         shellcheck test/action/*
 
+    - name: Check install files
+      run: shellcheck .install/*
+
   Test:
     needs: Analysis
     strategy:
