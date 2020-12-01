@@ -24,7 +24,7 @@ jobs:
     - name: Check test files
       run: |
         shellcheck test/run.sh
-        shellcheck test/action/*
+        shellcheck test/action-api/*
 
     - name: Check install files
       run: shellcheck .install/*
