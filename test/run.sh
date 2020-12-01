@@ -44,7 +44,7 @@ export SHORT_HASH &&
 # RUN TESTS
 #-------------------------------------------------------------------------------
 
-run_test test/action/status.sh &&
-run_test test/action/install.sh &&
-run_test test/action/update.sh &&
-run_test test/action/downgrade.sh
+run_test test/action-api/status.sh &&
+run_test test/action-api/install.sh &&
+run_test test/action-api/update.sh &&
+run_test test/action-api/downgrade.sh
