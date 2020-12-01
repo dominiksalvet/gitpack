@@ -36,9 +36,9 @@ export URL=github.com/dominiksalvet/gitpack &&
 export NEW_VERSION=0.7.0 &&
 export OLD_VERSION=0.1.0 &&
 
-export COMMIT="${GITHUB_SHA:?}" && # current commit hash
-SHORT_COMMIT="$(echo "$COMMIT" | cut -c 1-7)" &&
-export SHORT_COMMIT &&
+export HASH="${GITHUB_SHA:?}" && # current commit hash
+SHORT_HASH="$(echo "$HASH" | cut -c 1-7)" &&
+export SHORT_HASH &&
 
 #-------------------------------------------------------------------------------
 # RUN TESTS
