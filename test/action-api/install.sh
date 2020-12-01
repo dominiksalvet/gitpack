@@ -5,18 +5,26 @@
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-gitpack_out="$($GITPACK install -o "$GITPACK_URL")" &&
-test "$gitpack_out" = "[install] $GITPACK_URL $GITPACK_VERSION" &&
-gitpack_out="$($GITPACK install -o "$GITPACK_URL")" &&
-test "$gitpack_out" = "[installed] $GITPACK_URL $GITPACK_VERSION" &&
+out="$($GITPACK install "$URL")" &&
+test "$out" = ">>> running install for $URL
+<<< done; successfully installed" &&
 
-gitpack_out="$($GITPACK status -o "$GITPACK_URL")" &&
-test "$gitpack_out" = "[ok] $GITPACK_URL $GITPACK_VERSION" &&
+out="$($GITPACK install "$URL")" &&
+test "$out" = ">>> running install for $URL
+<<< already installed" &&
 
-gitpack_out="$($GITPACK uninstall -o "$GITPACK_URL")" &&
-test "$gitpack_out" = "[uninstall] $GITPACK_URL $GITPACK_VERSION" &&
-gitpack_out="$($GITPACK uninstall -o "$GITPACK_URL")" &&
-test "$gitpack_out" = "[uninstalled] $GITPACK_URL" &&
+out="$($GITPACK status "$URL")" &&
+test "$out" = ">>> running status for $URL
+<<< candidate $VERSION already installed" &&
 
-gitpack_out="$($GITPACK status -o "$GITPACK_URL")" &&
-test "$gitpack_out" = "[nothing] $GITPACK_URL -> $GITPACK_VERSION"
+out="$($GITPACK uninstall "$URL")" &&
+test "$out" = ">>> running uninstall for $URL
+<<< done; successfully uninstalled" &&
+
+out="$($GITPACK uninstall "$URL")" &&
+test "$out" = ">>> running uninstall for $URL
+<<< already uninstalled" &&
+
+out="$($GITPACK status "$URL")" &&
+test "$out" = ">>> running status for $URL
+<<< not installed; candidate is $VERSION"

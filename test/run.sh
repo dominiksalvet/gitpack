@@ -31,14 +31,17 @@ run_test() (
 # ENVIRONMENT INITIALIZATION
 #-------------------------------------------------------------------------------
 
-export GITPACK='sh -x src/gitpack' && # GitPack is run with tracing enabled
-export URL=github.com/dominiksalvet/gitpack &&
-export NEW_VERSION=0.7.0 &&
-export OLD_VERSION=0.1.0 &&
-
 export HASH="${GITHUB_SHA:?}" && # current commit hash
 SHORT_HASH="$(echo "$HASH" | cut -c 1-7)" &&
 export SHORT_HASH &&
+
+export GITPACK='sh -x src/gitpack' && # GitPack is run with tracing enabled
+export URL=github.com/dominiksalvet/gitpack &&
+VERSION="$(git describe --tags --abbrev=0)" && # latest GitPack version
+export VERSION &&
+export VERSION_HASH=d5a9f75a89eefbd5316b5abe956d28d3a5358327 &&
+export VERSION_SHORT_HASH=d5a9f75 &&
+export OLD_VERSION=0.1.0 &&
 
 #-------------------------------------------------------------------------------
 # RUN TESTS
