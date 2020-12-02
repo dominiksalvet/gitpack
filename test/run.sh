@@ -49,4 +49,6 @@ export OLD_VERSION=0.1.0 &&
 run_test test/action-api/status.sh &&
 run_test test/action-api/install.sh &&
 run_test test/action-api/update.sh &&
-run_test test/action-api/downgrade.sh
+run_test test/action-api/downgrade.sh &&
+
+run_test test/command-api/messages.sh
