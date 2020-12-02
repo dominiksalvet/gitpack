@@ -27,4 +27,13 @@ test "$out" = ">>> running uninstall for $URL
 
 out="$($GITPACK status "$URL")" &&
 test "$out" = ">>> running status for $URL
-<<< not installed; candidate is $VERSION"
+<<< not installed; candidate is $VERSION" &&
+
+# raw URL mode
+out="$($GITPACK -r install "https://$URL.git")" &&
+test "$out" = ">>> running install for https://$URL.git
+<<< done; successfully installed" &&
+
+out="$($GITPACK -r uninstall "https://$URL.git")" &&
+test "$out" = ">>> running uninstall for https://$URL.git
+<<< done; successfully uninstalled"
