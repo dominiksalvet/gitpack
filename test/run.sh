@@ -53,4 +53,5 @@ run_test test/action-api/update.sh &&
 run_test test/action-api/downgrade.sh &&
 run_test test/action-api/local-global.sh &&
 
-run_test test/command-api/messages.sh
+run_test test/command-api/messages.sh &&
+run_test test/command-api/paths.sh
