@@ -36,6 +36,7 @@ SHORT_HASH="$(echo "$HASH" | cut -c 1-7)" &&
 export SHORT_HASH &&
 
 export GITPACK='sh -x src/gitpack' && # GitPack is run with tracing enabled
+export SUDO_GITPACK='sudo sh -x src/gitpack' && # root permissions
 export URL=github.com/dominiksalvet/gitpack &&
 export VERSION=0.7.0 && # latest GitPack version
 export VERSION_HASH=d5a9f75a89eefbd5316b5abe956d28d3a5358327 &&
@@ -50,5 +51,6 @@ run_test test/action-api/status.sh &&
 run_test test/action-api/install.sh &&
 run_test test/action-api/update.sh &&
 run_test test/action-api/downgrade.sh &&
+run_test test/action-api/local-global.sh &&
 
 run_test test/command-api/messages.sh
