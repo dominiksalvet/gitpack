@@ -9,8 +9,16 @@ out="$($GITPACK install "$URL")" &&
 test "$out" = ">>> running install for $URL
 <<< done; successfully installed" &&
 
-out="$($GITPACK install "$URL")" &&
+out="$($GITPACK install "$URL")" && # must be already installed
 test "$out" = ">>> running install for $URL
+<<< already installed" &&
+
+out="$($GITPACK install "$URL=$VERSION")" &&
+test "$out" = ">>> running install for $URL=$VERSION
+<<< already installed" &&
+
+out="$($GITPACK install "$URL=$VERSION_HASH")" &&
+test "$out" = ">>> running install for $URL=$VERSION_HASH
 <<< already installed" &&
 
 out="$($GITPACK status "$URL")" &&
@@ -21,7 +29,7 @@ out="$($GITPACK uninstall "$URL")" &&
 test "$out" = ">>> running uninstall for $URL
 <<< done; successfully uninstalled" &&
 
-out="$($GITPACK uninstall "$URL")" &&
+out="$($GITPACK uninstall "$URL")" && # must be already uninstalled
 test "$out" = ">>> running uninstall for $URL
 <<< already uninstalled" &&
 
