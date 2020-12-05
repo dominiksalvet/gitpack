@@ -5,44 +5,44 @@
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-out="$($GITPACK status "$URL")" &&
-test "$out" = ">>> running status for $URL
+out1="$($GITPACK status "$URL")" &&
+test "$out1" = ">>> running status for $URL
 <<< not installed; candidate is $VERSION" &&
 
-out="$($GITPACK status "$URL")" && # must not change
-test "$out" = ">>> running status for $URL
+out2="$($GITPACK status "$URL")" && # must not change
+test "$out2" = ">>> running status for $URL
 <<< not installed; candidate is $VERSION" &&
 
-out="$($GITPACK status "$URL=$VERSION")" &&
-test "$out" = ">>> running status for $URL=$VERSION
+out3="$($GITPACK status "$URL=$VERSION")" &&
+test "$out3" = ">>> running status for $URL=$VERSION
 <<< not installed; candidate is $VERSION" &&
 
-out="$($GITPACK status "$URL=$VERSION_HASH")" &&
-test "$out" = ">>> running status for $URL=$VERSION_HASH
+out4="$($GITPACK status "$URL=$VERSION_HASH")" &&
+test "$out4" = ">>> running status for $URL=$VERSION_HASH
 <<< not installed; candidate is $VERSION" &&
 
 # single options
-out="$($GITPACK -f status "$URL")" &&
-test "$out" = ">>> running status for $URL
+out5="$($GITPACK -f status "$URL")" &&
+test "$out5" = ">>> running status for $URL
 <<< not installed; candidate is $VERSION" &&
 
-out="$($GITPACK -h status "$URL")" &&
-test "$out" = ">>> running status for $URL
+out6="$($GITPACK -h status "$URL")" &&
+test "$out6" = ">>> running status for $URL
 <<< not installed; candidate is $VERSION_SHORT_HASH" &&
 
-out="$($GITPACK -H status "$URL")" &&
-test "$out" = ">>> running status for $URL
+out7="$($GITPACK -H status "$URL")" &&
+test "$out7" = ">>> running status for $URL
 <<< not installed; candidate is $VERSION_HASH" &&
 
-out="$($GITPACK -r status "https://$URL.git")" && # raw URL mode
-test "$out" = ">>> running status for https://$URL.git
+out8="$($GITPACK -r status "https://$URL.git")" && # raw URL mode
+test "$out8" = ">>> running status for https://$URL.git
 <<< not installed; candidate is $VERSION" &&
 
 # multiple options
-out="$($GITPACK -fh status "$URL")" &&
-test "$out" = ">>> running status for $URL
+out9="$($GITPACK -fh status "$URL")" &&
+test "$out9" = ">>> running status for $URL
 <<< not installed; candidate is $VERSION_SHORT_HASH" &&
 
-out="$($GITPACK -Hr status "https://$URL.git")" &&
-test "$out" = ">>> running status for https://$URL.git
+out10="$($GITPACK -Hr status "https://$URL.git")" &&
+test "$out10" = ">>> running status for https://$URL.git
 <<< not installed; candidate is $VERSION_HASH"

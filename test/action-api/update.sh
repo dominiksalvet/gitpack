@@ -5,35 +5,35 @@
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-out="$($GITPACK install "$URL=$OLD_VERSION")" &&
-test "$out" = ">>> running install for $URL=$OLD_VERSION
+out1="$($GITPACK install "$URL=$OLD_VERSION")" &&
+test "$out1" = ">>> running install for $URL=$OLD_VERSION
 <<< done; successfully installed" &&
 
-out="$($GITPACK status "$URL=$OLD_VERSION")" &&
-test "$out" = ">>> running status for $URL=$OLD_VERSION
+out2="$($GITPACK status "$URL=$OLD_VERSION")" &&
+test "$out2" = ">>> running status for $URL=$OLD_VERSION
 <<< candidate $OLD_VERSION already installed" &&
 
-out="$($GITPACK status "$URL")" &&
-test "$out" = ">>> running status for $URL
+out3="$($GITPACK status "$URL")" &&
+test "$out3" = ">>> running status for $URL
 <<< installed $OLD_VERSION is older than candidate $VERSION" &&
 
-out="$($GITPACK install "$URL")" &&
-test "$out" = ">>> running install for $URL
+out4="$($GITPACK install "$URL")" &&
+test "$out4" = ">>> running install for $URL
 <<< done; successfully updated" &&
 
-out="$($GITPACK uninstall "$URL")" &&
-test "$out" = ">>> running uninstall for $URL
+out5="$($GITPACK uninstall "$URL")" &&
+test "$out5" = ">>> running uninstall for $URL
 <<< done; successfully uninstalled" &&
 
 # raw URL mode
-out="$($GITPACK -r install "https://$URL.git=$OLD_VERSION")" &&
-test "$out" = ">>> running install for https://$URL.git=$OLD_VERSION
+out6="$($GITPACK -r install "https://$URL.git=$OLD_VERSION")" &&
+test "$out6" = ">>> running install for https://$URL.git=$OLD_VERSION
 <<< done; successfully installed" &&
 
-out="$($GITPACK -r install "https://$URL.git")" &&
-test "$out" = ">>> running install for https://$URL.git
+out7="$($GITPACK -r install "https://$URL.git")" &&
+test "$out7" = ">>> running install for https://$URL.git
 <<< done; successfully updated" &&
 
-out="$($GITPACK -r uninstall "https://$URL.git")" &&
-test "$out" = ">>> running uninstall for https://$URL.git
+out8="$($GITPACK -r uninstall "https://$URL.git")" &&
+test "$out8" = ">>> running uninstall for https://$URL.git
 <<< done; successfully uninstalled"

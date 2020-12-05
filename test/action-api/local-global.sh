@@ -6,35 +6,35 @@
 #-------------------------------------------------------------------------------
 
 # local before global (FIFO)
-out="$($GITPACK install "$URL")" &&
-test "$out" = ">>> running install for $URL
+out1="$($GITPACK install "$URL")" &&
+test "$out1" = ">>> running install for $URL
 <<< done; successfully installed" &&
 
-out="$($SUDO_GITPACK install "$URL")" && # must not be already installed
-test "$out" = ">>> running install for $URL
+out2="$($SUDO_GITPACK install "$URL")" && # must not be already installed
+test "$out2" = ">>> running install for $URL
 <<< done; successfully installed" &&
 
-out="$($GITPACK uninstall "$URL")" &&
-test "$out" = ">>> running uninstall for $URL
+out3="$($GITPACK uninstall "$URL")" &&
+test "$out3" = ">>> running uninstall for $URL
 <<< done; successfully uninstalled" &&
 
-out="$($SUDO_GITPACK uninstall "$URL")" && # must not be already uninstalled
-test "$out" = ">>> running uninstall for $URL
+out4="$($SUDO_GITPACK uninstall "$URL")" && # must not be already uninstalled
+test "$out4" = ">>> running uninstall for $URL
 <<< done; successfully uninstalled" &&
 
 # global before local (LIFO)
-out="$($SUDO_GITPACK install "$URL")" &&
-test "$out" = ">>> running install for $URL
+out5="$($SUDO_GITPACK install "$URL")" &&
+test "$out5" = ">>> running install for $URL
 <<< done; successfully installed" &&
 
-out="$($GITPACK install "$URL")" &&
-test "$out" = ">>> running install for $URL
+out6="$($GITPACK install "$URL")" &&
+test "$out6" = ">>> running install for $URL
 <<< done; successfully installed" &&
 
-out="$($GITPACK uninstall "$URL")" &&
-test "$out" = ">>> running uninstall for $URL
+out7="$($GITPACK uninstall "$URL")" &&
+test "$out7" = ">>> running uninstall for $URL
 <<< done; successfully uninstalled" &&
 
-out="$($SUDO_GITPACK uninstall "$URL")" &&
-test "$out" = ">>> running uninstall for $URL
+out8="$($SUDO_GITPACK uninstall "$URL")" &&
+test "$out8" = ">>> running uninstall for $URL
 <<< done; successfully uninstalled"

@@ -5,8 +5,8 @@
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-out="$($GITPACK help)" && # must succeed
-test "$out" && # must not be empty
+out1="$($GITPACK help)" && # must succeed
+test "$out1" && # must not be empty
 
-out="$($GITPACK about)" &&
-test "$out"
+out2="$($GITPACK about)" &&
+test "$out2"

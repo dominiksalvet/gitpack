@@ -7,14 +7,14 @@
 
 # local paths
 user_id="$(id -u)" &&
-out="$($GITPACK paths)" &&
-test "$out" = "state-dir $HOME/.local/share/gitpack
+out1="$($GITPACK paths)" &&
+test "$out1" = "state-dir $HOME/.local/share/gitpack
 cache-dir $HOME/.cache/gitpack
 lock-path /var/lock/gitpack-$user_id" &&
 
 # global paths
 root_id="$(sudo id -u)" &&
-out="$($SUDO_GITPACK paths)" &&
-test "$out" = "state-dir /var/lib/gitpack
+out2="$($SUDO_GITPACK paths)" &&
+test "$out2" = "state-dir /var/lib/gitpack
 cache-dir /var/cache/gitpack
 lock-path /var/lock/gitpack-$root_id"
