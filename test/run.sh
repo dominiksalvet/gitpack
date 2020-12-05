@@ -15,15 +15,15 @@
 
 # $1 - test path
 run_test() (
-    printf '%s' "$1" || return
+    echo "running $1" &&
 
     # run test and store its execution trace
     if ! test_trace="$(sh -x "$1" 2>&1)"; then
-        printf ' fail\n' &&
-        echo "$test_trace" | tail -n 100 &&
+        echo "$test_trace" | tail -n 100 && # recent trace
+        echo "$1 failed" &&
         return 1
     else
-        printf ' pass\n'
+        echo "$1 passed"
     fi
 )
 
