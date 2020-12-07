@@ -35,7 +35,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-20.04, macos-10.15]
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{matrix.os}}
     steps:
     - name: Checkout commit
       uses: actions/checkout@v2
@@ -47,7 +47,7 @@ jobs:
       uses: actions/upload-artifact@v2
       if: always()
       with:
-        name: gitpack-trace
+        name: ${{matrix.os}}-gitpack-trace
         path: |
           /tmp/gitpack/test-trace/passed/
           /tmp/gitpack/test-trace/failed_*
