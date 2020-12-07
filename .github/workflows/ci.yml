@@ -42,3 +42,11 @@ jobs:
 
     - name: Run tests
       run: test/run.sh
+
+    - name: Upload execution trace
+      uses: actions/upload-artifact@v2
+      with:
+        name: gitpack-trace
+        path: |
+          /tmp/gitpack/test-trace/passed/
+          /tmp/gitpack/test-trace/failed_*
