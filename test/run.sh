@@ -16,17 +16,17 @@
 # $1 - test path
 run_test() (
     echo "running $1" &&
-    test_name="$(echo "$1" | sed 's|/|_|g')" && # replace slashes
+    test_name="$(echo "$1" | sed 's|/|_|g; s/\.sh$//')" && # derive test name
 
     # run test and store its execution trace
     if ! test_trace="$(sh -x "$1" 2>&1)"; then
         echo "$test_trace" | tail -n 20 && # recent trace
         echo "$1 failed" &&
-        echo "$test_trace" > "$TRACE_DIR"/failed_"$test_name"
+        echo "$test_trace" > "$TRACE_DIR"/failed_"$test_name" &&
         return 1
     else
         echo "$1 passed" &&
-        echo "$test_trace" > "$TRACE_DIR"/passed/"$test_name"
+        echo "$test_trace" > "$TRACE_DIR"/passed_"$test_name"
     fi
 )
 
@@ -34,7 +34,7 @@ run_test() (
 # INITIALIZE VARIABLES
 #-------------------------------------------------------------------------------
 
-readonly TRACE_DIR=/tmp/gitpack/test-trace && # artifacts storage
+readonly TRACE_DIR=/tmp/gitpack-trace && # trace artifacts storage
 
 export HASH="${GITHUB_SHA:?}" && # current commit hash
 SHORT_HASH="$(echo "$HASH" | cut -c 1-7)" &&
@@ -52,7 +52,7 @@ export OLD_VERSION=0.1.0 &&
 # INITIALIZE FILES
 #-------------------------------------------------------------------------------
 
-mkdir -p "$TRACE_DIR"/passed/ && # create directory for passed tests
+mkdir -p "$TRACE_DIR"/ &&
 
 #-------------------------------------------------------------------------------
 # RUN TESTS

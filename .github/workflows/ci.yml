@@ -49,5 +49,5 @@ jobs:
       with:
         name: ${{matrix.os}}-gitpack-trace
         path: |
-          /tmp/gitpack/test-trace/passed/
-          /tmp/gitpack/test-trace/failed_*
+          /tmp/gitpack-trace/failed_*
+          /tmp/gitpack-trace/passed_*
