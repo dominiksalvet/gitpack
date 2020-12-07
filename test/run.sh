@@ -20,6 +20,7 @@ run_test() (
 
     # run test and store its execution trace
     if ! test_trace="$(sh -x "$1" 2>&1)"; then
+        echo 'recent trace (more in artifacts):' &&
         echo "$test_trace" | tail -n 20 && # recent trace
         echo "$1 failed" &&
         echo "$test_trace" > "$TRACE_DIR"/failed_"$test_name" &&
@@ -34,7 +35,7 @@ run_test() (
 # INITIALIZE VARIABLES
 #-------------------------------------------------------------------------------
 
-readonly TRACE_DIR=/tmp/gitpack-trace && # trace artifacts storage
+readonly TRACE_DIR=gitpack-trace && # trace artifacts storage
 
 export HASH="${GITHUB_SHA:?}" && # current commit hash
 SHORT_HASH="$(echo "$HASH" | cut -c 1-7)" &&
