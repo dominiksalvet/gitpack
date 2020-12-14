@@ -25,6 +25,6 @@ rm "$HOME"/.local/share/gitpack/status &&
 rmdir "$HOME"/.local/share/gitpack/ &&
 
 # clean global state
-test ! -s /var/lib/gitpack/status &&
-rm /var/lib/gitpack/status &&
-rmdir /var/lib/gitpack/
+sudo test ! -s /var/lib/gitpack/status &&
+sudo rm /var/lib/gitpack/status &&
+sudo rmdir /var/lib/gitpack/
