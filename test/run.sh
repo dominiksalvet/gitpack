@@ -70,5 +70,8 @@ run_test test/command-api/paths.sh &&
 run_test test/command-api/list.sh &&
 run_test test/command-api/clean.sh &&
 
+run_test test/subcommand/clean.sh &&
+run_test test/storage/remove-empty-state.sh &&
+
 run_test test/self-install/local.sh &&
 run_test test/self-install/global.sh
