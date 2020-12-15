@@ -75,6 +75,7 @@ run_test test/command-api/clean.sh &&
 # actions and commands functionality
 run_test test/storage/no-install-files.sh &&
 run_test test/subcommand/install.sh &&
+run_test test/subcommand/uninstall.sh &&
 run_test test/subcommand/clean.sh &&
 run_test test/storage/remove-empty-state.sh &&
 run_test test/subcommand/self-install.sh # install current commit
