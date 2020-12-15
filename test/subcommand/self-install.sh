@@ -10,23 +10,23 @@ out1="$($GITPACK -H install "$URL=$HASH")" &&
 test "$out1" = ">>> running install for $URL=$HASH
 <<< done; successfully installed" &&
 
-out2="$($GITPACK -H status "$URL=$HASH")" &&
+out2="$(sh -x "$HOME"/.local/bin/gitpack -H status "$URL=$HASH")" &&
 test "$out2" = ">>> running status for $URL=$HASH
 <<< candidate $HASH already installed" &&
 
-out3="$($GITPACK -H uninstall "$URL")" &&
+out3="$(sh -x "$HOME"/.local/bin/gitpack -H uninstall "$URL")" &&
 test "$out3" = ">>> running uninstall for $URL
 <<< done; successfully uninstalled" &&
 
 # global self-install
-out1="$($SUDO_GITPACK -H install "$URL=$HASH")" &&
-test "$out1" = ">>> running install for $URL=$HASH
+out4="$($SUDO_GITPACK -H install "$URL=$HASH")" &&
+test "$out4" = ">>> running install for $URL=$HASH
 <<< done; successfully installed" &&
 
-out2="$($SUDO_GITPACK -H status "$URL=$HASH")" &&
-test "$out2" = ">>> running status for $URL=$HASH
+out5="$(sudo sh -x /usr/local/bin/gitpack -H status "$URL=$HASH")" &&
+test "$out5" = ">>> running status for $URL=$HASH
 <<< candidate $HASH already installed" &&
 
-out3="$($SUDO_GITPACK -H uninstall "$URL")" &&
-test "$out3" = ">>> running uninstall for $URL
+out6="$(sudo sh -x /usr/local/bin/gitpack -H uninstall "$URL")" &&
+test "$out6" = ">>> running uninstall for $URL
 <<< done; successfully uninstalled"
