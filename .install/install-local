@@ -18,7 +18,7 @@ else
 fi &&
 
 mkdir -p "$HOME"/.local/bin/ &&
-mkdir -p "$HOME"/.bash_completion/d/ &&
+mkdir -p "$HOME"/.bash_completion.d/ &&
 cp src/gitpack "$HOME"/.local/bin/ &&
 cp src/bash/gitpack-completion "$HOME"/.bash_completion.d/ &&
 
