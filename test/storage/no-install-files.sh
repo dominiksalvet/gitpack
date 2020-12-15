@@ -5,10 +5,8 @@
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-out1="$($GITPACK clean)" && # it must delete cache
-test ! -d "$HOME"/.cache/gitpack/ &&
+test ! -e "$HOME"/.local/bin/gitpack &&
+test ! -e "$HOME"/.bash_completion.d/gitpack-completion &&
 
-out2="$($SUDO_GITPACK clean)" &&
-test ! -d /var/cache/gitpack/ &&
-
-: "$out1" "$out2"
+test ! -e /usr/local/bin/gitpack &&
+test ! -e /etc/bash_completion.d/gitpack-completion

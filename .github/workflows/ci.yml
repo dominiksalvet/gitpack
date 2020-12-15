@@ -26,9 +26,8 @@ jobs:
         shellcheck test/run.sh
         shellcheck test/action-api/*
         shellcheck test/command-api/*
-        shellcheck test/subcommand/*
         shellcheck test/storage/*
-        shellcheck test/self-install/*
+        shellcheck test/subcommand/*
 
     - name: Check install files
       run: shellcheck .install/*

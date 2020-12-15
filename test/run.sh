@@ -59,19 +59,22 @@ mkdir -p "$TRACE_DIR"/ &&
 # RUN TESTS
 #-------------------------------------------------------------------------------
 
+# actions API
 run_test test/action-api/status.sh &&
 run_test test/action-api/install.sh &&
 run_test test/action-api/update.sh &&
 run_test test/action-api/downgrade.sh &&
 run_test test/action-api/local-global.sh &&
 
+# commands API
 run_test test/command-api/messages.sh &&
 run_test test/command-api/paths.sh &&
 run_test test/command-api/list.sh &&
 run_test test/command-api/clean.sh &&
 
+# actions and commands functionality
+run_test test/storage/no-install-files.sh &&
+run_test test/subcommand/install.sh &&
 run_test test/subcommand/clean.sh &&
 run_test test/storage/remove-empty-state.sh &&
-
-run_test test/self-install/local.sh &&
-run_test test/self-install/global.sh
+run_test test/subcommand/self-install.sh # install current commit
