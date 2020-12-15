@@ -6,9 +6,9 @@
 #-------------------------------------------------------------------------------
 
 out1="$($GITPACK clean)" && # it must delete cache
-test ! -d "$HOME"/.cache/gitpack/ &&
+test ! -e "$HOME"/.cache/gitpack &&
 
 out2="$($SUDO_GITPACK clean)" &&
-test ! -d /var/cache/gitpack/ &&
+test ! -e /var/cache/gitpack &&
 
 : "$out1" "$out2"

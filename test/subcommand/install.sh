@@ -6,7 +6,7 @@
 #-------------------------------------------------------------------------------
 
 # local installation
-out1="$($GITPACK install "$URL")" &&
+out1="$($GITPACK install "$URL=$OLD_VERSION")" &&
 test -d "$HOME"/.local/bin/ &&
 test -f "$HOME"/.local/bin/gitpack &&
 test -x "$HOME"/.local/bin/gitpack &&
@@ -15,7 +15,7 @@ test -f "$HOME"/.bash_completion.d/gitpack-completion &&
 out2="$($GITPACK uninstall "$URL")" &&
 
 # global installation
-out3="$($SUDO_GITPACK install "$URL")" &&
+out3="$($SUDO_GITPACK install "$URL=$OLD_VERSION")" &&
 sudo test -d /usr/local/bin/ &&
 sudo test -f /usr/local/bin/gitpack &&
 sudo test -x /usr/local/bin/gitpack &&
