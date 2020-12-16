@@ -5,6 +5,8 @@
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
+# shellcheck disable=SC2034
+
 out1="$(! $GITPACK status '')" &&
 out2="$(! $GITPACK status 'bad url')" &&
 out3="$(! $GITPACK status 'bad
@@ -25,7 +27,4 @@ HEAD")" &&
 out14="$(! $GITPACK status "$URL=HE
 AD")" &&
 out15="$(! $GITPACK status "$URL=HEAD
-")" &&
-
-: "$out1" "$out2" "$out3" "$out4" "$out5" "$out6" "$out7" "$out8" "$out9"
-: "$out10" "$out11" "$out12" "$out13" "$out14" "$out15"
+")"

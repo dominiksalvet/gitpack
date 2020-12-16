@@ -5,6 +5,8 @@
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
+# shellcheck disable=SC2034
+
 # local uninstallation
 out1="$($GITPACK install "$URL=$OLD_VERSION")" &&
 out2="$($GITPACK uninstall "$URL")" &&
@@ -15,6 +17,4 @@ test ! -e "$HOME"/.bash_completion.d/gitpack-completion &&
 out3="$($SUDO_GITPACK install "$URL=$OLD_VERSION")" &&
 out4="$($SUDO_GITPACK uninstall "$URL")" &&
 test ! -e /usr/local/bin/gitpack &&
-test ! -e /etc/bash_completion.d/gitpack-completion &&
-
-: "$out1" "$out2" "$out3" "$out4"
+test ! -e /etc/bash_completion.d/gitpack-completion
