@@ -35,8 +35,6 @@ run_test() (
 # INITIALIZE VARIABLES
 #-------------------------------------------------------------------------------
 
-readonly TRACE_DIR=gitpack-trace && # trace artifacts storage
-
 export HASH="${GITHUB_SHA:?}" && # current commit hash
 SHORT_HASH="$(echo "$HASH" | cut -c 1-7)" &&
 export SHORT_HASH &&
@@ -49,10 +47,14 @@ export VERSION_HASH=d5a9f75a89eefbd5316b5abe956d28d3a5358327 &&
 export VERSION_SHORT_HASH=d5a9f75 &&
 export OLD_VERSION=0.1.0 &&
 
+export EXTRA_URL=github.com/dominiksalvet/sandbox && # needed in some tests
+export EXTRA_VERSION=beforecommit && # use this and only this version
+
 #-------------------------------------------------------------------------------
 # INITIALIZE FILES
 #-------------------------------------------------------------------------------
 
+readonly TRACE_DIR=gitpack-trace && # trace artifacts storage
 mkdir -p "$TRACE_DIR"/ &&
 
 #-------------------------------------------------------------------------------
@@ -64,6 +66,7 @@ run_test test/action-api/status.sh &&
 run_test test/action-api/install.sh &&
 run_test test/action-api/update.sh &&
 run_test test/action-api/downgrade.sh &&
+run_test test/action-api/install-multiple.sh &&
 run_test test/action-api/local-global.sh &&
 
 # commands API
