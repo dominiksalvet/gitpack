@@ -72,10 +72,16 @@ run_test test/command-api/paths.sh &&
 run_test test/command-api/list.sh &&
 run_test test/command-api/clean.sh &&
 
-# actions and commands functionality
+# check install files
 run_test test/storage/no-install-files.sh &&
 run_test test/subcommand/install.sh &&
 run_test test/subcommand/uninstall.sh &&
+
+# install current commit
 run_test test/subcommand/clean.sh &&
 run_test test/storage/remove-empty-state.sh &&
-run_test test/subcommand/self-install.sh # install current commit
+run_test test/subcommand/self-install.sh &&
+
+# tests that cannot succeed
+run_test test/xfail/args.sh &&
+run_test test/xfail/urls.sh
