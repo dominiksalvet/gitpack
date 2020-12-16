@@ -5,43 +5,43 @@
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-out1="$($GITPACK install "$URL")" &&
+out1="$($GITPACK install "$URL")"
 test "$out1" = ">>> running install for $URL
-<<< done; successfully installed" &&
+<<< done; successfully installed"
 
-out2="$($GITPACK install "$URL")" && # must be already installed
+out2="$($GITPACK install "$URL")" # must be already installed
 test "$out2" = ">>> running install for $URL
-<<< already installed" &&
+<<< already installed"
 
-out3="$($GITPACK install "$URL=$VERSION")" &&
+out3="$($GITPACK install "$URL=$VERSION")"
 test "$out3" = ">>> running install for $URL=$VERSION
-<<< already installed" &&
+<<< already installed"
 
-out4="$($GITPACK install "$URL=$VERSION_HASH")" &&
+out4="$($GITPACK install "$URL=$VERSION_HASH")"
 test "$out4" = ">>> running install for $URL=$VERSION_HASH
-<<< already installed" &&
+<<< already installed"
 
-out5="$($GITPACK status "$URL")" &&
+out5="$($GITPACK status "$URL")"
 test "$out5" = ">>> running status for $URL
-<<< candidate $VERSION already installed" &&
+<<< candidate $VERSION already installed"
 
-out6="$($GITPACK uninstall "$URL")" &&
+out6="$($GITPACK uninstall "$URL")"
 test "$out6" = ">>> running uninstall for $URL
-<<< done; successfully uninstalled" &&
+<<< done; successfully uninstalled"
 
-out7="$($GITPACK uninstall "$URL")" && # must be already uninstalled
+out7="$($GITPACK uninstall "$URL")" # must be already uninstalled
 test "$out7" = ">>> running uninstall for $URL
-<<< already uninstalled" &&
+<<< already uninstalled"
 
-out8="$($GITPACK status "$URL")" &&
+out8="$($GITPACK status "$URL")"
 test "$out8" = ">>> running status for $URL
-<<< not installed; candidate is $VERSION" &&
+<<< not installed; candidate is $VERSION"
 
 # raw URL mode
-out9="$($GITPACK -r install "https://$URL.git")" &&
+out9="$($GITPACK -r install "https://$URL.git")"
 test "$out9" = ">>> running install for https://$URL.git
-<<< done; successfully installed" &&
+<<< done; successfully installed"
 
-out10="$($GITPACK -r uninstall "https://$URL.git")" &&
+out10="$($GITPACK -r uninstall "https://$URL.git")"
 test "$out10" = ">>> running uninstall for https://$URL.git
 <<< done; successfully uninstalled"

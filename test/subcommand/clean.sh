@@ -7,8 +7,8 @@
 
 # shellcheck disable=SC2034
 
-out1="$($GITPACK clean)" && # it must delete cache
-test ! -e "$HOME"/.cache/gitpack &&
+out1="$($GITPACK clean)" # it must delete cache
+test ! -e "$HOME"/.cache/gitpack
 
-out2="$($SUDO_GITPACK clean)" &&
+out2="$($SUDO_GITPACK clean)"
 test ! -e /var/cache/gitpack
