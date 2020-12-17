@@ -653,8 +653,8 @@ init_db() (
 # $3 - expected value
 db_select_first() (
     while IFS= read -r record; do
-        field="$(echo "$record" | cut -f "$2" -d "$DB_DELIMITER" -s)" || return
-        if [ "${field:?}" = "$3" ]; then # field safeguard
+        item="$(echo "$record" | cut -f "$2" -d "$DB_DELIMITER" -s)" || return
+        if [ "${item:?}" = "$3" ]; then # item safeguard
             echo "$record"; return
         fi
     done < "$1"
@@ -665,8 +665,8 @@ db_select_first() (
 # $3 - filtered value
 db_select_except() (
     while IFS= read -r record; do
-        field="$(echo "$record" | cut -f "$2" -d "$DB_DELIMITER" -s)" || return
-        if [ "${field:?}" != "$3" ]; then # field safeguard
+        item="$(echo "$record" | cut -f "$2" -d "$DB_DELIMITER" -s)" || return
+        if [ "${item:?}" != "$3" ]; then # item safeguard
             echo "$record"
         fi
     done < "$1"
