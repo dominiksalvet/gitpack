@@ -140,7 +140,7 @@ run_list() (
     while IFS= read -r record; do
         url="$(status_record_url "$record")" &&
         hash="$(status_record_hash "$record")" &&
-        version="$(beautify_hash "$url" "$hash")" &&
+        version="$(beautify_hash "${url:?}" "$hash")" && # url safeguard
         echo "$url $version" || return
     done < "$STATUS_PATH"
 )
@@ -586,12 +586,12 @@ echon() {
 
 # $1 - status record
 status_record_url() {
-    echo "$1" | cut -f "$STATUS_COL_URL" -d "$DB_DELIMITER"
+    echo "$1" | cut -f "$STATUS_COL_URL" -d "$DB_DELIMITER" -s
 }
 
 # $1 - status record
 status_record_hash() {
-    echo "$1" | cut -f "$STATUS_COL_HASH" -d "$DB_DELIMITER"
+    echo "$1" | cut -f "$STATUS_COL_HASH" -d "$DB_DELIMITER" -s
 }
 
 #-------------------------------------------------------------------------------
@@ -621,7 +621,7 @@ get_current_time() {
 
 # $1 - fetched record
 fetched_record_time() {
-    echo "$1" | cut -f "$FETCHED_COL_TIME" -d "$DB_DELIMITER"
+    echo "$1" | cut -f "$FETCHED_COL_TIME" -d "$DB_DELIMITER" -s
 }
 
 #-------------------------------------------------------------------------------
@@ -649,8 +649,8 @@ init_db() (
 # $3 - expected value
 db_select_first() (
     while IFS= read -r record; do
-        field="$(echo "$record" | cut -f "$2" -d "$DB_DELIMITER")" || return
-        if [ "$field" = "$3" ]; then
+        field="$(echo "$record" | cut -f "$2" -d "$DB_DELIMITER" -s)" || return
+        if [ "${field:?}" = "$3" ]; then # field safeguard
             echo "$record"; return
         fi
     done < "$1"
@@ -661,8 +661,8 @@ db_select_first() (
 # $3 - filtered value
 db_select_except() (
     while IFS= read -r record; do
-        field="$(echo "$record" | cut -f "$2" -d "$DB_DELIMITER")" || return
-        if [ "$field" != "$3" ]; then
+        field="$(echo "$record" | cut -f "$2" -d "$DB_DELIMITER" -s)" || return
+        if [ "${field:?}" != "$3" ]; then # field safeguard
             echo "$record"
         fi
     done < "$1"
