@@ -265,8 +265,8 @@ init_lock() {
 }
 
 init_files() {
-    init_db "$STATUS_PATH" &&
-    init_db "$FETCHED_PATH"
+    create_db "$STATUS_PATH" &&
+    create_db "$FETCHED_PATH"
 }
 
 exit_action() (
@@ -633,12 +633,12 @@ fetched_record_time() {
 #-------------------------------------------------------------------------------
 
 # $1 - database path
-init_db() (
+create_db() (
     db_dir="$(dirname -- "$1")" &&
     mkdir -p -- "$db_dir"/ &&
 
-    if ! [ -e "$1" ]; then
-        touch -- "$1"
+    if ! [ -e "$1" ]; then # if database does not exist
+        touch -- "$1" # create it
     fi &&
 
     if ! [ -r "$1" ] || ! [ -w "$1" ]; then
