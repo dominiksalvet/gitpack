@@ -660,12 +660,13 @@ create_db() (
 
 # $1 - database path
 # $2 - database pattern
-check_db() {
+check_db() (
     if grep -qv -- "$2" "$1"; then # if a record does not match the pattern
-        echo "E19: database $(basename -- "$1") is corrupted" >&2
+        db_name="$(basename -- "$1")"
+        echo "E19: database $db_name is corrupted" >&2
         return 1
     fi
-}
+)
 
 # $1 - database path
 # $2 - key column
