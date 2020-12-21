@@ -122,7 +122,7 @@ process_action_args() (
         echoh 'E4: no URL provided' >&2; return 1
     fi &&
 
-    init_runtime g c p l f &&
+    init_runtime g c p l s f &&
     for url_arg in "$@"; do
         perform_action "$action" "$url_arg" || return
     done
@@ -139,7 +139,7 @@ echoh() {
 #-------------------------------------------------------------------------------
 
 run_list() (
-    init_runtime g c p l f &&
+    init_runtime g c p l s &&
     while IFS= read -r record; do
         url="$(status_record_url "$record")" &&
         hash="$(status_record_hash "$record")" &&
@@ -208,7 +208,8 @@ init_runtime() {
             c) init_runtime_constants ;;
             p) init_paths ;;
             l) init_lock ;;
-            f) init_files ;;
+            s) init_status_db ;;
+            f) init_fetched_db ;;
             *) echo "E15: invalid runtime init flag $_flag" >&2; return 1 ;;
         esac || return
     done
@@ -267,10 +268,13 @@ init_lock() {
     fi
 }
 
-init_files() {
+init_status_db() {
     create_db "$STATUS_PATH" &&
+    check_db "$STATUS_PATH" "$STATUS_PATTERN"
+}
+
+init_fetched_db() {
     create_db "$FETCHED_PATH" &&
-    check_db "$STATUS_PATH" "$STATUS_PATTERN" &&
     check_db "$FETCHED_PATH" "$FETCHED_PATTERN"
 }
 
