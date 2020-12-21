@@ -164,8 +164,8 @@ run_paths() (
 
 # $1 - URL
 # $2 - hash (optional)
-beautify_hash() (
-    if [ "$2" ]; then
+beautify_hash() {
+    if [ "$2" ]; then (
         if ! [ "$hash_mode" ] && repo_cd "$1" 2>/dev/null &&
            ref="$(git describe --all --exact-match "$2" 2>/dev/null)"; then
             echo "${ref##*/}" # remove reference path prefix
@@ -174,8 +174,8 @@ beautify_hash() (
         else
             echo "$2" | cut -c 1-7 # return short hash
         fi
-    fi
-)
+    ) fi
+}
 
 # $1 - directory path
 remove_dir() {
@@ -324,12 +324,11 @@ url_arg_to_url() (
 )
 
 # $1 - URL argument
-url_arg_to_version() (
-    version="${1##*=}" # remove URL and keep version
-    if [ "$version" != "$1" ]; then
-        echo "$version"
+url_arg_to_version() {
+    if [ "${1##*=}" != "$1" ]; then
+        echo "${1##*=}" # remove URL and keep version
     fi
-)
+}
 
 # $1 - URL
 check_url() (
@@ -344,15 +343,14 @@ check_url() (
 #-------------------------------------------------------------------------------
 
 # $1 - URL
-init_repo() (
+init_repo() {
     if [ "$fetch_always_mode" = false ] && fetched_recently "$1"; then
         echo 'local repository fresh' >&2
     else
-        repo_dir="$(url_to_path "$1")" &&
-        fetch_repo "$1" "$repo_dir" &&
+        fetch_repo "$1" "$(url_to_path "$1")" &&
         mark_as_fetched_now "$1"
     fi
-)
+}
 
 # $1 - URL
 # $2 - repository directory
@@ -421,7 +419,7 @@ repo_cd() {
 
 # $1 - URL
 url_to_path() {
-    echo "$REPOS_DIR"/"$1"
+    echo "$REPOS_DIR"/"$1" # assume it will not fail (just like any other echo)
 }
 
 #-------------------------------------------------------------------------------
@@ -660,13 +658,13 @@ create_db() (
 
 # $1 - database path
 # $2 - database pattern
-check_db() (
-    if grep -qv -- "$2" "$1"; then # if a record does not match the pattern
+check_db() {
+    if grep -qv -- "$2" "$1"; then ( # if a record does not match the pattern
         db_name="$(basename -- "$1")"
         echo "E19: database $db_name is corrupted" >&2
         return 1
-    fi
-)
+    ) fi
+}
 
 # $1 - database path
 # $2 - key column
