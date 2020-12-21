@@ -15,7 +15,7 @@
 
 # $@ - GitPack arguments
 main() {
-    init_constants &&
+    init_strings &&
     init_config &&
     init_opts &&
     process_args "$@"
@@ -25,7 +25,7 @@ main() {
 # STATIC INITIALIZATION
 #-------------------------------------------------------------------------------
 
-init_constants() {
+init_strings() {
     readonly VERSION=0.7.0 # current GitPack version
 
     readonly HELP_MESSAGE='USAGE:    gitpack [OPTION...] ACTION URL[=VERSION]...
@@ -122,7 +122,7 @@ process_action_args() (
         echoh 'E4: no URL provided' >&2; return 1
     fi &&
 
-    init_runtime g c p l s f &&
+    init_runtime g e l s f &&
     for url_arg in "$@"; do
         perform_action "$action" "$url_arg" || return
     done
@@ -139,7 +139,7 @@ echoh() {
 #-------------------------------------------------------------------------------
 
 run_list() (
-    init_runtime g c p l s &&
+    init_runtime g e l s &&
     while IFS= read -r record; do
         url="$(status_record_url "$record")" &&
         hash="$(status_record_hash "$record")" &&
@@ -149,14 +149,14 @@ run_list() (
 )
 
 run_clean() (
-    init_runtime c p l &&
+    init_runtime e l &&
     if ! remove_dir "$CACHE_DIR"; then
         echo 'E5: failed to remove cache directory' >&2; return 1
     fi
 )
 
 run_paths() (
-    init_runtime c p &&
+    init_runtime e &&
     echo "state-dir $STATE_DIR" &&
     echo "cache-dir $CACHE_DIR" &&
     echo "lock-path $LOCK_PATH"
@@ -205,8 +205,7 @@ init_runtime() {
     for _flag in "$@"; do # order matters
         case "$_flag" in
             g) check_git ;;
-            c) init_runtime_constants ;;
-            p) init_paths ;;
+            e) init_env ;;
             l) init_lock ;;
             s) init_status_db ;;
             f) init_fetched_db ;;
@@ -221,7 +220,7 @@ check_git() {
     fi
 }
 
-init_runtime_constants() {
+init_env() {
     USER_ID="$(id -u)" &&
     readonly USER_ID &&
 
@@ -232,7 +231,9 @@ init_runtime_constants() {
     fi &&
 
     SYSTEM="$(uname)" &&
-    readonly SYSTEM
+    readonly SYSTEM &&
+
+    init_paths
 }
 
 init_paths() {
@@ -568,14 +569,14 @@ run_script() (
 
 # $1 - URL
 get_status_record() {
-    echo 'reading package database' >&2 &&
+    echo 'reading status database' >&2 &&
     db_select_first "$STATUS_PATH" "$STATUS_COL_URL" "$1"
 }
 
 # $1 - URL
 # $2 - hash
 insert_status_record() {
-    echo 'adding to package database' >&2 &&
+    echo 'adding to status database' >&2 &&
     cp "$STATUS_PATH" "$STATUS_PATH".tmp &&
     echo "$1 $2" >> "$STATUS_PATH".tmp &&
     mv "$STATUS_PATH".tmp "$STATUS_PATH" # should be signal-safe
@@ -583,7 +584,7 @@ insert_status_record() {
 
 # $1 - URL
 delete_status_records() (
-    echo 'removing from package database' >&2 &&
+    echo 'removing from status database' >&2 &&
     db="$(db_select_except "$STATUS_PATH" "$STATUS_COL_URL" "$1")" &&
     echon "$db" > "$STATUS_PATH".tmp &&
     mv "$STATUS_PATH".tmp "$STATUS_PATH"
