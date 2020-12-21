@@ -55,7 +55,7 @@ https://github.com/dominiksalvet/gitpack"
 
 init_config() {
     # URLs matching this regular expression are rejected
-    readonly BAD_URL_REGEX='(^$| |(^|/)\.\.?($|/))' # ERE regex
+    readonly BAD_URL_PATTERN='(^$| |(^|/)\.\.?($|/))' # ERE regex
 
     # map remote references to local ones
     readonly ORIGIN_HEAD=refs/remotes/origin/HEAD # remote HEAD reference path
@@ -329,7 +329,7 @@ url_arg_to_version() (
 # $1 - URL
 check_url() (
     lineno="$(echo "$1" | wc -l)" &&
-    if [ "$lineno" -ne 1 ] || echo "$1" | grep -qE "$BAD_URL_REGEX"; then
+    if [ "$lineno" -ne 1 ] || echo "$1" | grep -qE "$BAD_URL_PATTERN"; then
         echo 'E6: unsupported URL delivered' >&2; return 1
     fi
 )
