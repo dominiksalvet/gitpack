@@ -63,11 +63,14 @@ init_config() {
     readonly TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # versions
     readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # branches
 
+    # line patterns of GitPack databases
+    readonly DB_DELIM=' ' # internal delimiter for database data
+    readonly STATUS_PATTERN='^[^ ]\+ [^ ]\+$' # respect database delimiter
+    readonly FETCHED_PATTERN='^[^ ]\+ [^ ]\+$'
+
     # field column numbers of GitPack databases
     readonly STATUS_COL_URL=1 STATUS_COL_HASH=2
     readonly FETCHED_COL_URL=1 FETCHED_COL_TIME=2
-
-    readonly DB_DELIMITER=' ' # internal delimiter for database data
 }
 
 init_opts() {
@@ -140,7 +143,7 @@ run_list() (
     while IFS= read -r record; do
         url="$(status_record_url "$record")" &&
         hash="$(status_record_hash "$record")" &&
-        version="$(beautify_hash "${url:?}" "$hash")" && # url safeguard
+        version="$(beautify_hash "$url" "$hash")" &&
         echo "$url $version" || return
     done < "$STATUS_PATH"
 )
@@ -266,7 +269,9 @@ init_lock() {
 
 init_files() {
     create_db "$STATUS_PATH" &&
-    create_db "$FETCHED_PATH"
+    create_db "$FETCHED_PATH" &&
+    check_db "$STATUS_PATH" "$STATUS_PATTERN" &&
+    check_db "$FETCHED_PATH" "$FETCHED_PATTERN"
 }
 
 exit_action() (
@@ -590,12 +595,12 @@ echon() {
 
 # $1 - status record
 status_record_url() {
-    echo "$1" | cut -f "$STATUS_COL_URL" -d "$DB_DELIMITER" -s
+    echo "$1" | cut -f "$STATUS_COL_URL" -d "$DB_DELIM" -s
 }
 
 # $1 - status record
 status_record_hash() {
-    echo "$1" | cut -f "$STATUS_COL_HASH" -d "$DB_DELIMITER" -s
+    echo "$1" | cut -f "$STATUS_COL_HASH" -d "$DB_DELIM" -s
 }
 
 #-------------------------------------------------------------------------------
@@ -625,7 +630,7 @@ get_current_time() {
 
 # $1 - fetched record
 fetched_record_time() {
-    echo "$1" | cut -f "$FETCHED_COL_TIME" -d "$DB_DELIMITER" -s
+    echo "$1" | cut -f "$FETCHED_COL_TIME" -d "$DB_DELIM" -s
 }
 
 #-------------------------------------------------------------------------------
@@ -649,12 +654,21 @@ create_db() (
 )
 
 # $1 - database path
+# $2 - database pattern
+check_db() {
+    if grep -qv -- "$2" "$1"; then # if a record does not match the pattern
+        echo "E19: database $(basename -- "$1") is corrupted" >&2
+        return 1
+    fi
+}
+
+# $1 - database path
 # $2 - key column
 # $3 - expected value
 db_select_first() (
     while IFS= read -r record; do
-        item="$(echo "$record" | cut -f "$2" -d "$DB_DELIMITER" -s)" || return
-        if [ "${item:?}" = "$3" ]; then # item safeguard
+        item="$(echo "$record" | cut -f "$2" -d "$DB_DELIM" -s)" || return
+        if [ "$item" = "$3" ]; then
             echo "$record"; return
         fi
     done < "$1"
@@ -665,8 +679,8 @@ db_select_first() (
 # $3 - filtered value
 db_select_except() (
     while IFS= read -r record; do
-        item="$(echo "$record" | cut -f "$2" -d "$DB_DELIMITER" -s)" || return
-        if [ "${item:?}" != "$3" ]; then # item safeguard
+        item="$(echo "$record" | cut -f "$2" -d "$DB_DELIM" -s)" || return
+        if [ "$item" != "$3" ]; then
             echo "$record"
         fi
     done < "$1"
