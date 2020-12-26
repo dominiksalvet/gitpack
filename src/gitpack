@@ -55,18 +55,18 @@ https://github.com/dominiksalvet/gitpack"
 
 init_config() {
     # URLs matching this regular expression are rejected
-    readonly BAD_URL_PATTERN='(^$| |(^|/)\.\.?($|/))' # ERE regex
+    readonly BAD_URL_PATTERN='(^$| |(^|/)\.\.?($|/))' # ERE
+
+    # line patterns of GitPack databases
+    readonly DB_DELIM=' ' # internal delimiter for database data
+    readonly STATUS_PATTERN='^[^ ]\+ [^ ]\+$' # BRE, respect database delimiter
+    readonly FETCHED_PATTERN='^[^ ]\+ [^ ]\+$'
 
     # map remote references to local ones
     readonly ORIGIN_HEAD=refs/remotes/origin/HEAD # remote HEAD reference path
     readonly HEAD_REFSPEC=+HEAD:"$ORIGIN_HEAD" # default remote branch
     readonly TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # versions
     readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # branches
-
-    # line patterns of GitPack databases
-    readonly DB_DELIM=' ' # internal delimiter for database data
-    readonly STATUS_PATTERN='^[^ ]\+ [^ ]\+$' # respect database delimiter
-    readonly FETCHED_PATTERN='^[^ ]\+ [^ ]\+$'
 
     # field column numbers of GitPack databases
     readonly STATUS_COL_URL=1 STATUS_COL_HASH=2
