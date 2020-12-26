@@ -1,0 +1,146 @@
+#!/bin/bash
+
+#-------------------------------------------------------------------------------
+# Copyright 2019-2020 Dominik Salvet
+# https://github.com/dominiksalvet/gitpack
+#-------------------------------------------------------------------------------
+# This file represents a GitPack extension, which incorporates a prompting tab
+# completion of GitPak arguments into Bash shells. It is expected to be sourced.
+#-------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+# ENTRY POINT
+#-------------------------------------------------------------------------------
+
+_gitpack() {
+    # GitPack actions and commands are collectively referred to as commands here
+    local -r COMMANDS='install uninstall status list clean paths help about' &&
+    local native_mode words cword cur command_index raw_url_mode &&
+
+    _gitpack_init_comp &&
+    command_index="$(_gitpack_get_command_index)" &&
+    raw_url_mode="$(_gitpack_get_raw_url_mode)" &&
+
+    if ! [ "$command_index" ]; then # no command so far
+        _gitpack_set_compreply -W "$COMMANDS" -- "$cur"
+    else # URL arguments
+        local command="${COMP_WORDS[command_index]}" &&
+        case "$command" in # only for GitPack actions
+            install | uninstall | status) _gitpack_hint_url_arg ;;
+        esac
+    fi &&
+
+    if [ "$native_mode" = true ]; then
+        __ltrim_colon_completions "$cur" # make hints with colon in word work
+    fi
+}
+
+# $@ - compgen arguments
+_gitpack_set_compreply() {
+    local line &&
+    COMPREPLY=() && # initialize as an empty array
+    while IFS= read -r line; do # use this instead of mapfile due compatibility
+        COMPREPLY+=("$line")
+    done < <(compgen "$@")
+}
+
+#-------------------------------------------------------------------------------
+# INITIALIZATION
+#-------------------------------------------------------------------------------
+
+_gitpack_init_comp() {
+    if command -v _get_comp_words_by_ref > /dev/null &&
+       command -v __ltrim_colon_completions > /dev/null; then # more features
+        native_mode=true
+        _get_comp_words_by_ref -n ':=' cur words cword # no colons splitting
+    else # less features as a fallback
+        native_mode=false
+        cur="${COMP_WORDS[COMP_CWORD]}"
+        words=("${COMP_WORDS[@]}")
+        cword="$COMP_CWORD"
+    fi
+}
+
+_gitpack_get_command_index() {
+    local i accept_next=false item &&
+    for ((i=1; i<cword; i++)); do # ignore first and last items
+        item="${words[i]}"
+        if [ "$accept_next" = true ]; then
+            echo "$i"; return
+        fi
+        if [ "$item" = "${item#-}" ]; then # no dash prefix
+            echo "$i"; return
+        elif [ "$item" = '--' ]; then
+            accept_next=true
+        fi
+    done
+}
+
+_gitpack_get_raw_url_mode() {
+    local i &&
+    for ((i=1; i<command_index; i++)); do # ignore first and command item
+        if [[ "${words[i]}" =~ r ]]; then
+            echo true; return # raw URL mode option found
+        fi
+    done &&
+    echo false
+}
+
+#-------------------------------------------------------------------------------
+# URL ARGUMENTS
+#-------------------------------------------------------------------------------
+
+_gitpack_hint_url_arg() {
+    local -r RAW_URL_REGEX='//|.git$|/$' && # raw URLs heuristic pattern
+    local url version &&
+    url="${cur%=*}" && # remove version if any
+    version="${cur##*=}" && # remove URL and keep version
+
+    if [ "$version" = "$cur" ]; then # URL hints (no URL prefix removed)
+        local urls && urls="$(_gitpack_get_urls)" &&
+        _gitpack_set_compreply -W "$urls" -- "$cur" &&
+        compopt -o nospace # do not insert space after URL hint applied
+    else # version hints
+        local versions && versions="$(_gitpack_get_versions "$url")" &&
+        _gitpack_set_compreply -W "$versions" -- "$version"
+    fi
+}
+
+_gitpack_get_urls() {
+    if [ "$raw_url_mode" = false ]; then
+        _gitpack_get_db_urls | grep -vE "$RAW_URL_REGEX" # exclude raw URLs
+    else
+        _gitpack_get_db_urls # in raw URL mode, show all
+    fi
+}
+
+_gitpack_get_db_urls() {
+    cut -f 1 -d ' ' /var/lib/gitpack/status \
+                    "$HOME"/.local/share/gitpack/status 2>/dev/null
+    test "$command" != uninstall && # only installed packages for uninstall
+    cut -f 1 -d ' ' /var/cache/gitpack/fetched \
+                    "$HOME"/.cache/gitpack/fetched 2>/dev/null
+    true # always successful
+}
+
+# $1 - URL
+_gitpack_get_versions() {
+    if [ "$command" = uninstall ] || # uninstall does not care
+       [[ "$raw_url_mode" = false && "$1" =~ $RAW_URL_REGEX ]]; then # raw URLs
+        return # do not generate any hint
+    fi
+
+    (   cd "$HOME"/.cache/gitpack/repos/"$1"/ 2>/dev/null &&
+        test -d .git/ && git show-ref
+        cd /var/cache/gitpack/repos/"$1"/ 2>/dev/null &&
+        test -d .git/ && git show-ref
+        true # just for sure
+    ) | sed 's/^.* //; s|^.*/||; s/\^{}$//' # beautify show-ref output
+}
+
+#-------------------------------------------------------------------------------
+# REGISTER COMPLETION
+#-------------------------------------------------------------------------------
+
+# load the gitpack completion into the current Bash environment
+complete -F _gitpack gitpack

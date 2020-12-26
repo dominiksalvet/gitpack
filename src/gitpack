@@ -4,122 +4,47 @@
 # Copyright 2019-2020 Dominik Salvet
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
-# DESCRIPTION:
-#   This is GitPack, simple Git-based package manager.
-# PARAMETERS:
-#   All given arguments are processed as GitPack's help describes.
+# This is GitPack, a simple Git-based package manager. It is particularly useful
+# for installing scripts across various platforms. This script is all you need
+# to have GitPack running. All arguments are processed as GitPack help explains.
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
 # MAIN FUNCTION
 #-------------------------------------------------------------------------------
 
-# DESCRIPTION:
-#   This is the GitPack entry point and it is expected to be executed first, yet
-#   its calling should be at the end of this script.
-# PARAMETERS:
-#   $@ - GitPack arguments
+# $@ - GitPack arguments
 main() {
-    check_commands &&
-    init_constants &&
     init_strings &&
-    init_core_config &&
     init_config &&
-    store_command "$0 $*" &&
-    process_args "$@" # process all given GitPack arguments
-}
-
-# DESCRIPTION:
-#   Checks whether optional commands are present.
-check_commands() {
-    if ! command -v git > /dev/null; then # check only git
-        echo 'missing git command' >&2; return 1
-    fi
+    init_opts &&
+    process_args "$@"
 }
 
 #-------------------------------------------------------------------------------
 # STATIC INITIALIZATION
 #-------------------------------------------------------------------------------
 
-# DESCRIPTION:
-#   Initializes static constants.
-init_constants() {
-    # the current version of GitPack
-    readonly VERSION=0.7.0
-
-    # GitPack actions
-    readonly ACTION_INSTALL=install
-    readonly ACTION_UNINSTALL=uninstall
-    readonly ACTION_STATUS=status
-    # GitPack runtime commands
-    readonly COMMAND_LIST=list
-    readonly COMMAND_CLEAN=clean
-    readonly COMMAND_PATHS=paths
-
-    # project states of install action
-    readonly STATE_INSTALL=install # just installed
-    readonly STATE_UPDATE=update # just updated
-    readonly STATE_DOWNGRADE=downgrade # just downgraded
-    readonly STATE_CHANGE=change # just changed
-    readonly STATE_INSTALLED=installed # already installed
-    # project states of uninstall action
-    readonly STATE_UNINSTALL=uninstall # just uninstalled
-    readonly STATE_UNINSTALLED=uninstalled # already uninstalled
-    # project states of status action
-    readonly STATE_NOTHING=nothing # project is not installed
-    readonly STATE_OLDER=older # current version is older than target version
-    readonly STATE_NEWER=newer # current version is newer than target version
-    readonly STATE_DIFF=diff # current version is incomparable to target version
-    readonly STATE_OK=ok # current version is equal to target version
-
-    # global log types
-    readonly LOGTYPE_LOG=log # logging initialization
-    readonly LOGTYPE_FAIL=fail # any recorder fail
-    readonly LOGTYPE_SIGNAL=signal # a handled signal
-    readonly LOGTYPE_EXIT=exit # exit the program
-    # action log types
-    readonly LOGTYPE_URL=url # URL check
-    readonly LOGTYPE_REPO=repo # repository initialization
-    # database log types
-    readonly LOGTYPE_DB=db # database initialization
-    readonly LOGTYPE_GET=get # get database item
-    readonly LOGTYPE_INSERT=insert # insert a database item
-    readonly LOGTYPE_DELETE=delete # delete database items
-    readonly LOGTYPE_BACKUP=backup # backup database
-    # installation log types
-    readonly LOGTYPE_PRECP=precp # precp script execution
-    readonly LOGTYPE_CP=cp # copy files using map
-    readonly LOGTYPE_POSTCP=postcp # postcp script execution
-    # uninstallation log types
-    readonly LOGTYPE_PRERM=prerm # prerm script execution
-    readonly LOGTYPE_RM=rm # remove files using map
-    readonly LOGTYPE_POSTRM=postrm # postrm script execution
-}
-
-# DESCRIPTION:
-#   Initializes strings used to display output to end users. Constants must be
-#   already initialized.
 init_strings() {
-    readonly HELP_MESSAGE="USAGE:
-  gitpack ACTION [-oh] URL[=VERSION]...
-  gitpack list [-h]
-  gitpack (clean | paths | help | about)
+    readonly VERSION=0.7.0 # current GitPack version
 
-ACTION:
-  $ACTION_INSTALL    install/update projects
-  $ACTION_UNINSTALL  uninstall projects
-  $ACTION_STATUS     get status of projects
+    readonly HELP_MESSAGE='USAGE:    gitpack [OPTION...] ACTION URL[=VERSION]...
+          gitpack [OPTION...] COMMAND
 
-OPTION:
-  -o  offline mode
-  -h  show commit hashes
+ACTION:   install    install/update package
+          uninstall  uninstall package
+          status     get package status
 
-COMMAND:
-  list   list installed projects
-  clean  clean files
-  paths  show paths
-  help   show help
-  about  show information"
+COMMAND:  list   list installed packages
+          clean  clean cache
+          paths  show file paths
+          help   show help
+          about  show information
+
+OPTION:   -h  show short version hashes
+          -H  show full version hashes
+          -f  always fetch remote updates
+          -r  raw URL mode; use with caution'
 
     readonly ABOUT_MESSAGE="GitPack $VERSION
 Simple Git-based package manager.
@@ -128,589 +53,451 @@ Copyright 2019-2020 Dominik Salvet
 https://github.com/dominiksalvet/gitpack"
 }
 
-#-------------------------------------------------------------------------------
-# INITIALIZE CONFIGURATION
-#-------------------------------------------------------------------------------
-
-# DESCRIPTION:
-#   Initializes core GitPack configuration constants. Their values should not be
-#   modified unless you really know what you are doing.
-init_core_config() {
-    # lists of possible options per argument types
-    readonly ACTION_OPTS=oh # for any action
-    readonly LIST_OPTS=h # for the list command
-
-    # Git-related configuration
-    readonly REMOTE_HEAD_REF=refs/remote/HEAD # full remote HEAD reference path
-    readonly HEAD_REFSPEC=+HEAD:"$REMOTE_HEAD_REF" # fetch remote HEAD
-    readonly TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # fetch remote tags
-    readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # fetch remote branches
-
-    # other configuration
-    readonly BAD_URL_REGEX='(^$| |(^|/)(\.|\.\.)($|/))' # bad URL regex
-}
-
-# DESCRIPTION:
-#   Initializes GitPack configuration constants.
 init_config() {
-    readonly LOG_LINES_KEPT=1000 # keep those last lines when cleaning log
+    # URLs matching this regular expression are rejected
+    readonly BAD_URL_PATTERN='(^$| |(^|/)\.\.?($|/))' # ERE regex
+
+    # map remote references to local ones
+    readonly ORIGIN_HEAD=refs/remotes/origin/HEAD # remote HEAD reference path
+    readonly HEAD_REFSPEC=+HEAD:"$ORIGIN_HEAD" # default remote branch
+    readonly TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # versions
+    readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # branches
+
+    # line patterns of GitPack databases
+    readonly DB_DELIM=' ' # internal delimiter for database data
+    readonly STATUS_PATTERN='^[^ ]\+ [^ ]\+$' # respect database delimiter
+    readonly FETCHED_PATTERN='^[^ ]\+ [^ ]\+$'
+
+    # field column numbers of GitPack databases
+    readonly STATUS_COL_URL=1 STATUS_COL_HASH=2
+    readonly FETCHED_COL_URL=1 FETCHED_COL_TIME=2
 }
 
-# DESCRIPTION:
-#   Stores a copy of a given command, which invoked this GitPack instance.
-# PARAMETERS:
-#   $@ - complete GitPack command
-store_command() {
-    readonly COMMAND="$*" # the complete current GitPack command
+init_opts() {
+    # global variables
+    hash_mode= # short, full
+    fetch_always_mode=false
+    raw_url_mode=false
 }
 
 #-------------------------------------------------------------------------------
 # ARGUMENT PROCESSING
 #-------------------------------------------------------------------------------
 
-# DESCRIPTION:
-#   Processes given GitPack arguments and performs all associated operations.
-# PARAMETERS:
-#   $@ - GitPack arguments
+# $@ - GitPack arguments
 process_args() (
-    case "$1" in # process arguments based on the first argument
-        "$ACTION_INSTALL" | "$ACTION_UNINSTALL" | "$ACTION_STATUS")
-            init_runtime && process_action_args "$@" ;; # actions
-        "$COMMAND_LIST" | "$COMMAND_CLEAN" | "$COMMAND_PATHS")
-            init_runtime && process_command_args "$@" ;; # commands
-        help) echo "$HELP_MESSAGE"; return ;;
-        about) echo "$ABOUT_MESSAGE"; return ;;
-        '') echo 'no argument provided' >&2; return 1 ;;
-        *) echo "invalid argument $1" >&2; return 1 ;;
-    esac &&
+    process_opts "$@" &&
+    shift "$((OPTIND - 1))" && # shift to an actual subcommand
 
-    backup_db # if success, back up the GitPack database
-)
-
-# DESCRIPTION:
-#   Processes a given action and its arguments. Expects the runtime environment
-#   to be already initialized.
-# PARAMETERS:
-#   $1 - action
-#   $@ - action arguments
-process_action_args() (
-    action="$1" # store the given action
-    shift && # shift to action arguments
-
-    process_opts "$ACTION_OPTS" "$@" && # sets the OPTIND variable
-    shift "$((OPTIND - 1))" && # shift to URL arguments
-    if [ "$#" -eq 0 ]; then # check if there is any URL argument
-        echof 'no URL provided'; return 1
-    fi &&
-
-    for raw_url in "$@"; do # process each URL individually with a common action
-        process_action "$action" "$raw_url" || return
-    done
-)
-
-# DESCRIPTION:
-#   Processes a given runtime command and its arguments. Expects the runtime
-#   environment to be already initialized.
-# PARAMETERS:
-#   $1 - command
-#   $@ - command arguments
-process_command_args() (
-    command="$1" # store the given command
-    shift && # shift to command arguments
-
-    # choose and execute the command
-    case "$command" in
-        "$COMMAND_LIST") process_opts "$LIST_OPTS" "$@" && list ;;
-        "$COMMAND_CLEAN") clean ;;
-        "$COMMAND_PATHS") paths ;;
+    case "$1" in
+        install | uninstall | status) process_action_args "$@" ;;
+        list | clean | paths) run_"$1" ;; # ignore other arguments
+        help) echo "$HELP_MESSAGE" ;;
+        about) echo "$ABOUT_MESSAGE" ;;
+        '') echoh 'E2: no subcommand provided' >&2; return 1 ;;
+        *) echoh "E3: invalid subcommand $1" >&2; return 1 ;;
     esac
 )
 
-# DESCRIPTION:
-#   Processes given arguments as a given type of options. It sets the OPTIND
-#   variable holding the position of the following argument.
-# PARAMETERS:
-#   $1 - options type
-#   $@ - arguments
+# $@ - GitPack options
 process_opts() {
-    _opts_type="$1" # store the given type of options
-    shift && # shift to actual arguments
-
-    while getopts :"$_opts_type" _opt; do # for each option argument
+    while getopts :hHfr _opt; do
         case "$_opt" in
-            o) OFFLINE_MODE=true ;;
-            h) hash_mode=true ;;
-            \?) echof "invalid option -$OPTARG"; return 1 ;;
-        esac
+            h) hash_mode=short ;;
+            H) hash_mode=full ;;
+            f) fetch_always_mode=true ;;
+            r) raw_url_mode=true ;;
+            ?) echoh "E13: invalid option -$OPTARG" >&2; return 1 ;;
+        esac || return
     done
 }
 
-# DESCRIPTION:
-#   Prints given echo arguments to standard error stream and logs the same into
-#   the GitPack log file as a fail.
-# PARAMETERS:
-#   $@ - echo arguments
-echof() {
-    echo "$@" >&2 # print the fail
-    log "$LOGTYPE_FAIL" "$@" # log the fail
-}
+# $1 - action
+# $@ - action arguments
+process_action_args() (
+    action="$1" &&
+    shift && # shift to URL arguments
 
-#-------------------------------------------------------------------------------
-# DYNAMIC INITIALIZATION
-#-------------------------------------------------------------------------------
-
-# DESCRIPTION:
-#   Initializes a runtime environment for GitPack. After calling this function,
-#   GitPack's environment, logging and file structure will be prepared.
-init_runtime() {
-    def_forced_vars &&
-    init_runtime_constants &&
-    init_global_vars &&
-    init_env_vars &&
-    init_paths &&
-    init_logging && # logging starts from here
-    init_traps &&
-    init_db
-}
-
-# DESCRIPTION:
-#   Defines all forced variables. Those are global variables, which would
-#   otherwise be used as local variables but for some reason it is not possible.
-#   They must not be reused and their names must exclusively start with an
-#   underscore character.
-def_forced_vars() {
-    # list of all forced variables
-    _user_id=
-    _system_name=
-    _signal_status=
-    _opts_type=
-    _opt=
-}
-
-# DESCRIPTION:
-#   Initializes runtime constants.
-init_runtime_constants() {
-    _user_id="$(id -u)" && # check if running as root
-    if [ "$_user_id" -eq 0 ]; then
-        readonly ACCESS=global # global installation (system installation)
-    else
-        readonly ACCESS=local # local installation (user installation)
+    if [ "$#" -eq 0 ]; then
+        echoh 'E4: no URL provided' >&2; return 1
     fi &&
 
-    _system_name="$(uname)" && # get the current system name
-    readonly SYSTEM="$_system_name"
-}
+    init_runtime g e l s f &&
+    for url_arg in "$@"; do
+        perform_action "$action" "$url_arg" || return
+    done
+)
 
-# DESCRIPTION:
-#   Initializes all standard global variables. If there is such a variable, it
-#   must be stated here even though its value is going to be overwritten.
-init_global_vars() {
-    state= # the state of the processed project
-
-    # command line options
-    hash_mode=false # use only commit hashes as versions during reports
-}
-
-# DESCRIPTION:
-#   Initializes all environment variables with default values, which may be
-#   overwritten later. They can be read in project's control scripts to adjust
-#   their execution appropriately.
-init_env_vars() {
-    # command line options
-    export OFFLINE_MODE=false # GitPack offline mode
-}
-
-# DESCRIPTION:
-#   Initializes all GitPack-specific paths. They must be absolute paths.
-init_paths() {
-    # initialize directory paths
-    if [ "$ACCESS" = global ]; then # respect FHS
-        readonly LOG_DIR=/var/log/gitpack
-        readonly CACHE_DIR=/var/cache/gitpack
-        readonly STATE_DIR=/var/lib/gitpack
-    else # respect XDG
-        readonly LOG_DIR="$HOME"/.local/share/gitpack
-        readonly CACHE_DIR="$HOME"/.cache/gitpack
-        readonly STATE_DIR="$HOME"/.local/share/gitpack
-    fi
-
-    # initialize derived paths
-    readonly LOG_PATH="$LOG_DIR"/gitpack.log # execution log file
-    readonly CACHE_REPO_DIR="$CACHE_DIR"/repo # cache for local repositories
-    readonly STATUS_PATH="$STATE_DIR"/status # database of installed projects
-    readonly STATUS_BAK_PATH="$STATE_DIR"/status.bak # database backup
-}
-
-# DESCRIPTION:
-#   Initializes traps of all handled signals in GitPack.
-init_traps() {
-    trap 'log "$LOGTYPE_EXIT" "$?"' EXIT && # log GitPack exit status on exit
-    trap term_action HUP INT QUIT TERM # handle termination signals
-}
-
-# DESCRIPTION:
-#   This function is expected to handle all termination signals that can be sent
-#   to GitPack. It logs the signal name and exits with its exit status.
-term_action() {
-    _signal_status="$?" # get exit status of the signal
-    log "$LOGTYPE_SIGNAL" "SIG$(kill -l "$_signal_status")" # log signal name
-    exit "$_signal_status" # exit GitPack (it also invokes the EXIT trap)
+# $@ - echo arguments
+echoh() {
+    echo "$@" &&
+    echo "try 'gitpack help' for more information" # print also a hint
 }
 
 #-------------------------------------------------------------------------------
 # COMMAND PROCESSING
 #-------------------------------------------------------------------------------
 
-# DESCRIPTION:
-#   Prints all installed Git projects and their versions or commit hashes.
-list() (
-    log "$COMMAND_LIST" "$STATUS_PATH" &&
-    db="$(get_db)" &&
-    echon "$db" | while IFS= read -r db_record; do
-        url="$(get_db_record_url "$db_record")" && # extract URL
-        hash="$(get_db_record_hash "$db_record")" && # extract commit hash
-        version="$(beautify_hash "$url" "$hash")" && # beautify it
+run_list() (
+    init_runtime g e l s &&
+    while IFS= read -r record; do
+        url="$(status_record_url "$record")" &&
+        hash="$(status_record_hash "$record")" &&
+        version="$(beautify_hash "$url" "$hash")" &&
         echo "$url $version" || return
-    done
+    done < "$STATUS_PATH"
 )
 
-# DESCRIPTION:
-#   Cleans the GitPack cache and log performing checks for unintended removal.
-clean() (
-    # log clean operation, also creates a log file if it does not exist
-    log "$COMMAND_CLEAN" "$CACHE_DIR"/ &&
-
-    # clean log shortening it to a defined number of last lines
-    tail_out="$(tail -n "$LOG_LINES_KEPT" "$LOG_PATH")" &&
-    echo "$tail_out" > "$LOG_PATH" && # write changes back to the log file
-
-    # clean Git cache
-    if ! remove_dir "$CACHE_DIR"; then # in case of fail
-        echof 'failed to remove cache directory'; return 1
+run_clean() (
+    init_runtime e l &&
+    if ! remove_dir "$CACHE_DIR"; then
+        echo 'E5: failed to remove cache directory' >&2; return 1
     fi
 )
 
-# DESCRIPTION:
-#   Prints all GitPack-specific paths.
-paths() {
-    log "$COMMAND_PATHS" &&
-    echo "log $LOG_DIR/" &&
-    echo "cache $CACHE_DIR/" &&
-    echo "state $STATE_DIR/"
+run_paths() (
+    init_runtime e &&
+    echo "state-dir $STATE_DIR" &&
+    echo "cache-dir $CACHE_DIR" &&
+    echo "lock-path $LOCK_PATH"
+)
+
+# $1 - URL
+# $2 - hash (optional)
+beautify_hash() {
+    if [ "$2" ]; then (
+        if ! [ "$hash_mode" ] && repo_cd "$1" 2>/dev/null &&
+           ref="$(git describe --all --exact-match "$2" 2>/dev/null)"; then
+            echo "${ref##*/}" # remove reference path prefix
+        elif [ "$hash_mode" = full ]; then
+            echo "$2" # return full hash
+        else
+            echo "$2" | cut -c 1-7 # return short hash
+        fi
+    ) fi
 }
 
-# DESCRIPTION:
-#   An echo wrapper. It does not print a new line if the final string is empty.
-# PARAMETERS:
-#   $@ - echo arguments
-echon() {
-    if [ "$@" ]; then echo "$@"; fi
-}
-
-# DESCRIPTION:
-#   Removes a given directory recursively if it exists. It also prevents from
-#   removing the root and home directories and there are performed additional
-#   checks related to safety of the whole process.
-# PARAMETERS:
-#   $1 - directory
+# $1 - directory path
 remove_dir() {
-    test "$1" && # the directory path must not be empty
-    if ! [ -d "$1"/ ]; then return; fi && # the directory does not exist, return
+    if ! [ "$1" ]; then
+        echo 'E16: cannot remove directory with empty path' >&2; return 1
+    elif ! [ -d "$1"/ ]; then
+        return # already removed, success
+    fi
 
-    (   # store physical path of the given directory
-        cd -- "$1"/ && pwd_out="$(pwd -P)" &&
-        # check for the root directory
-        test "$PWD" != / && test "$pwd_out" != / &&
-        # check for the root directory (with two slashes)
-        test "$PWD" != // && test "$pwd_out" != // &&
-        # check for a home directory
-        test "$PWD" != "$HOME" && test "$pwd_out" != "$HOME"
+    echo "removing directory $1" >&2 &&
+    # do not remove any important directory
+    (   cd -- "$1"/ && real_path="$(pwd -P)" &&
+        test "$PWD" != / && test "$real_path" != / &&
+        test "$PWD" != // && test "$real_path" != // &&
+        test "$PWD" != "$HOME" && test "$real_path" != "$HOME"
     ) &&
 
-    rm -fr -- "${1:?}"/ # remove the directory itself recursively
+    rm -rf -- "${1:?}"/
 }
+
+#-------------------------------------------------------------------------------
+# DYNAMIC INITIALIZATION
+#-------------------------------------------------------------------------------
+
+# $@ - init flags
+init_runtime() {
+    for _flag in "$@"; do # order matters
+        case "$_flag" in
+            g) check_git ;;
+            e) init_env ;;
+            l) init_lock ;;
+            s) init_status_db ;;
+            f) init_fetched_db ;;
+            *) echo "E15: invalid runtime init flag $_flag" >&2; return 1 ;;
+        esac || return
+    done
+}
+
+check_git() {
+    if ! command -v git > /dev/null; then
+        echo 'E1: missing git command' >&2; return 1
+    fi
+}
+
+init_env() {
+    USER_ID="$(id -u)" &&
+    readonly USER_ID &&
+
+    if [ "$USER_ID" -eq 0 ]; then
+        readonly ACCESS=global
+    else
+        readonly ACCESS=local
+    fi &&
+
+    SYSTEM="$(uname)" &&
+    readonly SYSTEM &&
+
+    init_paths
+}
+
+init_paths() {
+    if [ "$ACCESS" = global ]; then # respect FHS
+        readonly STATE_DIR=/var/lib/gitpack
+        readonly CACHE_DIR=/var/cache/gitpack
+    else # respect XDG
+        readonly STATE_DIR="$HOME"/.local/share/gitpack
+        readonly CACHE_DIR="$HOME"/.cache/gitpack
+    fi
+    readonly LOCK_DIR=/var/lock # unified storage of locks
+
+    readonly STATUS_PATH="$STATE_DIR"/status # database of installed packages
+    readonly REPOS_DIR="$CACHE_DIR"/repos # cache for local repositories
+    readonly FETCHED_PATH="$CACHE_DIR"/fetched # repositories fetch timestamps
+    readonly LOCK_PATH="$LOCK_DIR"/gitpack-"$USER_ID" # lock is a directory
+    readonly LOCK_PID_PATH="$LOCK_PATH"/pid # process ID of the lock holder
+}
+
+init_lock() {
+    mkdir -p "$LOCK_DIR"/ && # first create a directory for locks
+
+    if mkdir "$LOCK_PATH"/ 2>/dev/null; then # acquire lock
+        trap exit_action EXIT && # function to call on an exit
+        trap exit HUP INT QUIT TERM && # call exit on these signals
+        echo "$$" > "$LOCK_PID_PATH"
+    else # failed to acquire lock
+        _lockfile="$(basename "$LOCK_PATH")"
+        _pid="$(cat "$LOCK_PID_PATH")" # may not exist yet, not a problem though
+        echo "E17: lockfile $_lockfile is owned by process $_pid" >&2
+        echo 'if the problem persists, try rebooting' >&2
+        return 1
+    fi
+}
+
+init_status_db() {
+    create_db "$STATUS_PATH" &&
+    check_db "$STATUS_PATH" "$STATUS_PATTERN"
+}
+
+init_fetched_db() {
+    create_db "$FETCHED_PATH" &&
+    check_db "$FETCHED_PATH" "$FETCHED_PATTERN"
+}
+
+exit_action() (
+    status="$?" # store exit status of last executed command
+    rm -f "$LOCK_PID_PATH"
+    rmdir "$LOCK_PATH"/ # release lock
+    return "$status"
+)
 
 #-------------------------------------------------------------------------------
 # ACTION PROCESSING
 #-------------------------------------------------------------------------------
 
-# DESCRIPTION:
-#   Performs several checks, prepares target Git repository and executes the
-#   given action itself. Requires GitPack's runtime to be already initialized.
-#   Also prints a report after the execution.
-# PARAMETERS:
-#   $1 - action
-#   $2 - raw URL
-process_action() (
-    {   # log current action processing
-        log "$1" "$2" &&
-        # process the given URL
-        url="$(raw_url_to_url "$2")" &&
-        version="$(raw_url_to_version "$2")" &&
-        check_url "$url" &&
+# $1 - action
+# $2 - URL argument
+perform_action() (
+    echo ">>> running $1 for $2" &&
+    url="$(url_arg_to_url "$2")" &&
+    version="$(url_arg_to_version "$2")" && # may be empty
+    check_url "$url" &&
 
-        # prepare Git repository
-        init_repo "$url" &&
+    init_repo "$url" &&
+    record="$(get_status_record "$url")" && # get package local information
+    src_hash="$(status_record_hash "$record")" &&
+    tar_hash="$(get_repo_hash "$url" "$version")" &&
 
-        # execute the action itself
-        execute_action "$1" "$url" "$version"
-    } || {
-        # all possible errors during action processing are caught here
-        action_status="$?" # store the action exit status
-        echo "<ERROR> $1 $2" >&2 # report GitPack information
-        return "$action_status" # propagate the status further
-    }
+    case "$1" in
+        install) perform_install "$url" "$src_hash" "$tar_hash" ;;
+        uninstall) perform_uninstall "$url" "$src_hash" ;;
+        status) perform_status "$url" "$src_hash" "$tar_hash" ;;
+    esac
 )
 
-# DESCRIPTION:
-#   Normalizes a given raw URL. It removes a version from the URL if present,
-#   and trims the URL.
-# PARAMETERS:
-#   $1 - raw URL
-raw_url_to_url() (
-    url="${1%%=*}" # remove version if any
-    url="$(echo "$url" | tr '[:upper:]' '[:lower:]')" && # to lowercase
-    url="${url#https://}" && # remove https:// prefix
-    echo "${url%.git}" # remove .git suffix
+# $1 - URL argument
+url_arg_to_url() (
+    url="${1%=*}" # remove version if any
+
+    if [ "$raw_url_mode" = false ]; then
+        url="$(echo "$url" | tr '[:upper:]' '[:lower:]')" &&
+        url="$(echo "${url#https://}" | sed 's|/\+|/|g')" &&
+        url="$(echo "$url" | sed 's|/$||; s/.git$//; s|/$||')"
+    fi &&
+
+    echo "$url"
 )
 
-# DESCRIPTION:
-#   Extracts a version from a given raw URL if there is any. Always succeeds.
-# PARAMETERS:
-#   $1 - raw URL
-raw_url_to_version() (
-    version="${1#*=}" # remove URL and keep version
-    if [ "$version" != "$1" ]; then # check if there was a version
-        echo "$version"
-    fi
-)
-
-# DESCRIPTION:
-#   Checks whether a given URL is supported.
-# PARAMETERS:
-#   $1 - URL
-check_url() {
-    log "$LOGTYPE_URL" "$1" &&
-
-    if [ "$(echo "$1" | wc -l)" -ne 1 ] || # URL must be a single line
-       echo "$1" | grep -qE "$BAD_URL_REGEX"; then
-        echof 'unsupported URL delivered'; return 1
+# $1 - URL argument
+url_arg_to_version() {
+    if [ "${1##*=}" != "$1" ]; then
+        echo "${1##*=}" # remove URL and keep version
     fi
 }
+
+# $1 - URL
+check_url() (
+    lineno="$(echo "$1" | wc -l)" &&
+    if [ "$lineno" -ne 1 ] || echo "$1" | grep -qE "$BAD_URL_PATTERN"; then
+        echo 'E6: unsupported URL delivered' >&2; return 1
+    fi
+)
 
 #-------------------------------------------------------------------------------
 # REPOSITORY
 #-------------------------------------------------------------------------------
 
-# DESCRIPTION:
-#   Initializes a Git repository of a given URL into a directory in the GitPack
-#   cache. The repository will be downloaded unless the offline mode is enabled,
-#   in which case succeeds only if it is already downloaded.
-# PARAMETERS:
-#   $1 - URL
-init_repo() (
-    repo_dir="$(url_to_path "$1")" && # get the repository directory path
-    log "$LOGTYPE_REPO" "$1" "$repo_dir"/ &&
-
-    if [ "$OFFLINE_MODE" = true ]; then # offline
-        if ! [ -d "$repo_dir"/ ]; then # fail if local repository does not exist
-            echof 'repository is not downloaded for offline usage'; return 1
-        fi
-    else # online
-        fetch_repo "$1" "$repo_dir"
+# $1 - URL
+init_repo() {
+    if [ "$fetch_always_mode" = false ] && fetched_recently "$1"; then
+        echo 'local repository fresh' >&2
+    else
+        fetch_repo "$1" "$(url_to_path "$1")" &&
+        mark_as_fetched_now "$1"
     fi
-)
-
-# DESCRIPTION:
-#   Downloads files of a given repository URL so that they are up to date. If an
-#   appropriate local repository does not exist, it is created and configured.
-#   Then, remote updates are fetched including any Git reference removal.
-# PARAMETERS:
-#   $1 - URL
-#   $2 - repository directory
-fetch_repo() (
-    if [ -d "$2"/ ]; then # local repository already exists
-        cd "$2"/
-    else # create and configure local repository
-        mkdir -p "$2"/ && cd "$2"/ && # create a directory
-        # create and configure the Git repository
-        git init -q && # create it
-        git config gc.auto 0 && # disable automatic Git garbage collection
-        git config remote.origin.url https://"$1".git && # add remote URL
-        git config remote.origin.fetch "$HEAD_REFSPEC" && # remote HEAD
-        git config --add remote.origin.fetch "$TAGS_REFSPEC" && # remote tags
-        git config --add remote.origin.fetch "$HEADS_REFSPEC" # remote branches
-    fi &&
-    # fetch remote updates (prune, do not fetch tags implicitly, update HEAD)
-    git fetch -pnuq origin # it may ask for a password
-)
-
-# DESCRIPTION:
-#   Transforms a given URL of a Git repository to an actual path where the local
-#   repository is stored.
-# PARAMETERS:
-#   $1 - URL
-url_to_path() {
-    echo "$CACHE_REPO_DIR"/"$1"
 }
 
-#-------------------------------------------------------------------------------
-# CHOOSE ACTION
-#-------------------------------------------------------------------------------
+# $1 - URL
+# $2 - repository directory
+fetch_repo() (
+    mkdir -p -- "$2"/ && # make sure directory for repository is created
+    cd -- "$2"/ &&
 
-# DESCRIPTION:
-#   Chooses which action will be executed and executes it with an initialized
-#   Git repository. If no version is delivered, GitPack chooses the preferred
-#   commit instead. Also prints a report after the execution.
-# PARAMETERS:
-#   $1 - action
-#   $2 - URL
-#   $3 - version (optional)
-execute_action() (
-    # get source (already installed) project information
-    src_db_record="$(get_db_record "$2")" &&
-    src_hash="$(get_db_record_hash "$src_db_record")" && # extract commit hash
-    # get target (installation candidate) project information
-    tar_hash="$(get_repo_hash "$2" "$3")" &&
+    if [ -d .git/ ]; then # current directory is repository
+        echo 'updating local repository' >&2
+    else # initialize and configure repository
+        echo 'downloading local repository' >&2 &&
+        git init -q &&
+        git config gc.auto 0 && # disable garbage collector
+        git config remote.origin.fetch "$HEAD_REFSPEC" &&
+        git config --add remote.origin.fetch "$TAGS_REFSPEC" &&
+        git config --add remote.origin.fetch "$HEADS_REFSPEC" &&
+        git config remote.origin.url "$(url_to_git_url "$1")"
+    fi &&
 
-    # choose action and execute it
-    case "$1" in
-        "$ACTION_INSTALL") execute_install "$2" "$src_hash" "$tar_hash" ;;
-        "$ACTION_UNINSTALL") execute_uninstall "$2" "$src_hash" ;;
-        "$ACTION_STATUS") execute_status "$2" "$src_hash" "$tar_hash" ;;
-    esac &&
-
-    report "$state" "$2" "$src_hash" "$tar_hash"
+    # fetch remote updates (prune, do not fetch tags implicitly, update HEAD)
+    git fetch -pnuq origin
 )
 
-# DESCRIPTION:
-#   Prints a preferred commit hash of a given project. If a version is provided,
-#   it is transformed into an actual commit hash. Otherwise, it chooses latest
-#   tag's commit (preferred) or latest commit of the default branch.
-# PARAMETERS:
-#   $1 - URL
-#   $2 - version (optional)
+# $1 - URL
+url_to_git_url() {
+    if [ "$raw_url_mode" = true ]; then
+        echo "$1"
+    else
+        echo https://"$1".git
+    fi
+}
+
+# $1 - URL
+# $2 - version (optional)
 get_repo_hash() (
     repo_cd "$1" &&
-    # transform the given HEAD version into a real remote HEAD reference
-    if [ "$2" = HEAD ]; then set -- "$1" "$REMOTE_HEAD_REF"; fi &&
+    if [ "$2" = HEAD ]; then # HEAD reference must point to remote HEAD
+        set -- "$1" "$ORIGIN_HEAD"
+    fi &&
 
-    if [ "$2" ]; then # if any version has been provided
+    if [ "$2" ]; then
+        echo 'using custom candidate version' >&2 &&
         # print the commit hash of the version if it is a valid Git reference
-        if ! git rev-parse --verify "$2"^0 2>/dev/null; then
-            echof "version $2 does not exist"; return 1
+        if ! git rev-parse -q --verify "$2"^0; then
+            echo "E8: repository does not have version $2" >&2; return 1
         fi
-    else # detect a preferred commit
-        # get latest tag (preferred) or latest commit of the default branch
-        ref="$(git describe --tags --abbrev=0 --always "$REMOTE_HEAD_REF")" &&
-        git rev-parse --verify "$ref"^0 2>/dev/null # get commit hash
+    else # use latest tag (preferred) or latest commit of default branch
+        echo 'using automatic candidate version' >&2 &&
+        ref="$(git describe --tags --abbrev=0 --always "$ORIGIN_HEAD")" &&
+        git rev-parse --verify "$ref"^0 # get commit hash
     fi
 )
 
-# DESCRIPTION:
-#   Changes current working directory to the local repository of a given URL. If
-#   a commit hash provided, it also checkouts the given commit.
-# PARAMETERS:
-#   $1 - URL
-#   $2 - hash (optional)
+# $1 - URL
+# $2 - hash (optional)
 repo_cd() {
-    cd "$(url_to_path "$1")"/ && # transform the given URL to path
+    if ! [ "$1" ]; then # just for sure
+        echo 'E18: cannot change directory to an empty URL' >&2; return 1
+    fi
+
+    cd "$(url_to_path "$1")"/ &&
     if [ "$2" ]; then
         git checkout -qf "$2"
     fi
+}
+
+# $1 - URL
+url_to_path() {
+    echo "$REPOS_DIR"/"$1" # assume it will not fail (just like any other echo)
 }
 
 #-------------------------------------------------------------------------------
 # EXECUTE ACTION
 #-------------------------------------------------------------------------------
 
-# DESCRIPTION:
-#   Decides whether install, change, or do nothing with a given project. If any
-#   operation is done, it will use only given commit hashes and also updates the
-#   GitPack database.
-# PARAMETERS:
-#   $1 - URL
-#   $2 - source hash (optional)
-#   $3 - target hash
-execute_install() {
-    if [ ! "$2" ]; then # no source version
-        state="$STATE_INSTALL" &&
-        install "$1" "$3" && # install target commit
-        insert_db_record "$1" "$3" # update GitPack database
-    elif [ "$2" = "$3" ]; then # given versions are equal
-        state="$STATE_INSTALLED"
-    else # given version are different
-        execute_change "$1" "$2" "$3"
+# $1 - URL
+# $2 - source hash (optional)
+# $3 - target hash
+perform_install() {
+    if ! [ "$2" ]; then # not installed yet
+        run_install "$1" "$3" &&
+        insert_status_record "$1" "$3" &&
+        echo '<<< done; successfully installed'
+    elif [ "$2" = "$3" ]; then
+        echo '<<< already installed'
+    else
+        perform_change "$1" "$2" "$3"
     fi
 }
 
-# DESCRIPTION:
-#   Changes version of a given project from a given source commit hash to a
-#   given target commit hash and updates the GitPack database.
-# PARAMETERS:
-#   $1 - URL
-#   $2 - source hash
-#   $3 - target hash
-execute_change() {
-    if is_ancestor_commit "$1" "$2" "$3"; then # source version is older
-        state="$STATE_UPDATE"
+# $1 - URL
+# $2 - source hash (optional)
+perform_uninstall() {
+    if [ "$2" ]; then # if installed
+        run_uninstall "$1" "$2" &&
+        delete_status_records "$1" &&
+        echo '<<< done; successfully uninstalled'
+    else
+        echo '<<< already uninstalled'
+    fi
+}
+
+# $1 - URL
+# $2 - source hash (optional)
+# $3 - target hash
+perform_status() (
+    src_version="$(beautify_hash "$1" "$2")" && # success even when empty
+    tar_version="$(beautify_hash "$1" "$3")" &&
+
+    if ! [ "$2" ]; then # no source version
+        echo "<<< not installed; candidate is $tar_version"
+    elif [ "$2" = "$3" ]; then # given versions are equal
+        echo "<<< candidate $tar_version already installed"
+    elif is_ancestor_commit "$1" "$2" "$3"; then # source version is older
+        echo "<<< installed $src_version is older than candidate $tar_version"
     elif is_ancestor_commit "$1" "$3" "$2"; then # source version is newer
-        state="$STATE_DOWNGRADE"
-    else # given versions are not comparable (different branches)
-        state="$STATE_CHANGE"
+        echo "<<< installed $src_version is newer than candidate $tar_version"
+    else # given versions are not comparable
+        echo "<<< installed $src_version differs from candidate $tar_version"
+    fi
+)
+
+# $1 - URL
+# $2 - source hash
+# $3 - target hash
+perform_change() (
+    if is_ancestor_commit "$1" "$2" "$3"; then # source version is older
+        echo 'updating package' >&2 &&
+        report='<<< done; successfully updated'
+    elif is_ancestor_commit "$1" "$3" "$2"; then # source version is newer
+        echo 'downgrading package' >&2 &&
+        report='<<< done; successfully downgraded'
+    else # given versions are not comparable
+        echo 'changing package version' >&2 &&
+        report='<<< done; successfully changed'
     fi &&
 
-    uninstall "$1" "$2" && # uninstall source commit
-    delete_db_records "$1" && # update GitPack database
-    install "$1" "$3" && # install target commit
-    insert_db_record "$1" "$3" # update GitPack database
-}
+    run_uninstall "$1" "$2" &&
+    delete_status_records "$1" &&
+    run_install "$1" "$3" &&
+    insert_status_record "$1" "$3" &&
+    echo "$report"
+)
 
-# DESCRIPTION:
-#   Decides whether uninstall, or do nothing with a given project. If any
-#   operation is done, it will use only the given commit hash and also updates
-#   the GitPack database.
-# PARAMETERS:
-#   $1 - URL
-#   $2 - hash (optional)
-execute_uninstall() {
-    if [ "$2" ]; then # if installed
-        state="$STATE_UNINSTALL" &&
-        uninstall "$1" "$2" && # uninstall given commit
-        delete_db_records "$1" # update GitPack database
-    else # no source version
-        state="$STATE_UNINSTALLED"
-    fi
-}
-
-# DESCRIPTION:
-#   Checks a given repository considering given source and target commit hashes.
-#   It always succeeds.
-# PARAMETERS:
-#   $1 - URL
-#   $2 - source hash (optional)
-#   $3 - target hash
-execute_status() {
-    if [ ! "$2" ]; then # no source version
-        state="$STATE_NOTHING"
-    elif [ "$2" = "$3" ]; then # given versions are equal
-        state="$STATE_OK"
-    elif is_ancestor_commit "$1" "$2" "$3"; then # source version is older
-        state="$STATE_OLDER"
-    elif is_ancestor_commit "$1" "$3" "$2"; then # source version is newer
-        state="$STATE_NEWER"
-    else # given versions are not comparable (different branches)
-        state="$STATE_DIFF"
-    fi
-}
-
-# DESCRIPTION:
-#   Checks whether the commit of the first hash is an ancestor of the commit of
-#   the second hash in a given Git repository.
-# PARAMETERS:
-#   $1 - URL
-#   $2 - first hash
-#   $3 - second hash
+# $1 - URL
+# $2 - first hash
+# $3 - second hash
 is_ancestor_commit() (
     repo_cd "$1" &&
     git merge-base --is-ancestor "$2" "$3"
@@ -720,402 +507,202 @@ is_ancestor_commit() (
 # INSTALLATION AND UNINSTALLATION
 #-------------------------------------------------------------------------------
 
-# DESCRIPTION:
-#   Installs a project based on a given repository URL and a commit hash.
-# PARAMETERS:
-#   $1 - URL
-#   $2 - hash
-install() (
+# $1 - URL
+# $2 - hash
+run_install() (
+    version="$(beautify_hash "$1" "$2")" &&
+    echo "installing version $version" >&2 &&
+
     repo_cd "$1" "$2" &&
-    install_dir="$(get_install_dir)" && # get preferred installation directory
-    install_method="$(basename -- "$install_dir"/)" && # installation method
-
-    if [ -x "$install_dir"/precp ]; then # before files copy
-        log "$LOGTYPE_PRECP" "$1" "$2" "$install_method" &&
-        run_script "$install_dir"/precp
-    fi &&
-
-    # copy all files using the preferred map
-    log "$LOGTYPE_CP" "$1" "$2" "$install_method" &&
-    for_each_route "$install_dir"/map copy_files_to_dir &&
-
-    if [ -x "$install_dir"/postcp ]; then # after files copy
-        log "$LOGTYPE_POSTCP" "$1" "$2" "$install_method" &&
-        run_script "$install_dir"/postcp
-    fi
+    install_script="$(get_install_script)" &&
+    get_uninstall_script > /dev/null && # GitPack must be able to uninstall it
+    run_script "$install_script"
 )
 
-# DESCRIPTION:
-#   Uninstalls a project based on a given repository URL and a commit hash.
-# PARAMETERS:
-#   $1 - URL
-#   $2 - hash
-uninstall() (
+# $1 - URL
+# $2 - hash
+run_uninstall() (
+    version="$(beautify_hash "$1" "$2")" &&
+    echo "uninstalling version $version" >&2 &&
+
     repo_cd "$1" "$2" &&
-    install_dir="$(get_install_dir)" && # get preferred installation directory
-    install_method="$(basename -- "$install_dir"/)" && # uninstallation method
-
-    if [ -x "$install_dir"/prerm ]; then # before files removal
-        log "$LOGTYPE_PRERM" "$1" "$2" "$install_method" &&
-        run_script "$install_dir"/prerm
-    fi &&
-
-    # remove all files using the preferred map
-    log "$LOGTYPE_RM" "$1" "$2" "$install_method" &&
-    for_each_route "$install_dir"/map remove_files_from_dir &&
-
-    if [ -x "$install_dir"/postrm ]; then # after files removal
-        log "$LOGTYPE_POSTRM" "$1" "$2" "$install_method" &&
-        run_script "$install_dir"/postrm
-    fi
+    uninstall_script="$(get_uninstall_script)" &&
+    run_script "$uninstall_script"
 )
 
-# DESCRIPTION:
-#   Prints the relative path of the appropriate GitPack installation directory
-#   based on the current runtime and system information.
-get_install_dir() {
-    if [ -d .gitpack/install/"${ACCESS}-$SYSTEM"/ ]; then
-        echo .gitpack/install/"${ACCESS}-$SYSTEM" # system-specific directory
+get_install_script() {
+    if [ -x .install/install-"${ACCESS}-$SYSTEM" ]; then
+        echo .install/install-"${ACCESS}-$SYSTEM"
+    elif [ -x .install/install-"$ACCESS" ]; then
+        echo .install/install-"$ACCESS"
     else
-        echo .gitpack/install/"$ACCESS" # system-independent directory
+        echo 'E9: missing installation script' >&2; return 1
     fi
 }
 
-# DESCRIPTION:
-#   Runs a given script. In case of an error, prints and logs a fail report.
-# PARAMETERS:
-#   $1 - script path
-run_script() (
-    "$1" && return # run the script and return early if it exited successfully
+get_uninstall_script() {
+    if [ -x .install/uninstall-"${ACCESS}-$SYSTEM" ]; then
+        echo .install/uninstall-"${ACCESS}-$SYSTEM"
+    elif [ -x .install/uninstall-"$ACCESS" ]; then
+        echo .install/uninstall-"$ACCESS"
+    else
+        echo 'E10: missing uninstallation script' >&2; return 1
+    fi
+}
 
-    script_status="$?" # store the exit status of the failed script
-    echof "$(basename -- "$1") script failed with $script_status"
+# $1 - script path
+run_script() (
+    echo "running script $1" >&2 &&
+    "$1" 1>&2 && return # return if success, stdout considered diagnostic output
+
+    script_status="$?"
+    script_name="$(basename -- "$1")"
+    echo "E11: $script_name script failed with $script_status" >&2
     return 1 # indicate error but do not propagate the exit status further
 )
 
 #-------------------------------------------------------------------------------
-# COPY FILES
+# STATUS DATABASE
 #-------------------------------------------------------------------------------
 
-# DESCRIPTION:
-#   Calls a given function for each route of a given map.
-# PARAMETERS:
-#   $1 - map path
-#   $2 - function name
-for_each_route() (
-    if [ -r "$1" ]; then # check whether the map file exists
-        grepe_out="$(grepe . "$1")" && # remove empty lines
-        # call a given function for each route
-        echon "$grepe_out" | while IFS= read -r route; do
-            eval "$2" "$route" || return
-        done
-    else # if the map file does not exist, fails
-        echof 'missing map file'; return 1
-    fi
-)
-
-# DESCRIPTION:
-#   Copies given files recursively to a given target directory. It also creates
-#   all intermediate directories necessary.
-# PARAMETERS:
-#   $@ - file paths
-#   -$1 - target directory
-copy_files_to_dir() (
-    target_dir="$(get_last_arg "$@")" &&
-    mkdir -p -- "$target_dir" && # create target directory
-    cp -R -- "$@" # copy files recursively into to
-)
-
-# DESCRIPTION:
-#   Prints the last argument of all given arguments.
-# PARAMETERS:
-#   $@ - arguments
-get_last_arg() {
-    shift "$(($# - 1))" && # shift to the last argument
-    echo "$1" # print it
+# $1 - URL
+get_status_record() {
+    echo 'reading status database' >&2 &&
+    db_select_first "$STATUS_PATH" "$STATUS_COL_URL" "$1"
 }
 
-# DESCRIPTION:
-#   This function is a grep wrapper. Succeeds even in the case of an empty grep
-#   selection.
-# PARAMETERS:
-#   $@ - grep arguments
-grepe() (
-    grep "$@" # execute the grep itself
-    grep_status="$?" # store its exit status
+# $1 - URL
+# $2 - hash
+insert_status_record() {
+    echo 'adding to status database' >&2 &&
+    cp "$STATUS_PATH" "$STATUS_PATH".tmp &&
+    echo "$1 $2" >> "$STATUS_PATH".tmp &&
+    mv "$STATUS_PATH".tmp "$STATUS_PATH" # should be signal-safe
+}
 
-    # suppress the empty selection error indicator (exit status of 1)
-    if [ "$grep_status" -eq 1 ]; then grep_status=0; fi
-    return "$grep_status" # return the modified exit status
+# $1 - URL
+delete_status_records() (
+    echo 'removing from status database' >&2 &&
+    db="$(db_select_except "$STATUS_PATH" "$STATUS_COL_URL" "$1")" &&
+    echon "$db" > "$STATUS_PATH".tmp &&
+    mv "$STATUS_PATH".tmp "$STATUS_PATH"
 )
 
-#-------------------------------------------------------------------------------
-# REMOVE FILES
-#-------------------------------------------------------------------------------
-
-# DESCRIPTION:
-#   Removes the copies of given files from a given target directory. Then, also
-#   removes all empty directories in the target directory pathname.
-# PARAMETERS:
-#   $@ - file paths
-#   -$1 - target directory
-remove_files_from_dir() (
-    # get the target directory to remove files from
-    target_dir="$(get_last_arg "$@")" &&
-    test "$target_dir" &&
-
-    while [ "$#" -gt 1 ]; do # for each file path argument
-        test "$1" &&
-        remove_file_from_dir "$1" "$target_dir" && # remove the file
-        rmdirt -p -- "${target_dir:?}"/ && # remove empty pathname directories
-        shift || return # shift to next argument
-    done
-)
-
-# DESCRIPTION:
-#   Removes the copy of a given file from a given target directory. In case of a
-#   directory, its content is removed in accordance with the original directory.
-# PARAMETERS:
-#   $1 - file path
-#   $2 - target directory
-remove_file_from_dir() (
-    test "$1" && test "$2" &&
-
-    if [ -d "$1"/ ]; then
-        remove_dir_from_dir "$1" "$2"
-    else
-        file_name="$(basename -- "$1")" && # name of the file to be removed
-        # remove the file from the target directory
-        rm -f -- "${2:?}"/"${file_name:?}"
+# $@ - echo arguments
+echon() {
+    # no newline if empty string
+    if [ "$*" ]; then
+        echo "$@"
     fi
-)
+}
 
-# DESCRIPTION:
-#   Removes the copy of a given directory from a given target directory. It uses
-#   the contents of the given directory as a file mask controlling the process
-#   of file removing in the target directory.
-# PARAMETERS:
-#   $1 - directory
-#   $2 - target directory
-remove_dir_from_dir() (
-    test "$1" && test "$2" &&
-    dir_name="$(basename -- "$1")" && # name of the directory to be removed
+# $1 - status record
+status_record_url() {
+    echo "$1" | cut -f "$STATUS_COL_URL" -d "$DB_DELIM" -s
+}
 
-    # scan the target directory to obtain a file mask (files and directories)
-    files="$(cd -- "$1"/ && find ./ ! -type d)" &&
-    dirs="$(cd -- "$1"/ && find ./ -type d ! -path ./)" &&
-    dirs="$(echo "$dirs" | sort -r)" && # sort from longest to shortest paths
-
-    echon "$files" | while IFS= read -r file; do # remove files using mask
-        rm -f -- "${2:?}"/"${dir_name:?}"/"${file:?}" || return
-    done &&
-    echon "$dirs" | while IFS= read -r dir; do # remove directories using mask
-        rmdirt -- "${2:?}"/"${dir_name:?}"/"${dir:?}"/ || return
-    done &&
-    rmdirt -- "${2:?}"/"${dir_name:?}"/ # remove the copied directory itself
-)
-
-# DESCRIPTION:
-#   This function is a rmdir wrapper. It prints no errors and always succeeds.
-# PARAMETERS:
-#   $@ - rmdir arguments
-rmdirt() {
-    # suppress error output and always succeeds
-    rmdir "$@" 2>/dev/null; true
+# $1 - status record
+status_record_hash() {
+    echo "$1" | cut -f "$STATUS_COL_HASH" -d "$DB_DELIM" -s
 }
 
 #-------------------------------------------------------------------------------
-# DATABASE
+# FETCHED DATABASE
 #-------------------------------------------------------------------------------
 
-# DESCRIPTION:
-#   Initializes GitPack database file structure based on prepared global
-#   variables. It fails if it cannot create a file or GitPack does not have read
-#   or write permissions.
-init_db() {
-    log "$LOGTYPE_DB" "$STATUS_PATH" &&
-    mkdir -p "$STATE_DIR"/ && # create the state directory
-    # create GitPack status file if it does not exist
-    if [ ! -e "$STATUS_PATH" ]; then
-        if [ -r "$STATUS_BAK_PATH" ]; then # if there is a status file backup
-            cp "$STATUS_BAK_PATH" "$STATUS_PATH" # recover from the backup
-        else
-            touch "$STATUS_PATH" # create a new status file
-        fi
+# $1 - URL
+fetched_recently() (
+    current_time="$(get_current_time)" &&
+    record="$(db_select_first "$FETCHED_PATH" "$FETCHED_COL_URL" "$1")" &&
+    record_time="$(fetched_record_time "$record")" &&
+    test "$record_time" = "$current_time"
+) 2>/dev/null
+
+# $1 - URL
+mark_as_fetched_now() (
+    current_time="$(get_current_time)" &&
+    db="$(db_select_except "$FETCHED_PATH" "$FETCHED_COL_URL" "$1")" &&
+    db="$(db_append_record "$db" "$1 $current_time")" &&
+    echo "$db" > "$FETCHED_PATH".tmp &&
+    mv "$FETCHED_PATH".tmp "$FETCHED_PATH"
+)
+
+get_current_time() {
+    date -u '+%Y%m%d%H' # UTC as <year><month><day><hour>
+}
+
+# $1 - fetched record
+fetched_record_time() {
+    echo "$1" | cut -f "$FETCHED_COL_TIME" -d "$DB_DELIM" -s
+}
+
+#-------------------------------------------------------------------------------
+# DATABASE FUNCTIONS
+#-------------------------------------------------------------------------------
+
+# $1 - database path
+create_db() (
+    db_dir="$(dirname -- "$1")" &&
+    mkdir -p -- "$db_dir"/ &&
+
+    if ! [ -e "$1" ]; then # if database does not exist
+        touch -- "$1" # create it
     fi &&
 
-    # check access to GitPack status file
-    if ! [ -r "$STATUS_PATH" ] || ! [ -w "$STATUS_PATH" ]; then
-        echof 'cannot access status file'; return 1
+    if ! [ -r "$1" ] || ! [ -w "$1" ]; then
+        db_name="$(basename -- "$1")"
+        echo "E14: cannot access $db_name database" >&2
+        return 1
+    fi
+)
+
+# $1 - database path
+# $2 - database pattern
+check_db() {
+    if grep -qv -- "$2" "$1"; then ( # if a record does not match the pattern
+        db_name="$(basename -- "$1")"
+        echo "E19: database $db_name is corrupted" >&2
+        return 1
+    ) fi
+}
+
+# $1 - database path
+# $2 - key column
+# $3 - expected value
+db_select_first() (
+    while IFS= read -r record; do
+        item="$(echo "$record" | cut -f "$2" -d "$DB_DELIM" -s)" || return
+        if [ "$item" = "$3" ]; then
+            echo "$record"; return
+        fi
+    done < "$1"
+)
+
+# $1 - database path
+# $2 - key column
+# $3 - filtered value
+db_select_except() (
+    while IFS= read -r record; do
+        item="$(echo "$record" | cut -f "$2" -d "$DB_DELIM" -s)" || return
+        if [ "$item" != "$3" ]; then
+            echo "$record"
+        fi
+    done < "$1"
+)
+
+# $1 - database
+# $2 - record
+db_append_record() {
+    if [ "$1" ]; then
+        echo "$1
+$2"
+    else
+        echo "$2"
     fi
 }
-
-# DESCRIPTION:
-#   Selects the first record matching a given URL from the GitPack database.
-# PARAMETERS:
-#   $1 - URL
-get_db_record() (
-    log "$LOGTYPE_GET" "$1" "$STATUS_PATH" &&
-    db="$(get_db)" &&
-    echon "$db" | while IFS= read -r db_record; do # for each database record
-        url="$(get_db_record_url "$db_record")" || return # get URL
-        if [ "$url" = "$1" ]; then # once it matches, prints record and return
-            echo "$db_record"; return
-        fi
-    done
-)
-
-# DESCRIPTION:
-#   Inserts a given installation record into the GitPack database.
-# PARAMETERS:
-#   $1 - URL
-#   $2 - hash
-insert_db_record() {
-    log "$LOGTYPE_INSERT" "$1" "$2" "$STATUS_PATH" &&
-    echo "$1 $2" >> "$STATUS_PATH"
-}
-
-# DESCRIPTION:
-#   Deletes all installation records with given URL from the GitPack database.
-# PARAMETERS:
-#   $1 - URL
-delete_db_records() (
-    log "$LOGTYPE_DELETE" "$1" "$STATUS_PATH" &&
-    pruned_db="$(get_pruned_db "$1")" &&
-    echon "$pruned_db" > "$STATUS_PATH"
-)
-
-# DESCRIPTION:
-#   Prints all records of the GitPack database except those with a given URL.
-# PARAMETERS:
-#   $1 - URL
-get_pruned_db() (
-    db="$(get_db)" &&
-    echon "$db" | while IFS= read -r db_record; do # for each database record
-        url="$(get_db_record_url "$db_record")" || return # get URL
-        if [ "$url" != "$1" ]; then # do not print records with the given URL
-            echo "$db_record"
-        fi
-    done
-)
-
-# DESCRIPTION:
-#   Prints all records of the GitPack database.
-get_db() {
-    grepe . "$STATUS_PATH" # remove empty lines
-}
-
-# DESCRIPTION:
-#   Extracts a URL from a given database record.
-# PARAMETERS:
-#   $1 - database record
-get_db_record_url() {
-    echo "${1%% *}" # remove everything after a space (including)
-}
-
-# DESCRIPTION:
-#   Extracts a commit hash from a given database record.
-# PARAMETERS:
-#   $1 - database record
-get_db_record_hash() {
-    echo "${1#* }" # remove everything before a space (including)
-}
-
-# DESCRIPTION:
-#   Backs up the GitPack database by copying it to a different path.
-backup_db() {
-    log "$LOGTYPE_BACKUP" "$STATUS_PATH" "$STATUS_BAK_PATH" &&
-    cp "$STATUS_PATH" "$STATUS_BAK_PATH"
-}
-
-#-------------------------------------------------------------------------------
-# LOGGING
-#-------------------------------------------------------------------------------
-
-# DESCRIPTION:
-#   Creates logging file structure and logs the initialization log item.
-init_logging() {
-    mkdir -p "$LOG_DIR"/ && # create the log directory
-    log "$LOGTYPE_LOG" "$COMMAND"
-}
-
-# DESCRIPTION:
-#   Creates a new log item in the predefined log file with current date and time
-#   based on a given type and details.
-# PARAMETERS:
-#   $1 - type
-#   $@ - details (optional)
-log() (
-    log_time="$(date '+%Y-%m-%d %H:%M:%S')" && # catch time immediately
-    logtype="$1" && # use the given log type
-    shift && # shift arguments to details
-
-    details= && # start with no details
-    for detail in "$@"; do # get all details
-        if [ "$detail" ]; then # ignore empty ones
-            details="$details $detail"
-        fi
-    done &&
-
-    # store the log item
-    echo "$log_time [$logtype]$details" >> "$LOG_PATH"
-)
-
-#-------------------------------------------------------------------------------
-# REPORT
-#-------------------------------------------------------------------------------
-
-# DESCRIPTION:
-#   Prints a report of a given Git project based on included parameters.
-# PARAMETERS:
-#   $1 - state
-#   $2 - URL
-#   $3 - source hash
-#   $4 - target hash
-report() (
-    # prepare given arguments
-    prefix="[$1] $2" &&
-    src_version="$(beautify_hash "$2" "$3")" &&
-    tar_version="$(beautify_hash "$2" "$4")" &&
-
-    case "$1" in
-        "$STATE_INSTALL") echo "$prefix $tar_version" ;;
-        "$STATE_UPDATE" | "$STATE_DOWNGRADE" | "$STATE_CHANGE")
-            echo "$prefix $tar_version <- $src_version" ;;
-        "$STATE_INSTALLED" | "$STATE_UNINSTALL" | "$STATE_OK")
-            echo "$prefix $src_version" ;;
-        "$STATE_UNINSTALLED") echo "$prefix" ;;
-        "$STATE_NOTHING") echo "$prefix -> $tar_version" ;;
-        "$STATE_OLDER" | "$STATE_NEWER" | "$STATE_DIFF")
-            echo "$prefix $src_version -> $tar_version" ;;
-    esac
-)
-
-# DESCRIPTION:
-#   Beautifies a given commit hash. If the hash is empty, exits without any
-#   output. If there is a Git reference associated with the given hash, prints
-#   its name. Otherwise, it shortens the given hash. Always succeeds.
-# PARAMETERS:
-#   $1 - URL
-#   $2 - hash (optional)
-beautify_hash() (
-    if ! [ "$2" ]; then return; fi # early return if no commit hash provided
-
-    # if hash mode disabled, check if any Git reference associated with the hash
-    if [ "$hash_mode" = false ] && repo_cd "$1" 2>/dev/null &&
-       ref="$(git describe --all --exact-match "$2" 2>/dev/null)"; then
-        version="${ref#*/}" # remove reference prefix
-        # do not print HEAD as it either provides no information or is ambiguous
-        if [ "$version" != HEAD ]; then
-            echo "$version"; return
-        fi
-    fi
-
-    echo "$2" | cut -c 1-7 # if no reference found or HEAD, return short hash
-)
 
 #-------------------------------------------------------------------------------
 # CALL MAIN
 #-------------------------------------------------------------------------------
 
-main "$@" # call the main function, having all functions above already defined
+main "$@"

@@ -5,8 +5,6 @@
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-gitpack_out="$($GITPACK status "$GITPACK_URL")" &&
-test "$gitpack_out" = "[nothing] $GITPACK_URL -> $GITPACK_VERSION" &&
-
-gitpack_out="$($GITPACK status -o "$GITPACK_URL")" &&
-test "$gitpack_out" = "[nothing] $GITPACK_URL -> $GITPACK_VERSION"
+echo 'removing files' &&
+rm /usr/local/bin/gitpack &&
+rm /etc/bash_completion.d/gitpack-completion

@@ -4,54 +4,87 @@
 # Copyright 2019-2020 Dominik Salvet
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
-# DESCRIPTION:
-#   Initializes test environment and manages running all GitPack tests. The
-#   current working directory must be set to the Git root directory.
+# Initializes test environment and runs all GitPack tests. The current working
+# directory must be set to the GitPack repository directory. It is expected to
+# be run in isolation, for example in a Docker container.
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
 # FUNCTIONS
 #-------------------------------------------------------------------------------
 
-# DESCRIPTION:
-#   Runs a single given test with all associated output messages. If the given
-#   test fails, it will print its execution trace.
-# PARAMETERS:
-#   $1 - test path
+# $1 - test path
 run_test() (
-    printf '%s' "$1" || return # print test path before executing
+    echo "running $1" &&
+    test_name="$(echo "$1" | sed 's|/|_|g; s/\.sh$//')" && # derive test name
 
-    # run test and store execution trace
-    if ! test_trace="$(sh -x "$1" 2>&1)"; then # test failed
-        printf ' fail\n' &&
-        echo "$test_trace" | tail -n 100 && # print recent execution trace
-        return 1 # indicate test fail
+    # run test and store its execution trace
+    if ! test_trace="$(sh -eux "$1" 2>&1)"; then
+        echo 'recent trace (more in artifacts):' &&
+        echo "$test_trace" | tail -n 20 && # recent trace
+        echo "$1 failed" &&
+        echo "$test_trace" > "$TRACE_DIR"/failed_"$test_name" &&
+        return 1
     else
-        printf ' pass\n'
+        echo "$1 passed" &&
+        echo "$test_trace" > "$TRACE_DIR"/passed_"$test_name"
     fi
 )
 
 #-------------------------------------------------------------------------------
-# ENVIRONMENT
+# INITIALIZE VARIABLES
 #-------------------------------------------------------------------------------
 
-# prepare current commit variables
-export COMMIT="${GITHUB_SHA:?}" && # export commit to the current environment
-SHORT_COMMIT="$(echo "$COMMIT" | cut -c 1-7)" && # short commit hash
-export SHORT_COMMIT &&
+export HASH="${GITHUB_SHA:?}" && # current commit hash
+SHORT_HASH="$(echo "$HASH" | cut -c 1-7)" &&
+export SHORT_HASH &&
 
-# prepare GitPack related variables
 export GITPACK='sh -x src/gitpack' && # GitPack is run with tracing enabled
-export GITPACK_URL=github.com/dominiksalvet/gitpack && # GitPack Git URL
-export GITPACK_VERSION=0.7.0 && # latest GitPack version
-export GITPACK_OLD_VERSION=0.1.0 && # older GitPack version
+export SUDO_GITPACK='sudo sh -x src/gitpack' && # root permissions
+export URL=github.com/dominiksalvet/gitpack &&
+export VERSION=0.7.0 && # latest GitPack version
+export VERSION_HASH=d5a9f75a89eefbd5316b5abe956d28d3a5358327 &&
+export VERSION_SHORT_HASH=d5a9f75 &&
+export OLD_VERSION=0.1.0 &&
+
+export EXTRA_URL=github.com/dominiksalvet/sandbox && # needed in some tests
+export EXTRA_VERSION=beforecommit && # use this and only this version
+
+#-------------------------------------------------------------------------------
+# INITIALIZE FILES
+#-------------------------------------------------------------------------------
+
+readonly TRACE_DIR=gitpack-trace && # trace artifacts storage
+mkdir -p "$TRACE_DIR"/ &&
 
 #-------------------------------------------------------------------------------
 # RUN TESTS
 #-------------------------------------------------------------------------------
 
-# test GitPack actions
-run_test test/action/status.sh &&
-run_test test/action/install.sh &&
-run_test test/action/update.sh &&
-run_test test/action/downgrade.sh
+# actions API
+run_test test/action-api/status.sh &&
+run_test test/action-api/install.sh &&
+run_test test/action-api/update.sh &&
+run_test test/action-api/downgrade.sh &&
+run_test test/action-api/install-multiple.sh &&
+run_test test/action-api/local-global.sh &&
+
+# commands API
+run_test test/command-api/messages.sh &&
+run_test test/command-api/paths.sh &&
+run_test test/command-api/list.sh &&
+run_test test/command-api/clean.sh &&
+
+# check install files
+run_test test/storage/no-install-files.sh &&
+run_test test/subcommand/install.sh &&
+run_test test/subcommand/uninstall.sh &&
+
+# install current commit
+run_test test/subcommand/clean.sh &&
+run_test test/storage/remove-empty-state.sh &&
+run_test test/subcommand/self-install.sh &&
+
+# tests that cannot succeed
+run_test test/xfail/args.sh &&
+run_test test/xfail/urls.sh

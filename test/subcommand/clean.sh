@@ -1,11 +1,14 @@
 #!/bin/sh
 
 #-------------------------------------------------------------------------------
-# Copyright 2019 Dominik Salvet
+# Copyright 2020 Dominik Salvet
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-# if there is no Bash completion file in home directory, create one
-if [ ! -e "$HOME"/.bash_completion ]; then
-    cp .gitpack/data/.bash_completion "$HOME"/
-fi
+# shellcheck disable=SC2034
+
+out1="$($GITPACK clean)" # it must delete cache
+test ! -e "$HOME"/.cache/gitpack
+
+out2="$($SUDO_GITPACK clean)"
+test ! -e /var/cache/gitpack

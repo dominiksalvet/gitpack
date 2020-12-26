@@ -17,27 +17,40 @@ jobs:
       run: shellcheck --version
 
     - name: Check source files
-      run: shellcheck src/*
+      run: |
+        shellcheck src/gitpack
+        shellcheck src/bash/gitpack-completion
 
     - name: Check test files
       run: |
         shellcheck test/run.sh
-        shellcheck test/action/*
+        shellcheck test/action-api/*
+        shellcheck test/command-api/*
+        shellcheck test/subcommand/*
+        shellcheck test/storage/*
+        shellcheck test/xfail/*
 
     - name: Check install files
-      run: |
-        shellcheck .gitpack/data/.bash_completion
-        shellcheck .gitpack/install/local/precp
+      run: shellcheck .install/*
 
   Test:
     needs: Analysis
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-10.15]
-    runs-on: ${{ matrix.os }}
+        os: [ubuntu-20.04, macos-10.15, windows-2019]
+    runs-on: ${{matrix.os}}
     steps:
     - name: Checkout commit
       uses: actions/checkout@v2
 
     - name: Run tests
       run: test/run.sh
+
+    - name: Upload execution trace
+      uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: ${{matrix.os}}-gitpack-trace
+        path: |
+          gitpack-trace/failed_*
+          gitpack-trace/passed_*
