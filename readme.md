@@ -121,8 +121,6 @@ Why should you use GitPack in your projects?
 
 How? The [guide.md](guide.md) file will show you the way. Then users can **immediately use GitPack to install your projects**.
 
-Not sure? Take a look at [.gitpack](.gitpack) directory of GitPack itself. It can be that simple.
-
 ### Badge
 
 GitPack projects work best with the following sleek badge:
