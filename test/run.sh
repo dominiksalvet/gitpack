@@ -22,11 +22,11 @@ run_test() (
     if ! test_trace="$(sh -eux "$1" 2>&1)"; then
         echo 'recent trace (more in artifacts):' &&
         echo "$test_trace" | tail -n 20 && # recent trace
-        echo "$1 failed" &&
+        echo "failed $1" &&
         echo "$test_trace" > "$TRACE_DIR"/failed_"$test_name" &&
         return 1
     else
-        echo "$1 passed" &&
+        echo "passed $1" &&
         echo "$test_trace" > "$TRACE_DIR"/passed_"$test_name"
     fi
 )
