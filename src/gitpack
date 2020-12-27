@@ -206,7 +206,7 @@ init_runtime() {
         case "$_flag" in
             g) check_git ;;
             e) init_env ;;
-            l) init_lock ;;
+            l) true ;;
             s) init_status_db ;;
             f) init_fetched_db ;;
             *) echo "E15: invalid runtime init flag $_flag" >&2; return 1 ;;
