@@ -6,5 +6,5 @@
 #-------------------------------------------------------------------------------
 
 echo 'removing files' &&
-rm /usr/local/bin/gitpack &&
-rm /etc/bash_completion.d/gitpack-completion
+rm -f /usr/local/bin/gitpack &&
+rm -f /etc/bash_completion.d/gitpack-completion
