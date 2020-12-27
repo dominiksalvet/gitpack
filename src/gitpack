@@ -236,23 +236,6 @@ init_env() {
     init_paths
 }
 
-init_paths() {
-    if [ "$ACCESS" = global ]; then # respect FHS
-        readonly STATE_DIR=/var/lib/gitpack
-        readonly CACHE_DIR=/var/cache/gitpack
-    else # respect XDG
-        readonly STATE_DIR="$HOME"/.local/share/gitpack
-        readonly CACHE_DIR="$HOME"/.cache/gitpack
-    fi
-    readonly LOCK_DIR=/var/lock # unified storage of locks
-
-    readonly STATUS_PATH="$STATE_DIR"/status # database of installed packages
-    readonly REPOS_DIR="$CACHE_DIR"/repos # cache for local repositories
-    readonly FETCHED_PATH="$CACHE_DIR"/fetched # repositories fetch timestamps
-    readonly LOCK_PATH="$LOCK_DIR"/gitpack-"$USER_ID" # lock is a directory
-    readonly LOCK_PID_PATH="$LOCK_PATH"/pid # process ID of the lock holder
-}
-
 init_lock() {
     mkdir -p "$LOCK_DIR/" && # first create a directory for locks
 
@@ -269,6 +252,13 @@ init_lock() {
     fi
 }
 
+exit_action() (
+    status="$?" # store exit status of last executed command
+    rm -f "$LOCK_PID_PATH"
+    rmdir "$LOCK_PATH/" # release lock
+    return "$status"
+)
+
 init_status_db() {
     create_db "$STATUS_PATH" &&
     check_db "$STATUS_PATH" "$STATUS_PATTERN"
@@ -279,12 +269,47 @@ init_fetched_db() {
     check_db "$FETCHED_PATH" "$FETCHED_PATTERN"
 }
 
-exit_action() (
-    status="$?" # store exit status of last executed command
-    rm -f "$LOCK_PID_PATH"
-    rmdir "$LOCK_PATH"/ # release lock
-    return "$status"
-)
+#-------------------------------------------------------------------------------
+# FILE PATHS
+#-------------------------------------------------------------------------------
+
+init_paths() {
+    # base paths
+    if [ "$SYSTEM" = Darwin ]; then
+        init_macos_paths
+    else
+        init_linux_paths
+    fi
+
+    # derived paths
+    readonly STATUS_PATH="$STATE_DIR/status" # database of installed packages
+    readonly REPOS_DIR="$CACHE_DIR/repos" # cache for local repositories
+    readonly FETCHED_PATH="$CACHE_DIR/fetched" # repositories fetch timestamps
+    readonly LOCK_PATH="$LOCK_DIR/gitpack-$USER_ID" # lock is a directory
+    readonly LOCK_PID_PATH="$LOCK_PATH/pid" # process ID of the lock holder
+}
+
+init_macos_paths() {
+    if [ "$ACCESS" = 'local' ]; then
+        readonly STATE_DIR="$HOME/.local/share/gitpack"
+        readonly CACHE_DIR="$HOME/Library/Caches/gitpack"
+    else
+        readonly STATE_DIR=/var/lib/gitpack
+        readonly CACHE_DIR=/Library/Caches/gitpack
+    fi
+    readonly LOCK_DIR=/tmp # unified storage for locks
+}
+
+init_linux_paths() {
+    if [ "$ACCESS" = 'local' ]; then # respect XDG
+        readonly STATE_DIR="$HOME/.local/share/gitpack"
+        readonly CACHE_DIR="$HOME/.cache/gitpack"
+    else # respect FHS
+        readonly STATE_DIR=/var/lib/gitpack
+        readonly CACHE_DIR=/var/cache/gitpack
+    fi
+    readonly LOCK_DIR=/var/lock
+}
 
 #-------------------------------------------------------------------------------
 # ACTION PROCESSING

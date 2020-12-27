@@ -32,7 +32,7 @@ run_test() (
 )
 
 #-------------------------------------------------------------------------------
-# INITIALIZE VARIABLES
+# INITIALIZE CONSTANTS
 #-------------------------------------------------------------------------------
 
 export HASH="${GITHUB_SHA:?}" && # current commit hash
@@ -51,7 +51,26 @@ export EXTRA_URL=github.com/dominiksalvet/sandbox && # needed in some tests
 export EXTRA_VERSION=beforecommit && # use this and only this version
 
 #-------------------------------------------------------------------------------
-# INITIALIZE FILES
+# FILE PATHS
+#-------------------------------------------------------------------------------
+
+system="$(uname)" &&
+if [ "$system" = Darwin ]; then
+    export LOCAL_STATE_DIR="$HOME/.local/share/gitpack"
+    export GLOBAL_STATE_DIR=/var/lib/gitpack
+    export LOCAL_CACHE_DIR="$HOME/Library/Caches/gitpack"
+    export GLOBAL_CACHE_DIR=/Library/Caches/gitpack
+    export LOCK_DIR=/tmp
+else
+    export LOCAL_STATE_DIR="$HOME/.local/share/gitpack"
+    export GLOBAL_STATE_DIR=/var/lib/gitpack
+    export LOCAL_CACHE_DIR="$HOME/.cache/gitpack"
+    export GLOBAL_CACHE_DIR=/var/cache/gitpack
+    export LOCK_DIR=/var/lock
+fi &&
+
+#-------------------------------------------------------------------------------
+# EXECUTION TRACING
 #-------------------------------------------------------------------------------
 
 readonly TRACE_DIR=gitpack-trace && # trace artifacts storage

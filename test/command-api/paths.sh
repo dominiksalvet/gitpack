@@ -8,13 +8,13 @@
 # local paths
 user_id="$(id -u)"
 out1="$($GITPACK paths)"
-test "$out1" = "state-dir $HOME/.local/share/gitpack
-cache-dir $HOME/.cache/gitpack
-lock-path /var/lock/gitpack-$user_id"
+test "$out1" = "state-dir $LOCAL_STATE_DIR
+cache-dir $LOCAL_CACHE_DIR
+lock-path $LOCK_DIR/gitpack-$user_id"
 
 # global paths
 root_id="$(sudo id -u)"
 out2="$($SUDO_GITPACK paths)"
-test "$out2" = "state-dir /var/lib/gitpack
-cache-dir /var/cache/gitpack
-lock-path /var/lock/gitpack-$root_id"
+test "$out2" = "state-dir $GLOBAL_STATE_DIR
+cache-dir $GLOBAL_CACHE_DIR
+lock-path $LOCK_DIR/gitpack-$root_id"

@@ -5,12 +5,12 @@
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-test -e "$HOME/.local/share/gitpack/status" # must exist
-test ! -s "$HOME/.local/share/gitpack/status" # must be empty
-rm "$HOME/.local/share/gitpack/status"
-rmdir "$HOME/.local/share/gitpack/"
+test -e "$LOCAL_STATE_DIR/status" # must exist
+test ! -s "$LOCAL_STATE_DIR/status" # must be empty
+rm "$LOCAL_STATE_DIR/status"
+rmdir "$LOCAL_STATE_DIR/"
 
-sudo test -e /var/lib/gitpack/status
-sudo test ! -s /var/lib/gitpack/status
-sudo rm /var/lib/gitpack/status
-sudo rmdir /var/lib/gitpack/
+sudo test -e "$GLOBAL_STATE_DIR/status"
+sudo test ! -s "$GLOBAL_STATE_DIR/status"
+sudo rm "$GLOBAL_STATE_DIR/status"
+sudo rmdir "$GLOBAL_STATE_DIR/"

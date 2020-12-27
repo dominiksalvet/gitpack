@@ -33,6 +33,7 @@ The changes not yet present in any release are listed in this section.
 * All options have been moved to right after `gitpack` command, not per action/command basis.
 * If more than one `=` is used in `URL=VERSION` argument, `URL` contains additional `=` rather than `VERSION`.
 * Bash tab completion considers previous arguments and dynamically generates hints.
+* When running on macOS, more predictable file paths are used.
 
 ### Fixed
 
