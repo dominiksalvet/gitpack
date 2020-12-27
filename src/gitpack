@@ -239,12 +239,12 @@ init_env() {
 init_paths() {
     if [ "$ACCESS" = global ]; then # respect FHS
         readonly STATE_DIR=/var/lib/gitpack
-        readonly CACHE_DIR=/Library/Caches/gitpack
+        readonly CACHE_DIR=/var/cache/gitpack
     else # respect XDG
         readonly STATE_DIR="$HOME"/.local/share/gitpack
-        readonly CACHE_DIR="$HOME"/Library/Caches/gitpack
+        readonly CACHE_DIR="$HOME"/.cache/gitpack
     fi
-    readonly LOCK_DIR=/tmp # unified storage of locks
+    readonly LOCK_DIR=/var/lock # unified storage of locks
 
     readonly STATUS_PATH="$STATE_DIR"/status # database of installed packages
     readonly REPOS_DIR="$CACHE_DIR"/repos # cache for local repositories
