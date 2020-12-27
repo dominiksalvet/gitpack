@@ -115,7 +115,7 @@ process_opts() {
 # $1 - action
 # $@ - action arguments
 process_action_args() (
-    action="$1" &&
+    action="$1"
     shift && # shift to URL arguments
 
     if [ "$#" -eq 0 ]; then
@@ -293,7 +293,7 @@ exit_action() (
 # $1 - action
 # $2 - URL argument
 perform_action() (
-    echo ">>> running $1 for $2" &&
+    echo ">>> running $1 for $2"
     url="$(url_arg_to_url "$2")" &&
     version="$(url_arg_to_version "$2")" && # may be empty
     check_url "$url" &&
@@ -552,7 +552,7 @@ get_uninstall_script() {
 
 # $1 - script path
 run_script() (
-    echo "running script $1" >&2 &&
+    echo "running script $1" >&2
     "$1" 1>&2 && return # return if success, stdout considered diagnostic output
 
     script_status="$?"
@@ -567,14 +567,14 @@ run_script() (
 
 # $1 - URL
 get_status_record() {
-    echo 'reading status database' >&2 &&
+    echo 'reading status database' >&2
     db_select_first "$STATUS_PATH" "$STATUS_COL_URL" "$1"
 }
 
 # $1 - URL
 # $2 - hash
 insert_status_record() {
-    echo 'adding to status database' >&2 &&
+    echo 'adding to status database' >&2
     cp "$STATUS_PATH" "$STATUS_PATH.tmp" &&
     echo "$1 $2" >> "$STATUS_PATH.tmp" &&
     mv "$STATUS_PATH.tmp" "$STATUS_PATH" # should be signal-safe
@@ -582,7 +582,7 @@ insert_status_record() {
 
 # $1 - URL
 delete_status_records() (
-    echo 'removing from status database' >&2 &&
+    echo 'removing from status database' >&2
     db="$(db_select_except "$STATUS_PATH" "$STATUS_COL_URL" "$1")" &&
     echon "$db" > "$STATUS_PATH.tmp" &&
     mv "$STATUS_PATH.tmp" "$STATUS_PATH"
