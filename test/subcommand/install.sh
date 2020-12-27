@@ -9,11 +9,11 @@
 
 # local installation
 out1="$($GITPACK install "$URL=$OLD_VERSION")" # API already tested
-test -d "$HOME"/.local/bin/
-test -f "$HOME"/.local/bin/gitpack
-test -x "$HOME"/.local/bin/gitpack
-test -d "$HOME"/.bash_completion.d/
-test -f "$HOME"/.bash_completion.d/gitpack-completion
+test -d "$HOME/.local/bin/"
+test -f "$HOME/.local/bin/gitpack"
+test -x "$HOME/.local/bin/gitpack"
+test -d "$HOME/.bash_completion.d/"
+test -f "$HOME/.bash_completion.d/gitpack-completion"
 out2="$($GITPACK uninstall "$URL")"
 
 # global installation

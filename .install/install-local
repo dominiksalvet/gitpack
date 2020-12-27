@@ -5,22 +5,22 @@
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-if [ ! -e "$HOME"/.bash_completion ]; then
+if [ ! -e "$HOME/.bash_completion" ]; then
     echo 'initializing tab completion' &&
-    cp .install/.bash_completion "$HOME"/
+    cp .install/.bash_completion "$HOME/"
 fi &&
 
 echo 'copying files' &&
-if ! [ -d "$HOME"/.local/bin/ ]; then
+if ! [ -d "$HOME/.local/bin/" ]; then
     first_local_bin=true
 else
     first_local_bin=false
 fi &&
 
-mkdir -p "$HOME"/.local/bin/ &&
-mkdir -p "$HOME"/.bash_completion.d/ &&
-cp src/gitpack "$HOME"/.local/bin/ &&
-cp src/bash/gitpack-completion "$HOME"/.bash_completion.d/ &&
+mkdir -p "$HOME/.local/bin/" &&
+mkdir -p "$HOME/.bash_completion.d/" &&
+cp src/gitpack "$HOME/.local/bin/" &&
+cp src/bash/gitpack-completion "$HOME/.bash_completion.d/" &&
 
 if [ "$first_local_bin" = true ]; then
     echo 'first local installation; computer reboot may be required'

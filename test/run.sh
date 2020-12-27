@@ -23,11 +23,11 @@ run_test() (
         echo 'recent trace (more in artifacts):' &&
         echo "$test_trace" | tail -n 20 && # recent trace
         echo "failed $1" &&
-        echo "$test_trace" > "$TRACE_DIR"/failed_"$test_name" &&
+        echo "$test_trace" > "$TRACE_DIR/failed_$test_name" &&
         return 1
     else
         echo "passed $1" &&
-        echo "$test_trace" > "$TRACE_DIR"/passed_"$test_name"
+        echo "$test_trace" > "$TRACE_DIR/passed_$test_name"
     fi
 )
 
@@ -55,7 +55,7 @@ export EXTRA_VERSION=beforecommit && # use this and only this version
 #-------------------------------------------------------------------------------
 
 readonly TRACE_DIR=gitpack-trace && # trace artifacts storage
-mkdir -p "$TRACE_DIR"/ &&
+mkdir -p "$TRACE_DIR/" &&
 
 #-------------------------------------------------------------------------------
 # RUN TESTS

@@ -64,7 +64,7 @@ init_config() {
 
     # map remote references to local ones
     readonly ORIGIN_HEAD=refs/remotes/origin/HEAD # remote HEAD reference path
-    readonly HEAD_REFSPEC=+HEAD:"$ORIGIN_HEAD" # default remote branch
+    readonly HEAD_REFSPEC="+HEAD:$ORIGIN_HEAD" # default remote branch
     readonly TAGS_REFSPEC='+refs/tags/*:refs/tags/*' # versions
     readonly HEADS_REFSPEC='+refs/heads/*:refs/heads/*' # branches
 
@@ -193,7 +193,7 @@ remove_dir() {
         test "$PWD" != "$HOME" && test "$real_path" != "$HOME"
     ) &&
 
-    rm -rf -- "${1:?}"/
+    rm -rf -- "${1:?}/"
 }
 
 #-------------------------------------------------------------------------------
@@ -227,7 +227,7 @@ init_env() {
     if [ "$USER_ID" -eq 0 ]; then
         readonly ACCESS=global
     else
-        readonly ACCESS=local
+        readonly ACCESS='local'
     fi &&
 
     SYSTEM="$(uname)" &&
@@ -254,9 +254,9 @@ init_paths() {
 }
 
 init_lock() {
-    mkdir -p "$LOCK_DIR"/ && # first create a directory for locks
+    mkdir -p "$LOCK_DIR/" && # first create a directory for locks
 
-    if mkdir "$LOCK_PATH"/ 2>/dev/null; then # acquire lock
+    if mkdir "$LOCK_PATH/" 2>/dev/null; then # acquire lock
         trap exit_action EXIT && # function to call on an exit
         trap exit HUP INT QUIT TERM && # call exit on these signals
         echo "$$" > "$LOCK_PID_PATH"
@@ -379,7 +379,7 @@ url_to_git_url() {
     if [ "$raw_url_mode" = true ]; then
         echo "$1"
     else
-        echo https://"$1".git
+        echo "https://$1.git"
     fi
 }
 
@@ -400,7 +400,7 @@ get_repo_hash() (
     else # use latest tag (preferred) or latest commit of default branch
         echo 'using automatic candidate version' >&2 &&
         ref="$(git describe --tags --abbrev=0 --always "$ORIGIN_HEAD")" &&
-        git rev-parse --verify "$ref"^0 # get commit hash
+        git rev-parse --verify "$ref^0" # get commit hash
     fi
 )
 
@@ -411,7 +411,7 @@ repo_cd() {
         echo 'E18: cannot change directory to an empty URL' >&2; return 1
     fi
 
-    cd "$(url_to_path "$1")"/ &&
+    cd "$(url_to_path "$1")/" &&
     if [ "$2" ]; then
         git checkout -qf "$2"
     fi
@@ -419,7 +419,7 @@ repo_cd() {
 
 # $1 - URL
 url_to_path() {
-    echo "$REPOS_DIR"/"$1" # assume it will not fail (just like any other echo)
+    echo "$REPOS_DIR/$1" # assume it will not fail (just like any other echo)
 }
 
 #-------------------------------------------------------------------------------
@@ -575,17 +575,17 @@ get_status_record() {
 # $2 - hash
 insert_status_record() {
     echo 'adding to status database' >&2 &&
-    cp "$STATUS_PATH" "$STATUS_PATH".tmp &&
-    echo "$1 $2" >> "$STATUS_PATH".tmp &&
-    mv "$STATUS_PATH".tmp "$STATUS_PATH" # should be signal-safe
+    cp "$STATUS_PATH" "$STATUS_PATH.tmp" &&
+    echo "$1 $2" >> "$STATUS_PATH.tmp" &&
+    mv "$STATUS_PATH.tmp" "$STATUS_PATH" # should be signal-safe
 }
 
 # $1 - URL
 delete_status_records() (
     echo 'removing from status database' >&2 &&
     db="$(db_select_except "$STATUS_PATH" "$STATUS_COL_URL" "$1")" &&
-    echon "$db" > "$STATUS_PATH".tmp &&
-    mv "$STATUS_PATH".tmp "$STATUS_PATH"
+    echon "$db" > "$STATUS_PATH.tmp" &&
+    mv "$STATUS_PATH.tmp" "$STATUS_PATH"
 )
 
 # $@ - echo arguments
@@ -623,8 +623,8 @@ mark_as_fetched_now() (
     current_time="$(get_current_time)" &&
     db="$(db_select_except "$FETCHED_PATH" "$FETCHED_COL_URL" "$1")" &&
     db="$(db_append_record "$db" "$1 $current_time")" &&
-    echo "$db" > "$FETCHED_PATH".tmp &&
-    mv "$FETCHED_PATH".tmp "$FETCHED_PATH"
+    echo "$db" > "$FETCHED_PATH.tmp" &&
+    mv "$FETCHED_PATH.tmp" "$FETCHED_PATH"
 )
 
 get_current_time() {
@@ -643,7 +643,7 @@ fetched_record_time() {
 # $1 - database path
 create_db() (
     db_dir="$(dirname -- "$1")" &&
-    mkdir -p -- "$db_dir"/ &&
+    mkdir -p -- "$db_dir/" &&
 
     if ! [ -e "$1" ]; then # if database does not exist
         touch -- "$1" # create it

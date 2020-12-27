@@ -10,11 +10,11 @@ out1="$($GITPACK -H install "$URL=$HASH")"
 test "$out1" = ">>> running install for $URL=$HASH
 <<< done; successfully installed"
 
-out2="$(sh -x "$HOME"/.local/bin/gitpack -H status "$URL=$HASH")"
+out2="$(sh -x "$HOME/.local/bin/gitpack" -H status "$URL=$HASH")"
 test "$out2" = ">>> running status for $URL=$HASH
 <<< candidate $HASH already installed"
 
-out3="$(sh -x "$HOME"/.local/bin/gitpack -H uninstall "$URL")"
+out3="$(sh -x "$HOME/.local/bin/gitpack" -H uninstall "$URL")"
 test "$out3" = ">>> running uninstall for $URL
 <<< done; successfully uninstalled"
 
