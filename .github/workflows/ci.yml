@@ -38,13 +38,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-20.04, macos-10.15, windows-2019]
-        shell: [sh, bash]
     runs-on: ${{matrix.os}}
     defaults:
       run:
-        shell: ${{matrix.shell}} {0}
-    env:
-      CUR_SHELL: ${{matrix.shell}}
+        shell: sh {0}
     steps:
     - name: Checkout commit
       uses: actions/checkout@v2
@@ -56,7 +53,7 @@ jobs:
       uses: actions/upload-artifact@v2
       if: always()
       with:
-        name: ${{matrix.os}}_${{matrix.shell}}_gitpack-trace
+        name: ${{matrix.os}}_gitpack-trace
         path: |
           gitpack-trace/failed_*
           gitpack-trace/passed_*
