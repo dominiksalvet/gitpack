@@ -39,9 +39,6 @@ jobs:
       matrix:
         os: [ubuntu-20.04, macos-10.15, windows-2019]
         shell: [sh, bash]
-        exclude:
-        - os: windows-2019
-          shell: sh
     runs-on: ${{matrix.os}}
     defaults:
       run:
@@ -57,7 +54,7 @@ jobs:
       uses: actions/upload-artifact@v2
       if: always()
       with:
-        name: ${{matrix.os}}-gitpack-trace
+        name: ${{matrix.os}}_${{matrix.shell}}_gitpack-trace
         path: |
           gitpack-trace/failed_*
           gitpack-trace/passed_*
