@@ -42,7 +42,7 @@ jobs:
     runs-on: ${{matrix.os}}
     defaults:
       run:
-        shell: ${{matrix.shell}}
+        shell: ${{matrix.shell}} {0}
     steps:
     - name: Checkout commit
       uses: actions/checkout@v2
