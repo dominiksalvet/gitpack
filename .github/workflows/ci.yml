@@ -38,10 +38,14 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-20.04, macos-10.15, windows-2019]
+        shell: [sh, bash]
+        exclude:
+        - os: windows-2019
+          shell: sh
+    runs-on: ${{matrix.os}}
     defaults:
       run:
-        shell: bash
-    runs-on: ${{matrix.os}}
+        shell: ${{matrix.shell}}
     steps:
     - name: Checkout commit
       uses: actions/checkout@v2
