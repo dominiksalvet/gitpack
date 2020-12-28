@@ -13,8 +13,10 @@ out2="$($GITPACK uninstall "$URL")"
 test ! -e "$HOME/.local/bin/gitpack"
 test ! -e "$HOME/.bash_completion.d/gitpack-completion"
 
-# global uninstallation
-out3="$($SUDO_GITPACK install "$URL=$OLD_VERSION")"
-out4="$($SUDO_GITPACK uninstall "$URL")"
-test ! -e /usr/local/bin/gitpack
-test ! -e /etc/bash_completion.d/gitpack-completion
+if [ "$USE_SUDO" = true ]; then
+    # global uninstallation
+    out3="$($SUDO_GITPACK install "$URL=$OLD_VERSION")"
+    out4="$($SUDO_GITPACK uninstall "$URL")"
+    sudo test ! -e /usr/local/bin/gitpack
+    sudo test ! -e /etc/bash_completion.d/gitpack-completion
+fi

@@ -42,6 +42,8 @@ jobs:
     defaults:
       run:
         shell: sh {0}
+    env:
+      MATRIX_OS: ${{matrix.os}}
     steps:
     - name: Checkout commit
       uses: actions/checkout@v2

@@ -50,6 +50,11 @@ export OLD_VERSION=ci-old-version &&
 export EXTRA_URL=github.com/dominiksalvet/sandbox && # needed in some tests
 export EXTRA_VERSION=beforecommit && # use this and only this version
 
+case "${MATRIX_OS:?}" in
+    windows-*) export HAS_SUDO=false ;;
+    *) export HAS_SUDO=true ;;
+esac &&
+
 #-------------------------------------------------------------------------------
 # FILE PATHS
 #-------------------------------------------------------------------------------

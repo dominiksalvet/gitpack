@@ -10,5 +10,7 @@
 out1="$($GITPACK clean)" # it must delete cache
 test ! -e "$LOCAL_CACHE_DIR"
 
-out2="$($SUDO_GITPACK clean)"
-test ! -e "$GLOBAL_CACHE_DIR"
+if [ "$USE_SUDO" = true ]; then
+    out2="$($SUDO_GITPACK clean)"
+    sudo test ! -e "$GLOBAL_CACHE_DIR"
+fi

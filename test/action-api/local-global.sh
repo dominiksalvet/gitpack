@@ -5,6 +5,11 @@
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
+# no meaning to run without sudo
+if [ "$USE_SUDO" = false ]; then
+    exit
+fi
+
 # local before global (FIFO)
 out1="$($GITPACK install "$URL")"
 test "$out1" = ">>> running install for $URL

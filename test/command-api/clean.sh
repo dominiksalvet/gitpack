@@ -12,9 +12,11 @@ test ! "$out1" # must be empty
 out2="$($GITPACK clean)"
 test ! "$out2"
 
-# clean global cache
-out3="$($SUDO_GITPACK clean)"
-test ! "$out3"
+if [ "$USE_SUDO" = true ]; then
+    # clean global cache
+    out3="$($SUDO_GITPACK clean)"
+    test ! "$out3"
 
-out4="$($SUDO_GITPACK clean)"
-test ! "$out4"
+    out4="$($SUDO_GITPACK clean)"
+    test ! "$out4"
+fi
