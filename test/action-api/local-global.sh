@@ -10,7 +10,7 @@ out1="$($GITPACK install "$URL")"
 test "$out1" = ">>> running install for $URL
 <<< done; successfully installed"
 
-out2="$($SUDO_GITPACK install "$URL")" # must not be already installed
+out2="$(su -c "$GITPACK install $URL")" # must not be already installed
 test "$out2" = ">>> running install for $URL
 <<< done; successfully installed"
 
