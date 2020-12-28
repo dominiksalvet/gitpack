@@ -51,8 +51,8 @@ export EXTRA_URL=github.com/dominiksalvet/sandbox && # needed in some tests
 export EXTRA_VERSION=beforecommit && # use this and only this version
 
 case "${MATRIX_OS:?}" in
-    windows-*) export HAS_SUDO=false ;;
-    *) export HAS_SUDO=true ;;
+    windows-*) export USE_SUDO=false ;;
+    *) export USE_SUDO=true ;;
 esac &&
 
 #-------------------------------------------------------------------------------
