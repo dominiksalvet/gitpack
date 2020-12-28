@@ -227,7 +227,7 @@ init_env() {
     if [ "$USER_ID" -eq 0 ]; then
         readonly ACCESS=global
     else
-        readonly ACCESS='local'
+        readonly ACCESS=local
     fi &&
 
     SYSTEM="$(uname)" &&
@@ -290,7 +290,7 @@ init_paths() {
 }
 
 init_macos_paths() {
-    if [ "$ACCESS" = 'local' ]; then
+    if [ "$ACCESS" = local ]; then
         readonly STATE_DIR="$HOME/.local/share/gitpack"
         readonly CACHE_DIR="$HOME/Library/Caches/gitpack"
     else
@@ -301,7 +301,7 @@ init_macos_paths() {
 }
 
 init_linux_paths() {
-    if [ "$ACCESS" = 'local' ]; then # respect XDG
+    if [ "$ACCESS" = local ]; then # respect XDG
         readonly STATE_DIR="$HOME/.local/share/gitpack"
         readonly CACHE_DIR="$HOME/.cache/gitpack"
     else # respect FHS
