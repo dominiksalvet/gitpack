@@ -19,7 +19,7 @@ run_test() (
     test_name="$(echo "$1" | sed 's|/|_|g; s/\.sh$//')" && # derive test name
 
     # run test and store its execution trace
-    if ! test_trace="$("$SHELL" -eux "$1" 2>&1)"; then
+    if ! test_trace="$("$CUR_SHELL" -eux "$1" 2>&1)"; then
         echo 'recent trace (more in artifacts):' &&
         echo "$test_trace" | tail -n 20 && # recent trace
         echo "failed $1" &&
@@ -39,8 +39,8 @@ export HASH="${GITHUB_SHA:?}" && # current commit hash
 SHORT_HASH="$(echo "$HASH" | cut -c 1-7)" &&
 export SHORT_HASH &&
 
-export GITPACK="$SHELL -x src/gitpack" && # GitPack is run with tracing enabled
-export SUDO_GITPACK="sudo $SHELL -x src/gitpack" && # root permissions
+export GITPACK="${CUR_SHELL:?} -x src/gitpack" && # GitPack with tracing enabled
+export SUDO_GITPACK="sudo $CUR_SHELL -x src/gitpack" && # root permissions
 export URL=github.com/dominiksalvet/gitpack &&
 export VERSION=ci-version && # latest GitPack version
 export VERSION_HASH=b2842a2affe769f2aeb1c03bba2a299eb2959ea7 &&

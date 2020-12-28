@@ -43,6 +43,8 @@ jobs:
     defaults:
       run:
         shell: ${{matrix.shell}} {0}
+    env:
+      CUR_SHELL: ${{matrix.shell}}
     steps:
     - name: Checkout commit
       uses: actions/checkout@v2
