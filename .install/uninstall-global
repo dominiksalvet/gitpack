@@ -5,6 +5,6 @@
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-echo 'removing files' &&
-rm -f /usr/local/bin/gitpack &&
-rm -f /etc/bash_completion.d/gitpack-completion
+echo 'removing files'
+rm -f /usr/local/bin/gitpack \
+      /etc/bash_completion.d/gitpack-completion
