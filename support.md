@@ -3,6 +3,6 @@
 If you are looking for support for GitPack, you can try following options:
 
 * Make sure you have read the contents of [readme.md](readme.md) file.
-* Visit our [community-driven wiki](https://github.com/dominiksalvet/gitpack/wiki).
-* Visit [issues](https://github.com/dominiksalvet/gitpack/issues) and search whether someone had the same problem.
-* To ask a new question, create a [fresh issue](https://github.com/dominiksalvet/gitpack/issues/new/choose). Choose the question issue type.
+* Have a look at our [community-driven wiki](https://github.com/dominiksalvet/gitpack/wiki).
+* Visit our [discussions](https://github.com/dominiksalvet/gitpack/discussions) and feel free to get involved.
+* You may search [issues](https://github.com/dominiksalvet/gitpack/issues) whether someone reported the same problem.
