@@ -1,0 +1,9 @@
+#-------------------------------------------------------------------------------
+# Copyright 2021 Dominik Salvet
+# https://github.com/dominiksalvet/gitpack
+#-------------------------------------------------------------------------------
+
+contact_links:
+- name: Discussions
+  url: https://github.com/dominiksalvet/gitpack/discussions
+  about: Please ask and answer questions here
