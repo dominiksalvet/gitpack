@@ -1,146 +1,38 @@
-GitPack is going to go through [significant changes](https://github.com/dominiksalvet/gitpack/projects/1) in the future. **My [GitPack projects](https://github.com/topics/gitpack) are and will be compatible.**
-
----
-
 # GitPack
 
-<p align="center">
-    <img src="img/gitpack.png" alt="GitPack logo" height="200">
-</p>
+`TODO: GitPack example`
 
-<p align="center">
-    <a href="https://github.com/dominiksalvet/gitpack/actions">
-        <img src="https://github.com/dominiksalvet/gitpack/workflows/CI/badge.svg" alt="CI status"></a>
-    <a href="https://github.com/dominiksalvet/gitpack">
-        <img src="https://img.shields.io/badge/-GitPack-571997" alt="GitPack"></a>
-    <a href="https://github.com/RichardLitt/standard-readme">
-        <img src="https://img.shields.io/badge/readme_style-standard-brightgreen" alt="standard-readme compliant"></a>
-    <a href="https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html">
-        <img src="https://img.shields.io/badge/POSIX-Shell-111111" alt="POSIX Shell"></a>
-</p>
+[![CI status](https://github.com/dominiksalvet/gitpack/workflows/CI/badge.svg)](https://github.com/dominiksalvet/gitpack/actions)
+[![GitPack](https://img.shields.io/badge/-GitPack-571997)](https://github.com/dominiksalvet/gitpack)
+[![POSIX Shell](https://img.shields.io/badge/POSIX-Shell-111111)](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html)
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fdominiksalvet%2Fgitpack&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 
 > Simple Git-based package manager.
 
-Wouldn't it be great to **install and update** your favorite Git projects like this?
+GitPack stands on a simple idea – a Git repository is a package, its URL is the package name. Based on that it is possible to **install/update** your favorite Git projects as shown:
 
 ```
 gitpack install <url>
 ```
 
-And when they are no longer needed, **uninstall** them that way?
+And when they are no longer needed, **uninstall** them that way:
 
 ```
 gitpack uninstall <url>
 ```
 
-If you are in, then GitPack comes in pretty handy. All you need is a URL of a compatible Git project.
+GitPack not only saves time for end users to figure out how to install a Git project, but it also **unifies the project development and distribution** in a convenient place; its Git repository.
 
----
-
-**Are you a developer?** Do you like the idea stated above? Then keep reading in the [Developer](#developer) section.
-
-> Do you want to support this awesome project? **Then spread the word!**
+> Do you want to try GitPack in your project? The [Developer](#developer) section will help you get started.
 
 ## Table of Contents
 
-* [Install](#install)
-  * [Dependencies](#dependencies)
-* [Usage](#usage)
-  * [Example](#example)
-* [Developer](#developer)
-  * [Badge](#badge)
-* [Questions](#questions)
-* [Contributing](#contributing)
-* [License](#license)
+`TODO: content`
 
 ## Install
 
-**Global** (system) installation:
-
-```sh
-mkdir -p /tmp/gitpack/ && cd /tmp/gitpack/ && # prepare a temporary directory
-git clone https://github.com/dominiksalvet/gitpack.git ./ && # clone repository
-git checkout 0.7.0 && # use latest stable version
-sudo src/gitpack install github.com/dominiksalvet/gitpack=0.7.0 # install GitPack
-```
-
-**Local** (user) installation:
-
-```sh
-mkdir -p /tmp/gitpack/ && cd /tmp/gitpack/ && # prepare a temporary directory
-git clone https://github.com/dominiksalvet/gitpack.git ./ && # clone repository
-git checkout 0.7.0 && # use latest stable version
-src/gitpack install github.com/dominiksalvet/gitpack=0.7.0 # install GitPack
-```
+`TODO: simplify installation`
 
 ### Dependencies
 
 * **Git** software
-
-## Usage
-
-**Install or update** a Git project:
-
-```
-gitpack install <url>
-```
-
-**Uninstall** a Git project:
-
-```
-gitpack uninstall <url>
-```
-
-Show **status** of a Git project:
-
-```
-gitpack status <url>
-```
-
-> Your favorite project is not compatible? Then encourage its developers to take a look at the [Developer](#developer) section below.
-
-### Example
-
-<p align="center">
-    <img src="img/example.png" alt="GitPack example">
-</p>
-
-As demonstrated, GitPack works with either global or local installations based on whether it is run with root permissions.
-
-## Developer
-
-Why should you use GitPack in your projects?
-
-* Simple by design
-* Language-independent
-* Runs on Linux, macOS and Windows (WSL)
-* Shell environment and Git is all you need
-* Global and local installations
-* Delta updates
-* POSIX-friendly
-
-How? The [guide.md](guide.md) file will show you the way. Then users can **immediately use GitPack to install your projects**.
-
-### Badge
-
-GitPack projects work best with the following sleek badge:
-
-[![GitPack](https://img.shields.io/badge/-GitPack-571997)](https://github.com/dominiksalvet/gitpack)
-
-Markdown:
-
-```markdown
-[![GitPack](https://img.shields.io/badge/-GitPack-571997)](https://github.com/dominiksalvet/gitpack)
-```
-
-## Questions
-
-If you have any questions, you can find out how to get them answered in [support.md](support.md) file.
-
-## Contributing
-
-Do you want to contribute somehow? Then [contributing.md](contributing.md) file is here for you.
-
-## License
-
-GitPack is licensed under the [MIT License](license).
