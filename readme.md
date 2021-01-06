@@ -27,11 +27,25 @@ GitPack not only saves time for end users to figure out how to install a Git pro
 
 ## Table of Contents
 
-`TODO: content`
+* [Install](#install)
+  * [Dependencies](#dependencies)
+* [Usage](#usage)
 
 ## Install
 
-`TODO: simplify installation`
+**Local** (user) installation:
+
+```sh
+wget -qO- https://raw.githubusercontent.com/dominiksalvet/gitpack/master/.install/wgetl.sh | sh
+```
+
+**Global** (system) installation:
+
+```sh
+wget -qO- https://raw.githubusercontent.com/dominiksalvet/gitpack/master/.install/wgetg.sh | sh
+```
+
+> With the help of the above scripts, GitPack actually installs itself. If you do not have `wget`, copy-paste the contents of one of the above URLs into a terminal emulator and execute it. That will work too.
 
 ### Dependencies
 
