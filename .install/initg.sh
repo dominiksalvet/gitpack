@@ -5,10 +5,10 @@
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-echo 'installing GitPack locally'
+echo 'installing GitPack globally' &&
 
 # prepare a temporary directory for the user
-user_id="$(id -u)" &&
+user_id="$(sudo id -u)" &&
 mkdir -p /tmp/first-gitpack/ &&
 mkdir "/tmp/first-gitpack/$user_id/" && # mutual exclusion (until reboot)
 cd "/tmp/first-gitpack/$user_id/" &&
@@ -19,6 +19,6 @@ latest_version="$(git describe --tags --abbrev=0)" &&
 git checkout -q "$latest_version" &&
 
 # install GitPack using GitPack
-src/gitpack install github.com/dominiksalvet/gitpack &&
+sudo src/gitpack install github.com/dominiksalvet/gitpack &&
 
 echo 'success'
