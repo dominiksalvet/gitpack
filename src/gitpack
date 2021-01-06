@@ -181,13 +181,13 @@ beautify_hash() {
 remove_dir() {
     if ! [ "$1" ]; then
         echo 'E16: cannot remove directory with empty path' >&2; return 1
-    elif ! [ -d "$1"/ ]; then
+    elif ! [ -d "$1/" ]; then
         return # already removed, success
     fi
 
     echo "removing directory $1" >&2 &&
     # do not remove any important directory
-    (   cd -- "$1"/ && real_path="$(pwd -P)" &&
+    (   cd -- "$1/" && real_path="$(pwd -P)" &&
         test "$PWD" != / && test "$real_path" != / &&
         test "$PWD" != // && test "$real_path" != // &&
         test "$PWD" != "$HOME" && test "$real_path" != "$HOME"
@@ -380,8 +380,8 @@ init_repo() {
 # $1 - URL
 # $2 - repository directory
 fetch_repo() (
-    mkdir -p -- "$2"/ && # make sure directory for repository is created
-    cd -- "$2"/ &&
+    mkdir -p -- "$2/" && # make sure directory for repository is created
+    cd -- "$2/" &&
 
     if [ -d .git/ ]; then # current directory is repository
         echo 'updating local repository' >&2
