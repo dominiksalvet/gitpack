@@ -53,7 +53,7 @@ wget -qO- https://raw.githubusercontent.com/dominiksalvet/gitpack/master/.instal
 
 ## Usage
 
-If GitPack is run with root permissions (e.g., using `sudo`), it will use global access and perform global installations. Otherwise, a local approach will be used.
+If GitPack is run with root permissions (e.g., using `sudo`), it will use global access and perform global installations. Otherwise, a local approach for the current user will be used.
 
 Install/update to the **latest version**:
 
