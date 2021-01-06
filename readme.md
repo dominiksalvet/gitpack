@@ -67,7 +67,7 @@ Install/update/downgrade to a **particular version**:
 gitpack install <url>=<version>
 ```
 
-> The `<version>` is any Git revision (tag, branch, hash).
+> The `<version>` is any Git revision (tag name, branch name, commit hash).
 
 **Uninstall** (version is detected automatically):
 
