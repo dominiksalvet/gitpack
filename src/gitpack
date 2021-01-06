@@ -386,7 +386,7 @@ fetch_repo() (
     if [ -d .git/ ]; then # current directory is repository
         echo 'updating local repository' >&2
     else # initialize and configure repository
-        echo 'downloading local repository' >&2 &&
+        echo 'downloading repository' >&2 &&
         git init -q &&
         git config gc.auto 0 && # disable garbage collector
         git config remote.origin.fetch "$HEAD_REFSPEC" &&
