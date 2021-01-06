@@ -45,9 +45,9 @@ wget -qO- https://raw.githubusercontent.com/dominiksalvet/gitpack/master/.instal
 wget -qO- https://raw.githubusercontent.com/dominiksalvet/gitpack/master/.install/initg.sh | sh
 ```
 
-> With the help of the above scripts, **GitPack actually installs itself**. If you do not have `wget`, copy-paste the contents of one of the above URLs into a terminal emulator and execute it. That will work too.
+> With the help of the mentioned scripts, **GitPack actually installs itself**. If you do not have `wget`, copy-paste the source code of one of the above scripts into a shell terminal and execute it. That will work too.
 
-Once GitPack is installed, it may be managed (e.g., updated) using GitPack itself.
+Once installed, you will use GitPack to manage (e.g., update) even itself.
 
 ### Dependencies
 
