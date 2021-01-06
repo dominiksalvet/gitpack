@@ -36,3 +36,39 @@ GitPack not only saves time for end users to figure out how to install a Git pro
 ### Dependencies
 
 * **Git** software
+
+## Usage
+
+If GitPack is run with root permissions (e.g., using `sudo`), it will use global access and perform global installations. Otherwise, a local approach will be used.
+
+Install/update to the **latest version**:
+
+```
+gitpack install <url>
+```
+
+Install/update/downgrade to a **particular version**:
+
+```
+gitpack install <url>=<version>
+```
+
+> The `<version>` is any Git revision (tag, branch, hash).
+
+**Uninstall** (version is detected automatically):
+
+```
+gitpack uninstall <url>
+```
+
+**Show the status** of a project:
+
+```
+gitpack status <url>
+```
+
+**List all installed** projects:
+
+```
+gitpack list
+```
