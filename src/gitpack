@@ -653,7 +653,7 @@ fetched_recently() (
     record="$(db_select_first "$FETCHED_PATH" "$FETCHED_COL_URL" "$1")" &&
     record_time="$(fetched_record_time "$record")" &&
     test "$record_time" = "$current_time"
-) 2>/dev/null
+)
 
 # $1 - URL
 mark_as_fetched_now() (
