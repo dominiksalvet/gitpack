@@ -326,6 +326,7 @@ perform_action() (
     init_repo "$url" &&
     record="$(get_status_record "$url")" && # get package local information
     src_hash="$(status_record_hash "$record")" &&
+    check_src_hash "$url" "$src_hash" && # hash must exist
     tar_hash="$(get_repo_hash "$url" "$version")" &&
 
     case "$1" in
@@ -362,6 +363,17 @@ check_url() (
         echo 'E6: unsupported URL delivered' >&2; return 1
     fi
 )
+
+# $1 - URL
+# $2 - source hash (optional)
+check_src_hash() {
+    if [ "$2" ]; then ( # source hash does not have to exist
+        repo_cd "$1" &&
+        if ! git rev-parse -q --verify "$2^0" > /dev/null; then
+            echo 'E20: commit of installed version does not exist' >&2; return 1
+        fi
+    ) fi
+}
 
 #-------------------------------------------------------------------------------
 # REPOSITORY
