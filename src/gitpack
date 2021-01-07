@@ -36,7 +36,7 @@ ACTION:   install    install/update package
           status     get package status
 
 COMMAND:  list   list installed packages
-          clean  clean cache
+          clean  remove cache
           paths  show file paths
           help   show help
           about  show information
@@ -265,7 +265,9 @@ init_status_db() {
 
 init_fetched_db() {
     create_db "$FETCHED_PATH" &&
-    check_db "$FETCHED_PATH" "$FETCHED_PATTERN"
+    if ! check_db "$FETCHED_PATH" "$FETCHED_PATTERN"; then
+        echo "try 'gitpack clean' to remove cache" >&2; return 1
+    fi
 }
 
 #-------------------------------------------------------------------------------
