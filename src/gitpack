@@ -419,7 +419,7 @@ get_repo_hash() (
     if [ "$2" ]; then
         echo 'using custom candidate version' >&2 &&
         # print the commit hash of the version if it is a valid Git reference
-        if ! git rev-parse -q --verify "$2"^0; then
+        if ! git rev-parse -q --verify "$2^0"; then
             echo "E8: repository does not have version $2" >&2; return 1
         fi
     else # use latest tag (preferred) or latest commit of default branch
