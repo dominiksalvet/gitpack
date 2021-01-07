@@ -41,10 +41,9 @@ COMMAND:  list   list installed packages
           help   show help
           about  show information
 
-OPTION:   -h  show short version hashes
-          -H  show full version hashes
-          -f  always fetch remote updates
-          -r  raw URL mode; use with caution'
+OPTION:   -h/-H  show short/full version hashes
+          -f     always fetch remote updates
+          -r     raw URL mode; use with caution'
 
     readonly ABOUT_MESSAGE="GitPack $VERSION
 Simple Git-based package manager.
