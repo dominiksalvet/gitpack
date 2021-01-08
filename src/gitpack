@@ -42,7 +42,7 @@ COMMAND:  list   list installed packages
           about  show information
 
 OPTION:   -h/-H  show short/full version hashes
-          -f     always fetch remote updates
+          -f/-n  always/never fetch from remote
           -r     raw URL mode; use with caution'
 
     readonly ABOUT_MESSAGE="GitPack $VERSION
@@ -75,7 +75,7 @@ init_config() {
 init_opts() {
     # global variables
     hash_mode= # short, full
-    fetch_always_mode=false
+    fetch_mode= # always, never
     raw_url_mode=false
 }
 
@@ -100,11 +100,12 @@ process_args() (
 
 # $@ - GitPack options
 process_opts() {
-    while getopts :hHfr _opt; do
+    while getopts :hHfnr _opt; do
         case "$_opt" in
             h) hash_mode=short ;;
             H) hash_mode=full ;;
-            f) fetch_always_mode=true ;;
+            f) fetch_mode=always ;;
+            n) fetch_mode=never ;;
             r) raw_url_mode=true ;;
             ?) echoh "E13: invalid option -$OPTARG" >&2; return 1 ;;
         esac || return
@@ -382,10 +383,16 @@ check_src_hash() {
 
 # $1 - URL
 init_repo() {
-    if [ "$fetch_always_mode" = false ] && fetched_recently "$1"; then
+    if [ "$fetch_mode" = never ]; then
+        if ! [ -d "$(url_to_repo_path "$1")/.git/" ]; then
+            echo 'E21: fetch disabled; cannot download repository' >&2
+            echo "try running without '-n' option" >&2
+            return 1
+        fi
+    elif ! [ "$fetch_mode" ] && fetched_recently "$1"; then
         echo 'local repository fresh' >&2
     else
-        fetch_repo "$1" "$(url_to_path "$1")" &&
+        fetch_repo "$1" "$(url_to_repo_path "$1")" &&
         mark_as_fetched_now "$1"
     fi
 }
@@ -449,14 +456,14 @@ repo_cd() {
         echo 'E18: cannot change directory to an empty URL' >&2; return 1
     fi
 
-    cd "$(url_to_path "$1")/" &&
+    cd "$(url_to_repo_path "$1")/" &&
     if [ "$2" ]; then
         git checkout -qf "$2"
     fi
 }
 
 # $1 - URL
-url_to_path() {
+url_to_repo_path() {
     echo "$REPOS_DIR/$1" # assume it will not fail (just like any other echo)
 }
 
