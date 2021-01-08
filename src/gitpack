@@ -574,7 +574,7 @@ get_install_script() {
     elif [ -x .install/install-"$ACCESS" ]; then
         echo .install/install-"$ACCESS"
     else
-        echo 'E9: missing installation script' >&2; return 1
+        echo "E9: missing script for $ACCESS installation" >&2; return 1
     fi
 }
 
@@ -584,7 +584,7 @@ get_uninstall_script() {
     elif [ -x .install/uninstall-"$ACCESS" ]; then
         echo .install/uninstall-"$ACCESS"
     else
-        echo 'E10: missing uninstallation script' >&2; return 1
+        echo "E10: missing script for $ACCESS uninstallation" >&2; return 1
     fi
 }
 
