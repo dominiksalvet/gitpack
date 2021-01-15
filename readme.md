@@ -63,6 +63,8 @@ Install/update to the **latest version**:
 gitpack install <url>
 ```
 
+> It uses the latest tag of the repository default branch.
+
 Install/update/downgrade to a **particular version**:
 
 ```
@@ -88,3 +90,5 @@ gitpack status <url>
 ```
 gitpack list
 ```
+
+Use `gitpack help` to **see more arguments**.
