@@ -92,3 +92,58 @@ gitpack list
 ```
 
 Use `gitpack help` to **see more arguments**.
+
+### Examples
+
+To better understand how GitPack works, there are some examples below.
+
+* Install a simple game with pathfinding locally (latest version):
+
+```
+$ gitpack install github.com/dominiksalvet/pathfinding-robots
+>>> running install for github.com/dominiksalvet/pathfinding-robots
+downloading repository
+reading status database
+using automatic candidate version
+installing version 1.1.0
+running script .install/install-local
+copying files
+adding to status database
+<<< done; successfully installed
+```
+
+* Use URL exactly as delivered (e.g., for SSH):
+
+```
+$ gitpack -r status git@github.com:dominiksalvet/vhdldep.git
+>>> running status for git@github.com:dominiksalvet/vhdldep.git
+downloading repository
+reading status database
+using automatic candidate version
+<<< not installed; candidate is 2.2.0
+```
+
+> The `-r` stands for raw URL mode, in which no HTTPS adjustments are done.
+
+* List globally installed projects (display full commit hashes):
+
+```
+$ sudo gitpack -H list
+github.com/dominiksalvet/gitpack 4ca05c10a9903251826a8d0addc25daf6808fffa
+github.com/dominiksalvet/asus-fan-control cb6be871cdbf4453d9072118194198d75dd0b380
+github.com/dominiksalvet/ux430ua-jack-volume 208f1a7bce8644482abdfa14107f90358a75bb1b
+```
+
+* GitPack uses different paths for local and global access:
+
+```
+$ gitpack paths
+state-dir /home/dominik/.local/share/gitpack
+cache-dir /home/dominik/.cache/gitpack
+lock-path /var/lock/gitpack-1000
+
+$ sudo gitpack paths
+state-dir /var/lib/gitpack
+cache-dir /var/cache/gitpack
+lock-path /var/lock/gitpack-0
+```
