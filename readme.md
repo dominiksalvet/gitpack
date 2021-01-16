@@ -31,6 +31,7 @@ GitPack not only saves time for end users to figure out how to install a Git pro
   * [Dependencies](#dependencies)
 * [Usage](#usage)
   * [Examples](#examples)
+* [Useful Resources](#useful-resources)
 
 ## Install
 
@@ -148,3 +149,9 @@ lock-path /var/lock/gitpack-0
 ```
 
 > Did you know that **GitPack has sleek tab completion** for Bash shells?
+
+## Useful Resources
+
+* [support.md](support.md) – questions, answers, help
+* [contributing.md](contributing.md) – get involved, suggestions, bug reports
+* [license](license) – author, license text
