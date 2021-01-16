@@ -113,7 +113,7 @@ adding to status database
 <<< done; successfully installed
 ```
 
-* Use URL exactly as delivered (e.g., for SSH):
+* Use URL exactly as delivered and perform no HTTPS adjustments (e.g., for SSH):
 
 ```
 $ gitpack -r status git@github.com:dominiksalvet/vhdldep.git
@@ -123,8 +123,6 @@ reading status database
 using automatic candidate version
 <<< not installed; candidate is 2.2.0
 ```
-
-> The `-r` stands for raw URL mode, in which no HTTPS adjustments are done.
 
 * List globally installed projects (display full commit hashes):
 
@@ -149,4 +147,4 @@ cache-dir /var/cache/gitpack
 lock-path /var/lock/gitpack-0
 ```
 
-Did you know that **GitPack has sleek tab completion** for Bash shells?
+> Did you know that **GitPack has sleek tab completion** for Bash shells?
