@@ -30,6 +30,7 @@ GitPack not only saves time for end users to figure out how to install a Git pro
 * [Install](#install)
   * [Dependencies](#dependencies)
 * [Usage](#usage)
+  * [Examples](#examples)
 
 ## Install
 
@@ -147,3 +148,5 @@ state-dir /var/lib/gitpack
 cache-dir /var/cache/gitpack
 lock-path /var/lock/gitpack-0
 ```
+
+Did you know that **GitPack has sleek tab completion** for Bash shells?
