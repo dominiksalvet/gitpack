@@ -27,14 +27,20 @@ GitPack not only saves time for end-users to figure out how to install a Git pro
 
 ## Table of Contents
 
-* [Install](#install)
-  * [Dependencies](#dependencies)
+* [Requirements](#requirements)
+* [Installation](#installation)
 * [Usage](#usage)
   * [Examples](#examples)
 * [For Developers](#for-developers)
 * [Useful Resources](#useful-resources)
 
-## Install
+## Requirements
+
+All you need to install and run GitPack is **Linux/Unix environment** and **Git**.
+
+> Windows users may simply use [Git for Windows](https://gitforwindows.org).
+
+## Installation
 
 **Local** (user) installation:
 
@@ -51,12 +57,6 @@ wget -qO- https://raw.githubusercontent.com/dominiksalvet/gitpack/master/.instal
 > If you do not have `wget`, copy-paste the source code of one of the scripts into a shell terminal and execute it.
 
 Once installed, you will **use GitPack to manage even itself** (e.g., for updating). Now [start exploring](https://github.com/topics/gitpack).
-
-### Dependencies
-
-All you need to install and run GitPack is **Linux/Unix environment** and **Git**.
-
-> Windows users may simply use [Git for Windows](https://gitforwindows.org).
 
 ## Usage
 
@@ -160,7 +160,7 @@ There are many reasons why developers should like GitPack:
 * Tight integration with Git
 * Any programming language may be used
 * Runs on Linux, macOS, and other Unixes
-* Runs on Windows (after [some setup](#dependencies))
+* Runs on Windows (after [some setup](#requirements))
 * Easy and flexible repository adaptation
 
 GitPack shines when installing the following:
