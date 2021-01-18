@@ -21,7 +21,7 @@ And when they are no longer needed, **uninstall** them that way:
 gitpack uninstall <url>
 ```
 
-GitPack not only saves time for end users to figure out how to install a Git project, but it also **unifies the project development and distribution** in a convenient place; its Git repository.
+GitPack not only saves time for end-users to figure out how to install a Git project, but it also **unifies the project development and distribution** in a convenient place; its Git repository.
 
 > Do you want to try GitPack in your project? The [section for developers](#for-developers) will help you get started.
 
@@ -50,7 +50,7 @@ wget -qO- https://raw.githubusercontent.com/dominiksalvet/gitpack/master/.instal
 
 > If you do not have `wget`, copy-paste the source code of one of the scripts into a shell terminal and execute it.
 
-Once installed, you will **use GitPack to manage even itself** (e.g., for updating).
+Once installed, you will **use GitPack to manage even itself** (e.g., for updating). Now [start exploring](https://github.com/topics/gitpack).
 
 ### Dependencies
 
@@ -161,6 +161,14 @@ There are many reasons why developers should like GitPack:
 * Any programming language may be used
 * Runs on Linux, macOS, and other Unixes
 * Runs on Windows (after [some setup](#dependencies))
+* Easy and flexible repository adaptation
+
+GitPack shines when installing the following:
+
+* Scripts with no/few dependencies
+* Binaries directly present in the repository
+* Simple compiled programs
+* Other repository content (e.g., themes)
 
 ## Useful Resources
 
