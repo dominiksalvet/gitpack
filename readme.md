@@ -23,7 +23,7 @@ gitpack uninstall <url>
 
 GitPack not only saves time for end users to figure out how to install a Git project, but it also **unifies the project development and distribution** in a convenient place; its Git repository.
 
-> Do you want to try GitPack in your project? The [Developer](#developer) section will help you get started.
+> Do you want to try GitPack in your project? The [section for developers](#for-developers) will help you get started.
 
 ## Table of Contents
 
@@ -31,6 +31,7 @@ GitPack not only saves time for end users to figure out how to install a Git pro
   * [Dependencies](#dependencies)
 * [Usage](#usage)
   * [Examples](#examples)
+* [For Developers](#for-developers)
 * [Useful Resources](#useful-resources)
 
 ## Install
@@ -53,7 +54,9 @@ Once installed, you will **use GitPack to manage even itself** (e.g., for updati
 
 ### Dependencies
 
-* **Git** software
+All you need to install and run GitPack is **Linux/Unix environment** and **Git**.
+
+> Windows users may simply use [Git for Windows](https://gitforwindows.org).
 
 ## Usage
 
@@ -149,6 +152,15 @@ lock-path /var/lock/gitpack-0
 ```
 
 > Did you know that **GitPack has sleek tab completion** for Bash shells?
+
+## For Developers
+
+There are many reasons why developers should like GitPack:
+
+* Tight integration with Git
+* Any programming language may be used
+* Runs on Linux, macOS, and other Unixes
+* Runs on Windows (after [some setup](#dependencies))
 
 ## Useful Resources
 
