@@ -9,6 +9,8 @@
 # be run in isolation, for example in a Docker container.
 #-------------------------------------------------------------------------------
 
+ls -al / && # todo: remove this
+
 #-------------------------------------------------------------------------------
 # FUNCTIONS
 #-------------------------------------------------------------------------------
@@ -111,6 +113,4 @@ run_test test/subcommand/self-install.sh &&
 
 # tests that cannot succeed
 run_test test/xfail/args.sh &&
-run_test test/xfail/urls.sh &&
-
-ls -al / # todo: remove this
+run_test test/xfail/urls.sh
