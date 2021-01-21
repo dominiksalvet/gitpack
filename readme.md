@@ -3,7 +3,7 @@
 `TODO: GitPack example`
 
 [![CI status](https://github.com/dominiksalvet/gitpack/workflows/CI/badge.svg)](https://github.com/dominiksalvet/gitpack/actions)
-[![GitPack](https://img.shields.io/badge/-GitPack-571997)](https://github.com/dominiksalvet/gitpack)
+[![GitPack](https://img.shields.io/badge/-GitPack-571997)](https://github.com/topics/gitpack)
 [![POSIX Shell](https://img.shields.io/badge/POSIX-Shell-111111)](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html)
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fdominiksalvet%2Fgitpack&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 
@@ -32,6 +32,7 @@ GitPack not only saves time for end-users to figure out how to install a Git pro
 * [Usage](#usage)
   * [Examples](#examples)
 * [For Developers](#for-developers)
+  * [Badge](#badge)
 * [Useful Resources](#useful-resources)
 
 ## Requirements
@@ -179,6 +180,18 @@ Unsure? There is even more in GitPack:
 * [Standalone script](src/gitpack) (for advanced uses)
 
 So are you ready to try GitPack in your project? Then see [how GitPack works](how-it-works.md).
+
+### Badge
+
+Projects that use GitPack work best with the following sleek badge:
+
+[![GitPack](https://img.shields.io/badge/-GitPack-571997)](https://github.com/topics/gitpack)
+
+In markdown:
+
+```markdown
+[![GitPack](https://img.shields.io/badge/-GitPack-571997)](https://github.com/topics/gitpack)
+```
 
 ## Useful Resources
 
