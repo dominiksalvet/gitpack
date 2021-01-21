@@ -277,11 +277,11 @@ init_fetched_db() {
 
 init_paths() {
     # base paths
-    if [ "$SYSTEM" = Darwin ]; then
-        init_macos_paths
-    else
-        init_linux_paths
-    fi
+    case "$SYSTEM" in
+        Linux) init_linux_paths ;;
+        Darwin) init_macos_paths ;;
+        *) init_fallback_paths ;;
+    esac
 
     # derived paths
     readonly STATUS_PATH="$STATE_DIR/status" # database of installed packages
@@ -289,17 +289,6 @@ init_paths() {
     readonly FETCHED_PATH="$CACHE_DIR/fetched" # repositories fetch timestamps
     readonly LOCK_PATH="$LOCK_DIR/gitpack-$USER_ID" # lock is a directory
     readonly LOCK_PID_PATH="$LOCK_PATH/pid" # process ID of the lock holder
-}
-
-init_macos_paths() {
-    if [ "$ACCESS" = local ]; then
-        readonly STATE_DIR="$HOME/.local/share/gitpack"
-        readonly CACHE_DIR="$HOME/Library/Caches/gitpack"
-    else
-        readonly STATE_DIR=/var/lib/gitpack
-        readonly CACHE_DIR=/Library/Caches/gitpack
-    fi
-    readonly LOCK_DIR=/tmp # unified storage for locks
 }
 
 init_linux_paths() {
@@ -310,7 +299,29 @@ init_linux_paths() {
         readonly STATE_DIR=/var/lib/gitpack
         readonly CACHE_DIR=/var/cache/gitpack
     fi
-    readonly LOCK_DIR=/var/lock
+    readonly LOCK_DIR=/var/lock # unified storage for locks
+}
+
+init_macos_paths() {
+    if [ "$ACCESS" = local ]; then
+        readonly STATE_DIR="$HOME/.local/share/gitpack"
+        readonly CACHE_DIR="$HOME/Library/Caches/gitpack"
+    else
+        readonly STATE_DIR=/var/lib/gitpack
+        readonly CACHE_DIR=/Library/Caches/gitpack
+    fi
+    readonly LOCK_DIR=/tmp
+}
+
+init_fallback_paths() {
+    if [ "$ACCESS" = local ]; then
+        readonly STATE_DIR="$HOME/.local/share/gitpack"
+        readonly CACHE_DIR="$HOME/.cache/gitpack"
+    else
+        readonly STATE_DIR=/var/lib/gitpack
+        readonly CACHE_DIR=/var/cache/gitpack
+    fi
+    readonly LOCK_DIR=/tmp
 }
 
 #-------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #-------------------------------------------------------------------------------
-# Copyright 2019-2020 Dominik Salvet
+# Copyright 2019-2021 Dominik Salvet
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # Initializes test environment and runs all GitPack tests. The current working
@@ -60,19 +60,26 @@ esac &&
 #-------------------------------------------------------------------------------
 
 system="$(uname)" &&
-if [ "$system" = Darwin ]; then
-    export LOCAL_STATE_DIR="$HOME/.local/share/gitpack"
-    export GLOBAL_STATE_DIR=/var/lib/gitpack
-    export LOCAL_CACHE_DIR="$HOME/Library/Caches/gitpack"
-    export GLOBAL_CACHE_DIR=/Library/Caches/gitpack
-    export LOCK_DIR=/tmp
-else
-    export LOCAL_STATE_DIR="$HOME/.local/share/gitpack"
-    export GLOBAL_STATE_DIR=/var/lib/gitpack
-    export LOCAL_CACHE_DIR="$HOME/.cache/gitpack"
-    export GLOBAL_CACHE_DIR=/var/cache/gitpack
-    export LOCK_DIR=/var/lock
-fi &&
+case "$system" in
+    Linux)  export LOCAL_STATE_DIR="$HOME/.local/share/gitpack"
+            export GLOBAL_STATE_DIR=/var/lib/gitpack
+            export LOCAL_CACHE_DIR="$HOME/.cache/gitpack"
+            export GLOBAL_CACHE_DIR=/var/cache/gitpack
+            export LOCK_DIR=/var/lock
+            ;;
+    Darwin) export LOCAL_STATE_DIR="$HOME/.local/share/gitpack"
+            export GLOBAL_STATE_DIR=/var/lib/gitpack
+            export LOCAL_CACHE_DIR="$HOME/Library/Caches/gitpack"
+            export GLOBAL_CACHE_DIR=/Library/Caches/gitpack
+            export LOCK_DIR=/tmp
+            ;;
+    *)  export LOCAL_STATE_DIR="$HOME/.local/share/gitpack"
+        export GLOBAL_STATE_DIR=/var/lib/gitpack
+        export LOCAL_CACHE_DIR="$HOME/.cache/gitpack"
+        export GLOBAL_CACHE_DIR=/var/cache/gitpack
+        export LOCK_DIR=/tmp
+        ;;
+esac &&
 
 #-------------------------------------------------------------------------------
 # EXECUTION TRACING
