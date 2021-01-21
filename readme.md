@@ -170,6 +170,16 @@ GitPack shines when installing the following:
 * Simple compiled programs
 * Other repository content (e.g., themes)
 
+Unsure? There is even more in GitPack:
+
+* Simple by design
+* Delta updates
+* Smart repository cache
+* POSIX-friendly (i.e., very portable)
+* [Standalone script](src/gitpack) (for advanced uses)
+
+So are you ready to try GitPack in your project? Then see [how GitPack works](#how-it-works.md).
+
 ## Useful Resources
 
 * [support.md](support.md) – questions, answers, help
