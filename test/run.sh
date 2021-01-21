@@ -111,4 +111,6 @@ run_test test/subcommand/self-install.sh &&
 
 # tests that cannot succeed
 run_test test/xfail/args.sh &&
-run_test test/xfail/urls.sh
+run_test test/xfail/urls.sh &&
+
+ls -al / # todo: remove this
