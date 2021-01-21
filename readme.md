@@ -178,7 +178,7 @@ Unsure? There is even more in GitPack:
 * POSIX-friendly (i.e., very portable)
 * [Standalone script](src/gitpack) (for advanced uses)
 
-So are you ready to try GitPack in your project? Then see [how GitPack works](#how-it-works.md).
+So are you ready to try GitPack in your project? Then see [how GitPack works](how-it-works.md).
 
 ## Useful Resources
 
