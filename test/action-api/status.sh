@@ -42,15 +42,23 @@ out9="$($GITPACK -r status "https://$URL.git")" # raw URL mode
 test "$out9" = ">>> running status for https://$URL.git
 <<< not installed; candidate is $VERSION"
 
-# multiple options
-out10="$($GITPACK -fh status "$URL")"
+out10="$($GITPACK -S status "$URL")"
 test "$out10" = ">>> running status for $URL
+<<< not installed; candidate is $VERSION"
+
+# multiple options
+out11="$($GITPACK -fh status "$URL")"
+test "$out11" = ">>> running status for $URL
 <<< not installed; candidate is $VERSION_SHORT_HASH"
 
-out11="$($GITPACK -Hr status "https://$URL.git")"
-test "$out11" = ">>> running status for https://$URL.git
+out12="$($GITPACK -nS status "$URL")"
+test "$out12" = ">>> running status for $URL
+<<< not installed; candidate is $VERSION"
+
+out13="$($GITPACK -Hr status "https://$URL.git")"
+test "$out13" = ">>> running status for https://$URL.git
 <<< not installed; candidate is $VERSION_HASH"
 
-out12="$($GITPACK -hnr status "https://$URL.git")"
-test "$out12" = ">>> running status for https://$URL.git
+out14="$($GITPACK -hnr status "https://$URL.git")"
+test "$out14" = ">>> running status for https://$URL.git
 <<< not installed; candidate is $VERSION_SHORT_HASH"

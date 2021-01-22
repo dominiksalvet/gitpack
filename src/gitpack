@@ -43,7 +43,8 @@ COMMAND:  list   list installed packages
 
 OPTION:   -h/-H  show short/full version hashes
           -f/-n  always/never fetch from remote
-          -r     raw URL mode; use with caution'
+          -r     raw URL mode; use with caution
+          -S     skip lock; only for wrappers'
 
     readonly ABOUT_MESSAGE="GitPack $VERSION
 Simple Git-based package manager.
@@ -77,6 +78,7 @@ init_opts() {
     hash_mode= # short, full
     fetch_mode= # always, never
     raw_url_mode=false
+    skip_lock=false
 }
 
 #-------------------------------------------------------------------------------
@@ -100,13 +102,14 @@ process_args() (
 
 # $@ - GitPack options
 process_opts() {
-    while getopts :hHfnr _opt; do
+    while getopts :hHfnrS _opt; do
         case "$_opt" in
             h) hash_mode=short ;;
             H) hash_mode=full ;;
             f) fetch_mode=always ;;
             n) fetch_mode=never ;;
             r) raw_url_mode=true ;;
+            S) skip_lock=true ;;
             ?) echoh "E13: invalid option -$OPTARG" >&2; return 1 ;;
         esac || return
     done
@@ -237,8 +240,12 @@ init_env() {
 }
 
 init_lock() {
-    mkdir -p "$LOCK_DIR/" && # first create a directory for locks
+    # useful when a wrapper of GitPack set up the lock previously
+    if [ "$skip_lock" = true ]; then
+        return
+    fi
 
+    mkdir -p "$LOCK_DIR/" && # first create a directory for locks
     if mkdir "$LOCK_PATH/" 2>/dev/null; then # acquire lock
         trap exit_action EXIT && # function to call on an exit
         trap exit HUP INT QUIT TERM && # call exit on these signals

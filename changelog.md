@@ -20,6 +20,7 @@ The changes not yet present in any release are listed in this section.
 * Added native mode for Bash completion, allowing it to use more features.
 * Added support for cached packages version hints in Bash completion.
 * Added option `-n` to never fetch from remote.
+* Added option `-S` to skip locking (useful for GitPack wrappers).
 
 ### Changed
 
