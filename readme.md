@@ -156,7 +156,7 @@ lock-path /var/lock/gitpack-0
 
 ## For Developers
 
-There are many reasons why developers should like GitPack:
+There are many reasons why **developers should like GitPack**:
 
 * Tight integration with Git
 * Any programming language may be used
@@ -164,14 +164,14 @@ There are many reasons why developers should like GitPack:
 * Runs on Windows (after [some setup](#requirements))
 * Easy and flexible repository adaptation
 
-GitPack shines when installing the following:
+**GitPack shines when installing** the following:
 
 * Scripts with no/few dependencies
 * Binaries directly present in the repository
 * Simple compiled programs
 * Other repository content (e.g., themes)
 
-Unsure? There is even more in GitPack:
+Unsure? There is **even more in GitPack**:
 
 * Simple by design
 * Delta updates
