@@ -47,9 +47,11 @@ export VERSION=ci-version && # latest GitPack version
 export VERSION_HASH=b2842a2affe769f2aeb1c03bba2a299eb2959ea7 &&
 export VERSION_SHORT_HASH=b2842a2 &&
 export OLD_VERSION=ci-old-version &&
+export OLD_VERSION_HASH=91736b0a36530f58e87e0906940b94509c258a2a &&
 
 export EXTRA_URL=github.com/dominiksalvet/sandbox && # needed in some tests
 export EXTRA_VERSION=beforecommit && # use this and only this version
+export EXTRA_VERSION_HASH=12fa65e5a0caefb0760ed2e0e51e8568cad91ada &&
 
 case "${MATRIX_OS:?}" in
     windows-*) export USE_SUDO=false ;;
