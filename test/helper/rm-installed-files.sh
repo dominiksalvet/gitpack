@@ -1,14 +1,14 @@
 #!/bin/sh
 
 #-------------------------------------------------------------------------------
-# Copyright 2020 Dominik Salvet
+# Copyright 2020-2021 Dominik Salvet
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-test ! -e "$HOME/.local/bin/gitpack"
-test ! -e "$HOME/.bash_completion.d/gitpack-completion"
+rm -f "$HOME/.local/bin/gitpack"
+rm -f "$HOME/.bash_completion.d/gitpack-completion"
 
 if [ "$USE_SUDO" = true ]; then
-    sudo test ! -e /usr/local/bin/gitpack
-    sudo test ! -e /etc/bash_completion.d/gitpack-completion
+    sudo rm -f /usr/local/bin/gitpack
+    sudo rm -f /etc/bash_completion.d/gitpack-completion
 fi

@@ -27,8 +27,8 @@ jobs:
         shellcheck test/action-api/*
         shellcheck test/command-api/*
         shellcheck test/feature/*
-        shellcheck test/storage/*
         shellcheck test/xfail/*
+        shellcheck test/helper/*
 
     - name: Check install files
       run: shellcheck .install/*

@@ -97,8 +97,6 @@ run_test test/action-api/status.sh &&
 run_test test/action-api/install.sh &&
 run_test test/action-api/update.sh &&
 run_test test/action-api/downgrade.sh &&
-run_test test/action-api/install-multiple.sh &&
-run_test test/action-api/local-global.sh &&
 
 # commands API
 run_test test/command-api/messages.sh &&
@@ -106,16 +104,18 @@ run_test test/command-api/paths.sh &&
 run_test test/command-api/list.sh &&
 run_test test/command-api/clean.sh &&
 
-# check install files
-run_test test/storage/no-install-files.sh &&
+# feature testing
+run_test test/helper/rm-installed-files.sh &&
 run_test test/feature/install.sh &&
 run_test test/feature/uninstall.sh &&
-
-# install current commit
-run_test test/feature/clean.sh &&
-run_test test/storage/remove-empty-state.sh &&
-run_test test/feature/self-install.sh &&
+run_test test/feature/install-multiple.sh &&
+run_test test/feature/install-local-global.sh &&
 
 # tests that cannot succeed
 run_test test/xfail/args.sh &&
-run_test test/xfail/urls.sh
+run_test test/xfail/urls.sh &&
+
+# install current commit
+run_test test/feature/clean.sh &&
+run_test test/helper/rm-state.sh &&
+run_test test/feature/self-install.sh
