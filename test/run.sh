@@ -15,18 +15,18 @@
 
 # $1 - test path
 run_test() (
-    echo "running $1"
+    echo "running $1" &&
     test_name="$(echo "$1" | sed 's|/|_|g; s/\.sh$//')" && # derive test name
 
     # run test and store its execution trace
     if ! test_trace="$(sh -eux "$1" 2>&1)"; then
-        echo 'recent trace (more in artifacts):'
+        echo 'recent trace (more in artifacts):' &&
         echo "$test_trace" | tail -n 20 && # recent trace
         echo "failed $1" &&
         echo "$test_trace" > "$TRACE_DIR/failed_$test_name" &&
         return 1
     else
-        echo "passed $1"
+        echo "passed $1" &&
         # if test is run multiple times, only latest successful trace is kept
         echo "$test_trace" > "$TRACE_DIR/passed_$test_name"
     fi
