@@ -105,17 +105,17 @@ run_test test/command-api/list.sh &&
 run_test test/command-api/clean.sh &&
 
 # feature testing
-run_test test/helper/rm-installed-files.sh &&
+run_test test/helper/clean-files.sh &&
 run_test test/feature/install.sh &&
 run_test test/feature/uninstall.sh &&
 run_test test/feature/install-multiple.sh &&
 run_test test/feature/install-local-global.sh &&
+run_test test/feature/clean.sh &&
 
 # tests that cannot succeed
 run_test test/xfail/args.sh &&
 run_test test/xfail/urls.sh &&
 
 # install current commit
-run_test test/feature/clean.sh &&
-run_test test/helper/rm-state.sh &&
+run_test test/helper/clean-files.sh &&
 run_test test/feature/self-install.sh
