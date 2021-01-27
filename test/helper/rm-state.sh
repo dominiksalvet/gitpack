@@ -7,8 +7,8 @@
 
 
 rm -f "$LOCAL_STATE_DIR/status"
-if [ -d "$LOCAL_STATUS_DIR/" ]; then
-    rmdir "$LOCAL_STATUS_DIR/"
+if [ -d "$LOCAL_STATE_DIR/" ]; then
+    rmdir "$LOCAL_STATE_DIR/"
 fi
 
 if [ "$USE_SUDO" = true ]; then
