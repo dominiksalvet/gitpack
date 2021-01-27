@@ -10,7 +10,7 @@ out1="$($GITPACK install "$URL=$VERSION")"
 test "$out1" = ">>> running install for $URL=$VERSION
 <<< done; successfully installed"
 
-out2="$(cut "$LOCAL_STATE_DIR/status")"
+out2="$(cat "$LOCAL_STATE_DIR/status")"
 test "$out2" = "$URL $VERSION_HASH"
 
 # install second package
@@ -18,7 +18,7 @@ out3="$($GITPACK install "$EXTRA_URL=$EXTRA_VERSION")"
 test "$out3" = ">>> running install for $EXTRA_URL=$EXTRA_VERSION
 <<< done; successfully installed"
 
-out4="$(cut "$LOCAL_STATE_DIR/status")"
+out4="$(cat "$LOCAL_STATE_DIR/status")"
 test "$out4" = "$URL $VERSION_HASH
 $EXTRA_URL $EXTRA_VERSION_HASH"
 
@@ -36,7 +36,7 @@ out7="$($GITPACK uninstall "$URL=$VERSION")"
 test "$out7" = ">>> running uninstall for $URL=$VERSION
 <<< done; successfully uninstalled"
 
-out8="$(cut "$LOCAL_STATE_DIR/status")"
+out8="$(cat "$LOCAL_STATE_DIR/status")"
 test "$out8" = "$EXTRA_URL $EXTRA_VERSION_HASH"
 
 # uninstall second package
@@ -44,5 +44,5 @@ out9="$($GITPACK uninstall "$EXTRA_URL")"
 test "$out9" = ">>> running uninstall for $EXTRA_URL
 <<< done; successfully uninstalled"
 
-out10="$(cut "$LOCAL_STATE_DIR/status")"
+out10="$(cat "$LOCAL_STATE_DIR/status")"
 test ! "$out10"

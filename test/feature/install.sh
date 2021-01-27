@@ -14,7 +14,7 @@ test -f "$HOME/.local/bin/gitpack"
 test -x "$HOME/.local/bin/gitpack"
 test -d "$HOME/.bash_completion.d/"
 test -f "$HOME/.bash_completion.d/gitpack-completion"
-out2="$(cut "$LOCAL_STATE_DIR/status")"
+out2="$(cat "$LOCAL_STATE_DIR/status")"
 test "$out2" = "$URL $OLD_VERSION_HASH"
 out3="$($GITPACK uninstall "$URL")"
 
@@ -26,7 +26,7 @@ if [ "$USE_SUDO" = true ]; then
     sudo test -x /usr/local/bin/gitpack
     sudo test -d /etc/bash_completion.d/
     sudo test -f /etc/bash_completion.d/gitpack-completion
-    out5="$(sudo cut "$GLOBAL_STATE_DIR/status")"
+    out5="$(sudo cat "$GLOBAL_STATE_DIR/status")"
     test "$out5" = "$URL $OLD_VERSION_HASH"
     out6="$($SUDO_GITPACK uninstall "$URL")"
 fi
