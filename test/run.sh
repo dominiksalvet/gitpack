@@ -108,13 +108,13 @@ run_test test/command-api/clean.sh &&
 
 # check install files
 run_test test/storage/no-install-files.sh &&
-run_test test/subcommand/install.sh &&
-run_test test/subcommand/uninstall.sh &&
+run_test test/feature/install.sh &&
+run_test test/feature/uninstall.sh &&
 
 # install current commit
-run_test test/subcommand/clean.sh &&
+run_test test/feature/clean.sh &&
 run_test test/storage/remove-empty-state.sh &&
-run_test test/subcommand/self-install.sh &&
+run_test test/feature/self-install.sh &&
 
 # tests that cannot succeed
 run_test test/xfail/args.sh &&

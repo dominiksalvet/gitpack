@@ -26,7 +26,7 @@ jobs:
         shellcheck test/run.sh
         shellcheck test/action-api/*
         shellcheck test/command-api/*
-        shellcheck test/subcommand/*
+        shellcheck test/feature/*
         shellcheck test/storage/*
         shellcheck test/xfail/*
 
