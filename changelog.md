@@ -16,7 +16,7 @@ The changes not yet present in any release are listed in this section.
 * Added a hint message when bad arguments passed to ease finding GitPack's help.
 * Added long hash mode option `-H` forcing to always show full commit hashes.
 * Added fetch mode option `-f` making GitPack always fetch from remote.
-* Added support for raw URL mode `-r`, in which GitPack uses URLs just as delivered.
+* Added support for raw URL mode `-r`, in which GitPack performs no HTTPS adjustments.
 * Added native mode for Bash completion, allowing it to use more features.
 * Added support for cached packages version hints in Bash completion.
 * Added option `-n` to never fetch from remote.

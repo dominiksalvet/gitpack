@@ -91,7 +91,7 @@ _gitpack_get_raw_url_mode() {
 #-------------------------------------------------------------------------------
 
 _gitpack_hint_url_arg() {
-    local -r RAW_URL_REGEX='^/|//|.git$|/$' && # raw URLs heuristic pattern
+    local -r RAW_URL_PATTERN='^[^/]+:.' && # raw URLs pattern
     local url version &&
     url="${cur%=*}" && # remove version if any
     version="${cur##*=}" && # remove URL and keep version
@@ -109,9 +109,9 @@ _gitpack_hint_url_arg() {
 _gitpack_get_urls() (
     _gitpack_init_paths &&
     if [ "$raw_url_mode" = false ]; then
-        _gitpack_get_db_urls | grep -vE "$RAW_URL_REGEX" # exclude raw URLs
+        _gitpack_get_db_urls | grep -vE "$RAW_URL_PATTERN" # exclude raw URLs
     else
-        _gitpack_get_db_urls # in raw URL mode, show all
+        _gitpack_get_db_urls | grep -E "$RAW_URL_PATTERN" # show only raw URLs
     fi
 )
 
@@ -127,7 +127,8 @@ _gitpack_get_db_urls() {
 # $1 - URL
 _gitpack_get_versions() (
     if [ "$command" = uninstall ] || # uninstall does not care
-       [[ "$raw_url_mode" = false && "$1" =~ $RAW_URL_REGEX ]]; then # raw URLs
+       [[ "$raw_url_mode" = false && "$1" =~ $RAW_URL_PATTERN ]] ||
+       [[ "$raw_url_mode" = true && ! "$1" =~ $RAW_URL_PATTERN ]]; then
         return # do not generate any hint
     fi
 

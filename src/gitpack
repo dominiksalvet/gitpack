@@ -55,8 +55,9 @@ https://github.com/dominiksalvet/gitpack"
 }
 
 init_config() {
-    # URLs matching this regular expression are rejected
-    readonly BAD_URL_PATTERN='(^$| |(^|/)\.\.?($|/))' # ERE
+    # URL patterns
+    readonly BAD_URL_PATTERN='(^$| |(^|/)\.\.?($|/))' # ERE, always rejected
+    readonly RAW_URL_PATTERN='^[^/]\+:.' # BRE, additional check for raw URLs
 
     # line patterns of GitPack databases
     readonly DB_DELIM=' ' # internal delimiter for database data
@@ -384,6 +385,11 @@ check_url() (
     lineno="$(echo "$1" | wc -l)" &&
     if [ "$lineno" -ne 1 ] || echo "$1" | grep -qE "$BAD_URL_PATTERN"; then
         echo 'E6: unsupported URL delivered' >&2; return 1
+    fi &&
+
+    if [ "$raw_url_mode" = true ] &&
+       echo "$1" | grep -qv "$RAW_URL_PATTERN"; then
+        echo 'E23: raw URL must start with scheme (protocol)' >&2; return 1
     fi
 )
 
