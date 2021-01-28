@@ -43,7 +43,8 @@ COMMAND:  list   list installed packages
 
 OPTION:   -h/-H  show short/full version hashes
           -f/-n  always/never fetch from remote
-          -r     raw URL mode; use with caution
+          -r     raw URL mode (no HTTPS adjustments)
+          -d     ignore installed basename duplicates
           -S     skip lock; only for wrappers'
 
     readonly ABOUT_MESSAGE="GitPack $VERSION
@@ -78,6 +79,7 @@ init_opts() {
     hash_mode= # short, full
     fetch_mode= # always, never
     raw_url_mode=false
+    ignore_duplicates=false
     skip_lock=false
 }
 
@@ -102,13 +104,14 @@ process_args() (
 
 # $@ - GitPack options
 process_opts() {
-    while getopts :hHfnrS _opt; do
+    while getopts :hHfnrdS _opt; do
         case "$_opt" in
             h) hash_mode=short ;;
             H) hash_mode=full ;;
             f) fetch_mode=always ;;
             n) fetch_mode=never ;;
             r) raw_url_mode=true ;;
+            d) ignore_duplicates=true ;;
             S) skip_lock=true ;;
             ?) echoh "E13: invalid option -$OPTARG" >&2; return 1 ;;
         esac || return
@@ -629,10 +632,39 @@ run_script() (
 #-------------------------------------------------------------------------------
 
 # $1 - URL
-get_status_record() {
+get_status_record() (
     echo 'reading status database' >&2 &&
-    db_select_first "$STATUS_PATH" "$STATUS_COL_URL" "$1"
-}
+    record="$(db_select_first "$STATUS_PATH" "$STATUS_COL_URL" "$1")" &&
+
+    if [ "$record" ]; then # if installed
+        echo "$record"
+    elif [ "$ignore_duplicates" = false ]; then
+        url_basename="$(get_url_basename "$1")" &&
+        # check if package with the same basename is installed
+        if ! is_url_basename_unique "$url_basename"; then
+            echo "E22: $url_basename was installed using different URL" >&2
+            echo "if this is mistake, try '-d' option" >&2
+            return 1
+        fi
+    fi
+)
+
+# $1 - URL basename
+is_url_basename_unique() (
+    while IFS= read -r record; do
+        url="$(status_record_url "$record")" &&
+        url_basename="$(get_url_basename "$url")" &&
+        if [ "$url_basename" = "$1" ]; then
+            return 1 # it is not unique
+        fi || return
+    done < "$STATUS_PATH"
+)
+
+# $1 - URL
+get_url_basename() (
+    url_basename="$(echo "$1" | sed 's|/*$||; s|/*.git$||')" &&
+    echo "${url_basename##*/}" | tr '[:upper:]' '[:lower:]'
+)
 
 # $1 - URL
 # $2 - hash

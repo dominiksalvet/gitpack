@@ -21,6 +21,7 @@ The changes not yet present in any release are listed in this section.
 * Added support for cached packages version hints in Bash completion.
 * Added option `-n` to never fetch from remote.
 * Added option `-S` to skip locking (useful for GitPack wrappers).
+* Added option `-d` to disable checking for installed URL basename duplicates.
 
 ### Changed
 
@@ -37,6 +38,7 @@ The changes not yet present in any release are listed in this section.
 * Bash tab completion considers previous arguments and dynamically generates hints.
 * When running on macOS, more predictable file paths are used.
 * When not running on a recognized system, fallback file paths are used.
+* Check URL basename against installed URL basenames for possible duplicates.
 
 ### Fixed
 
