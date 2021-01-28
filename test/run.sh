@@ -113,6 +113,7 @@ run_test test/feature/install.sh &&
 run_test test/feature/uninstall.sh &&
 run_test test/feature/install-multiple.sh &&
 run_test test/feature/install-local-global.sh &&
+run_test test/feature/basename-duplicates.sh &&
 run_test test/feature/clean.sh &&
 
 # tests that cannot succeed
