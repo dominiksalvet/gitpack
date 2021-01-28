@@ -91,7 +91,7 @@ _gitpack_get_raw_url_mode() {
 #-------------------------------------------------------------------------------
 
 _gitpack_hint_url_arg() {
-    local -r RAW_URL_REGEX='//|.git$|/$' && # raw URLs heuristic pattern
+    local -r RAW_URL_REGEX='^/|//|.git$|/$' && # raw URLs heuristic pattern
     local url version &&
     url="${cur%=*}" && # remove version if any
     version="${cur##*=}" && # remove URL and keep version
