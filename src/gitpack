@@ -151,20 +151,6 @@ run_list() (
     done < "$STATUS_PATH"
 )
 
-run_clean() (
-    init_runtime e l &&
-    if ! remove_dir "$CACHE_DIR"; then
-        echo 'E5: failed to remove cache directory' >&2; return 1
-    fi
-)
-
-run_paths() (
-    init_runtime e &&
-    echo "state-dir $STATE_DIR" &&
-    echo "cache-dir $CACHE_DIR" &&
-    echo "lock-path $LOCK_PATH"
-)
-
 # $1 - URL
 # $2 - hash (optional)
 beautify_hash() {
@@ -179,6 +165,13 @@ beautify_hash() {
         fi
     ) fi
 }
+
+run_clean() (
+    init_runtime e l &&
+    if ! remove_dir "$CACHE_DIR"; then
+        echo 'E5: failed to remove cache directory' >&2; return 1
+    fi
+)
 
 # $1 - directory path
 remove_dir() {
@@ -198,6 +191,13 @@ remove_dir() {
 
     rm -rf -- "${1:?}/"
 }
+
+run_paths() (
+    init_runtime e &&
+    echo "state-dir $STATE_DIR" &&
+    echo "cache-dir $CACHE_DIR" &&
+    echo "lock-path $LOCK_PATH"
+)
 
 #-------------------------------------------------------------------------------
 # DYNAMIC INITIALIZATION
@@ -416,6 +416,11 @@ init_repo() {
 }
 
 # $1 - URL
+url_to_repo_path() {
+    echo "$REPOS_DIR/$1" # assume it will not fail (just like any other echo)
+}
+
+# $1 - URL
 # $2 - repository directory
 fetch_repo() (
     mkdir -p -- "$2/" && # make sure directory for repository is created
@@ -480,11 +485,6 @@ repo_cd() {
     fi
 }
 
-# $1 - URL
-url_to_repo_path() {
-    echo "$REPOS_DIR/$1" # assume it will not fail (just like any other echo)
-}
-
 #-------------------------------------------------------------------------------
 # EXECUTE ACTION
 #-------------------------------------------------------------------------------
@@ -503,6 +503,28 @@ perform_install() {
         perform_change "$1" "$2" "$3"
     fi
 }
+
+# $1 - URL
+# $2 - source hash
+# $3 - target hash
+perform_change() (
+    if is_ancestor_commit "$1" "$2" "$3"; then # source version is older
+        echo 'updating package' >&2 &&
+        report='<<< done; successfully updated'
+    elif is_ancestor_commit "$1" "$3" "$2"; then # source version is newer
+        echo 'downgrading package' >&2 &&
+        report='<<< done; successfully downgraded'
+    else # given versions are not comparable
+        echo 'changing package version' >&2 &&
+        report='<<< done; successfully changed'
+    fi &&
+
+    run_uninstall "$1" "$2" &&
+    delete_status_records "$1" &&
+    run_install "$1" "$3" &&
+    insert_status_record "$1" "$3" &&
+    echo "$report"
+)
 
 # $1 - URL
 # $2 - source hash (optional)
@@ -537,28 +559,6 @@ perform_status() (
 )
 
 # $1 - URL
-# $2 - source hash
-# $3 - target hash
-perform_change() (
-    if is_ancestor_commit "$1" "$2" "$3"; then # source version is older
-        echo 'updating package' >&2 &&
-        report='<<< done; successfully updated'
-    elif is_ancestor_commit "$1" "$3" "$2"; then # source version is newer
-        echo 'downgrading package' >&2 &&
-        report='<<< done; successfully downgraded'
-    else # given versions are not comparable
-        echo 'changing package version' >&2 &&
-        report='<<< done; successfully changed'
-    fi &&
-
-    run_uninstall "$1" "$2" &&
-    delete_status_records "$1" &&
-    run_install "$1" "$3" &&
-    insert_status_record "$1" "$3" &&
-    echo "$report"
-)
-
-# $1 - URL
 # $2 - first hash
 # $3 - second hash
 is_ancestor_commit() (
@@ -582,6 +582,16 @@ run_install() (
     run_script "$install_script"
 )
 
+get_install_script() {
+    if [ -x .install/install-"${ACCESS}-$SYSTEM" ]; then
+        echo .install/install-"${ACCESS}-$SYSTEM"
+    elif [ -x .install/install-"$ACCESS" ]; then
+        echo .install/install-"$ACCESS"
+    else
+        echo "E9: missing script for $ACCESS installation" >&2; return 1
+    fi
+}
+
 # $1 - URL
 # $2 - hash
 run_uninstall() (
@@ -592,16 +602,6 @@ run_uninstall() (
     uninstall_script="$(get_uninstall_script)" &&
     run_script "$uninstall_script"
 )
-
-get_install_script() {
-    if [ -x .install/install-"${ACCESS}-$SYSTEM" ]; then
-        echo .install/install-"${ACCESS}-$SYSTEM"
-    elif [ -x .install/install-"$ACCESS" ]; then
-        echo .install/install-"$ACCESS"
-    else
-        echo "E9: missing script for $ACCESS installation" >&2; return 1
-    fi
-}
 
 get_uninstall_script() {
     if [ -x .install/uninstall-"${ACCESS}-$SYSTEM" ]; then
