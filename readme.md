@@ -118,7 +118,7 @@ adding to status database
 <<< done; successfully installed
 ```
 
-* Use URL exactly as delivered and perform no HTTPS adjustments (e.g., for SSH):
+* Use URL with no HTTPS and other adjustments (e.g., for SSH):
 
 ```
 $ gitpack -r status git@github.com:dominiksalvet/vhdldep.git
