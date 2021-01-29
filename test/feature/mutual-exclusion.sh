@@ -26,10 +26,10 @@ for i in 1 2 3 4 5; do # repeat multiple times
     out3="$($GITPACK status "$URL=$VERSION")"
     if [ "$status_1" -eq 0 ]; then
         test "$out3" = ">>> running status for $URL=$VERSION
-    <<< candidate $VERSION already installed"
+<<< candidate $VERSION already installed"
     elif [ "$status_1" -eq 64 ]; then
         test "$out3" = ">>> running status for $URL=$VERSION
-    <<< not installed; candidate is $VERSION"
+<<< not installed; candidate is $VERSION"
     else
         false # no other exit statuses accepted
     fi
@@ -38,10 +38,10 @@ for i in 1 2 3 4 5; do # repeat multiple times
     out4="$($GITPACK status "$EXTRA_URL=$EXTRA_VERSION")"
     if [ "$status_2" -eq 0 ]; then
         test "$out4" = ">>> running status for $EXTRA_URL=$EXTRA_VERSION
-    <<< candidate $EXTRA_VERSION already installed"
+<<< candidate $EXTRA_VERSION already installed"
     elif [ "$status_2" -eq 64 ]; then
         test "$out4" = ">>> running status for $EXTRA_URL=$EXTRA_VERSION
-    <<< not installed; candidate is $EXTRA_VERSION"
+<<< not installed; candidate is $EXTRA_VERSION"
         test "$status_1" -ne 64 # at least one must acquire lock
     else
         false
