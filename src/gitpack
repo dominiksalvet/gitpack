@@ -259,7 +259,7 @@ init_lock() {
         _pid="$(cat "$LOCK_PID_PATH")" # may not exist yet, not a problem though
         echo "E17: lockfile $_lockfile is owned by process $_pid" >&2
         echo 'if the problem persists, try rebooting' >&2
-        return 1
+        return 64 # user defined exit code
     fi
 }
 
