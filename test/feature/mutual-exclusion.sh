@@ -41,7 +41,7 @@ if [ "$status_2" -eq 0 ]; then
 elif [ "$status_2" -eq 64 ]; then
     test "$out4" = ">>> running status for $EXTRA_URL=$EXTRA_VERSION
 <<< not installed; candidate is $EXTRA_VERSION"
-    test [ "$status_1" -ne 64 ] # at least one must acquire lock
+    test "$status_1" -ne 64 # at least one must acquire lock
 else
     false
 fi
