@@ -8,12 +8,12 @@
 # shellcheck disable=SC2034
 
 # first GitPack instance
-{   out1="$($GITPACK install "$URL=$VERSION")"
+{   out1="$($GITPACK install "$URL=$VERSION")" || true
     echo "$?" > /tmp/gitpack-status-1
 } &
 
 # second GitPack instance
-{   out2="$($GITPACK install "$EXTRA_URL=$EXTRA_VERSION")"
+{   out2="$($GITPACK install "$EXTRA_URL=$EXTRA_VERSION")" || true
     echo "$?" > /tmp/gitpack-status-2
 } &
 
