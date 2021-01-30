@@ -1,45 +1,45 @@
-# Guide
+# How It Works
 
-This file contains **everything you need to start** using GitPack in your awesome projects. Once you have followed this guide, end users can immediately install, update or uninstall your projects. Immediately.
+This file describes how GitPack works. It is basically **everything you need to start** using GitPack in your awesome projects. Once a project (repository) is prepared, end users may **immediately install it**.
 
-## General
+## Install Files
 
-In default, GitPack works with Git default branches using their either latest tag (preferred) or latest commit.
+GitPack uses files in the `.install` directory of your repository to perform all required operations. Basically, GitPack uses two types of executable files placed there – one for installation and one for uninstallation.
 
-## Files
+Whenever GitPack runs those executables, the current working directory is set to the repository root. If the execution succeeds (i.e., returns 0), GitPack will mark your project as installed or not installed, respectively. Note that the executables do not have to be Shell scripts, they may be of any type (e.g., Python).
 
-GitPack works with the `.gitpack` directory of Git repositories matching the following structure:
+Since GitPack is very flexible, there are multiple methods of how GitPack may install your project. You may decide to support only one, or **you can support more installation methods**. Based on that, there may be multiple installation and uninstallation executables.
 
-* `.gitpack/install/<method>` is a directory:
-  * Its name starts with either `global` or `local` based on **installation type**.
-  * To target a particular system, append its name as `-<system>`.
-  * E.g., `global-Darwin` represents global installation for macOS.
-* `.gitpack/install/<method>/map` is a file:
-  * Describes how project files are copied/removed during **installation/uninstallation**.
-  * Each nonempty line contains file paths to be copied and a target directory path.
-  * Each nonempty line is evaluated as a shell function argument. Be careful.
-  * E.g., line `bin/vhdldep ~/.local/bin` copies `vhdldep` file to `~/.local/bin` directory.
+### Universal Local Installation
 
-## Optional Files
+Used for installations within the current user home directory. To support this installation in your project, create the following executable files:
 
-GitPack also works with optional files located in the `.gitpack` directory as follows:
+* `.install/install-local`
+  * When run, it installs (e.g., copy files) the current commit (version) locally.
+* `.install/uninstall-local`
+  * When run, it uninstalls (e.g., remove files) the local installation.
 
-* `.gitpack/install/<method>/<script>` is an executable file:
-  * Its name is `precp`, `postcp`, `prerm`, or `postrm`.
-  * It is run before the copying, after, before the removal, or after.
-  * E.g., `postcp` modifies `/etc/rc.local` file to run asus-fan-control after boot.
-* `.gitpack/data` is a directory:
-  * It contains any additional data related to the installation.
-  * E.g., it contains `.bash_completion` file, which is copied during `precp` script execution.
+### Universal Global Installation
 
-## Environment Variables
+Used for installations within the whole system. To support, create the following executable files:
 
-GitPack provides the following environment variables to all called scripts:
+* `.install/install-global`
+  * When run, it installs the current commit globally.
+* `.install/uninstall-global`
+  * When run, it uninstalls the global installation.
 
-* `OFFLINE_MODE`
-  * Equals either `false` or `true`.
-  * Once set to `true`, any online access should be avoided.
+> GitPack runs all `global` executables with root permissions.
 
-## Examples
+### Operating System Specific Installation
 
-If you are interested in **examples of projects using GitPack**, take a look at the [gitpack topic](https://github.com/topics/gitpack).
+Used for installations on a particular operating system. Installing on other operating systems will fail. To support, create the following executable files:
+
+* `.install/install-<access>-<system>`
+  * `<access>` is either `local` or `global` with the same meaning as above.
+  * `<system>` is the supported operating system name.
+  * Before running, GitPack checks that `<system>` matches the `uname` output.
+  * When run, it installs the current commit.
+* `.install/uninstall-<access>-<system>`
+  * When run, it uninstalls the current commit.
+
+> GitPack prefers this installation method to others, when available.
