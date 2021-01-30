@@ -9,7 +9,7 @@
 
 for i in 1 2 3 4 5; do # repeat multiple times
     # first GitPack instance
-    {   set +e
+    {   set +e # ignore simple command fails in this subshell
         out1="$($GITPACK install "$URL=$VERSION")"
         echo "$?" > /tmp/gitpack-status-1
     } &
