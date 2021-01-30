@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #-------------------------------------------------------------------------------
-# Copyright 2020 Dominik Salvet
+# Copyright 2020-2021 Dominik Salvet
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
@@ -24,4 +24,5 @@ out12="$(! $GITPACK status bad/../url)"
 
 out13="$(! $GITPACK status 'github.com/dominik
 salvet/gitpack')"
-out14="$(! $GITPACK status "$URL=nonexistent")"
+out14="$(! $GITPACK -r status "$URL")"
+out15="$(! $GITPACK status "$URL=nonexistent")"

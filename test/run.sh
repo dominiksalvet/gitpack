@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #-------------------------------------------------------------------------------
-# Copyright 2019-2020 Dominik Salvet
+# Copyright 2019-2021 Dominik Salvet
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # Initializes test environment and runs all GitPack tests. The current working
@@ -27,6 +27,7 @@ run_test() (
         return 1
     else
         echo "passed $1" &&
+        # if test is run multiple times, only latest successful trace is kept
         echo "$test_trace" > "$TRACE_DIR/passed_$test_name"
     fi
 )
@@ -46,9 +47,11 @@ export VERSION=ci-version && # latest GitPack version
 export VERSION_HASH=b2842a2affe769f2aeb1c03bba2a299eb2959ea7 &&
 export VERSION_SHORT_HASH=b2842a2 &&
 export OLD_VERSION=ci-old-version &&
+export OLD_VERSION_HASH=91736b0a36530f58e87e0906940b94509c258a2a &&
 
 export EXTRA_URL=github.com/dominiksalvet/sandbox && # needed in some tests
 export EXTRA_VERSION=beforecommit && # use this and only this version
+export EXTRA_VERSION_HASH=12fa65e5a0caefb0760ed2e0e51e8568cad91ada &&
 
 case "${MATRIX_OS:?}" in
     windows-*) export USE_SUDO=false ;;
@@ -60,19 +63,26 @@ esac &&
 #-------------------------------------------------------------------------------
 
 system="$(uname)" &&
-if [ "$system" = Darwin ]; then
-    export LOCAL_STATE_DIR="$HOME/.local/share/gitpack"
-    export GLOBAL_STATE_DIR=/var/lib/gitpack
-    export LOCAL_CACHE_DIR="$HOME/Library/Caches/gitpack"
-    export GLOBAL_CACHE_DIR=/Library/Caches/gitpack
-    export LOCK_DIR=/tmp
-else
-    export LOCAL_STATE_DIR="$HOME/.local/share/gitpack"
-    export GLOBAL_STATE_DIR=/var/lib/gitpack
-    export LOCAL_CACHE_DIR="$HOME/.cache/gitpack"
-    export GLOBAL_CACHE_DIR=/var/cache/gitpack
-    export LOCK_DIR=/var/lock
-fi &&
+case "$system" in
+    Linux)  export LOCAL_STATE_DIR="$HOME/.local/share/gitpack"
+            export GLOBAL_STATE_DIR=/var/lib/gitpack
+            export LOCAL_CACHE_DIR="$HOME/.cache/gitpack"
+            export GLOBAL_CACHE_DIR=/var/cache/gitpack
+            export LOCK_DIR=/var/lock
+            ;;
+    Darwin) export LOCAL_STATE_DIR="$HOME/.local/share/gitpack"
+            export GLOBAL_STATE_DIR=/var/lib/gitpack
+            export LOCAL_CACHE_DIR="$HOME/Library/Caches/gitpack"
+            export GLOBAL_CACHE_DIR=/Library/Caches/gitpack
+            export LOCK_DIR=/tmp
+            ;;
+    *)  export LOCAL_STATE_DIR="$HOME/.local/share/gitpack"
+        export GLOBAL_STATE_DIR=/var/lib/gitpack
+        export LOCAL_CACHE_DIR="$HOME/.cache/gitpack"
+        export GLOBAL_CACHE_DIR=/var/cache/gitpack
+        export LOCK_DIR=/tmp
+        ;;
+esac &&
 
 #-------------------------------------------------------------------------------
 # EXECUTION TRACING
@@ -90,8 +100,6 @@ run_test test/action-api/status.sh &&
 run_test test/action-api/install.sh &&
 run_test test/action-api/update.sh &&
 run_test test/action-api/downgrade.sh &&
-run_test test/action-api/install-multiple.sh &&
-run_test test/action-api/local-global.sh &&
 
 # commands API
 run_test test/command-api/messages.sh &&
@@ -99,16 +107,20 @@ run_test test/command-api/paths.sh &&
 run_test test/command-api/list.sh &&
 run_test test/command-api/clean.sh &&
 
-# check install files
-run_test test/storage/no-install-files.sh &&
-run_test test/subcommand/install.sh &&
-run_test test/subcommand/uninstall.sh &&
-
-# install current commit
-run_test test/subcommand/clean.sh &&
-run_test test/storage/remove-empty-state.sh &&
-run_test test/subcommand/self-install.sh &&
+# feature testing
+run_test test/helper/clean-files.sh &&
+run_test test/feature/install.sh &&
+run_test test/feature/uninstall.sh &&
+run_test test/feature/install-multiple.sh &&
+run_test test/feature/install-local-global.sh &&
+run_test test/feature/basename-duplicates.sh &&
+run_test test/feature/mutual-exclusion.sh &&
+run_test test/feature/clean.sh &&
 
 # tests that cannot succeed
 run_test test/xfail/args.sh &&
-run_test test/xfail/urls.sh
+run_test test/xfail/urls.sh &&
+
+# install current commit
+run_test test/helper/clean-files.sh &&
+run_test test/feature/self-install.sh

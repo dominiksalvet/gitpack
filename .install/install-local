@@ -1,12 +1,12 @@
 #!/bin/sh
 
 #-------------------------------------------------------------------------------
-# Copyright 2019-2020 Dominik Salvet
+# Copyright 2019-2021 Dominik Salvet
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
 if [ ! -e "$HOME/.bash_completion" ]; then
-    echo 'initializing tab completion'
+    echo 'initializing tab completion' &&
     cp .install/.bash_completion "$HOME/"
 fi &&
 

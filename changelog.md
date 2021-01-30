@@ -15,10 +15,13 @@ The changes not yet present in any release are listed in this section.
 * Added package index – fetch repositories updates only once an hour, otherwise use cache.
 * Added a hint message when bad arguments passed to ease finding GitPack's help.
 * Added long hash mode option `-H` forcing to always show full commit hashes.
-* Added fetch mode option `-f` forcing GitPack to always fetch updates from remote.
-* Added support for raw URL mode `-r`, in which GitPack uses URLs just as delivered.
+* Added fetch mode option `-f` making GitPack always fetch from remote.
+* Added support for raw URL mode `-r`, in which GitPack performs no HTTPS adjustments.
 * Added native mode for Bash completion, allowing it to use more features.
 * Added support for cached packages version hints in Bash completion.
+* Added option `-n` to never fetch from remote.
+* Added option `-S` to skip locking (useful for GitPack wrappers).
+* Added option `-d` to disable checking for installed URL basename duplicates.
 
 ### Changed
 
@@ -34,12 +37,15 @@ The changes not yet present in any release are listed in this section.
 * If more than one `=` is used in `URL=VERSION` argument, `URL` contains additional `=` rather than `VERSION`.
 * Bash tab completion considers previous arguments and dynamically generates hints.
 * When running on macOS, more predictable file paths are used.
+* When not running on a recognized system, fallback file paths are used.
+* Check URL basename against installed URL basenames for possible duplicates.
 
 ### Fixed
 
 * When fetching a repository fails, it is no longer present in Bash tab completion hints.
-* Only one instance of GitPack may be running at a time.
+* Only one instance of GitPack per user may be running at a time.
 * Unless raw URL mode used, GitPack removes or merges unnecessary `/` of URLs before processing.
+* Handle invalid URL hashes stored in `status`.
 
 ### Removed
 

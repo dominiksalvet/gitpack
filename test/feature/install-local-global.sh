@@ -1,11 +1,11 @@
 #!/bin/sh
 
 #-------------------------------------------------------------------------------
-# Copyright 2020 Dominik Salvet
+# Copyright 2020-2021 Dominik Salvet
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-# no meaning to run without sudo
+# it makes no sense to run without sudo
 if [ "$USE_SUDO" = false ]; then
     exit
 fi

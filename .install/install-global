@@ -1,11 +1,11 @@
 #!/bin/sh
 
 #-------------------------------------------------------------------------------
-# Copyright 2020 Dominik Salvet
+# Copyright 2020-2021 Dominik Salvet
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 
-echo 'copying files'
+echo 'copying files' &&
 mkdir -p /usr/local/bin/ \
          /etc/bash_completion.d/ &&
 cp src/gitpack /usr/local/bin/ &&
