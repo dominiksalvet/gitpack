@@ -8,7 +8,7 @@ GitPack uses files in the `.install` directory of your repository to perform all
 
 Whenever GitPack runs those executables, the current working directory is set to the repository root. If the execution succeeds (i.e., returns 0), GitPack will mark your project as installed or not installed, respectively. Note that the executables do not have to be Shell scripts, they may be of any type (e.g., Python).
 
-Since GitPack is very flexible, there are multiple methods of how GitPack may install your project. You may decide to support only one, or **you can support more installation methods**. Based on that, there may be multiple installation and uninstallation executables.
+Since GitPack is very flexible, there are multiple methods of how GitPack may install your project. You may decide to support only one, or **you can support more installation methods** at once. Based on that, there may be multiple installation and uninstallation executables.
 
 ### Universal Local Installation
 
