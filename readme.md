@@ -69,7 +69,7 @@ Install/update to the **latest version**:
 gitpack install <url>
 ```
 
-> It uses the latest tag of the repository default branch.
+> It uses the latest tag (latest commit if no tag) of the repository default branch.
 
 Install/update/downgrade to a **particular version**:
 

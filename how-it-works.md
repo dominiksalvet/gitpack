@@ -2,7 +2,7 @@
 
 This file describes how GitPack works. It is basically **everything you need to start** using GitPack in your awesome projects. Once a project (repository) is prepared, end users may **immediately install it**.
 
-## Install Files
+## Installation Files
 
 GitPack uses files in the `.install` directory of your repository to perform all required operations. Basically, GitPack uses two types of executable files placed there – one for installation and one for uninstallation.
 
@@ -43,3 +43,11 @@ Used for installations on a particular operating system. Installing on other ope
   * When run, it uninstalls the current commit.
 
 > GitPack prefers this installation method to others, when available.
+
+### Auxiliary Files
+
+Sometimes it is required to have more than just the executable files above (e.g., a systemd service file). For this purpose, you may put auxiliary files associated with the installation process to the `.install` directory as well. As long as their names do not start with `install` or `uninstall`, there are no special restrictions.
+
+## Examples
+
+It is always **good to see some examples**. [Here](https://github.com/topics/gitpack) you have them.
