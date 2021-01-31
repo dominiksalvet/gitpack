@@ -50,4 +50,4 @@ Sometimes it is required to have more than just the executable files above (e.g.
 
 ## Examples
 
-It is always **good to see some examples**. [Here](https://github.com/topics/gitpack) you have them.
+It is always **good to see some examples**. [Here](https://github.com/topics/gitpack) is a list of projects that use GitPack. Feel free to find their `.install` directories and get inspired.
