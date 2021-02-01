@@ -2,6 +2,12 @@
 
 The development of GitPack is published on [this website](https://github.com/dominiksalvet/gitpack) and **everyone is welcome to contribute**.
 
+## Wrap GitPack Up
+
+GitPack is simple. Compared to other package managers, it may be lacking some advanced features (such as dependency resolution). If you have the feeling that GitPack should have those features, you may create a GitPack wrapper with the desired features and call GitPack internally. This way, the GitPack's flexibility will not be broken. Furthermore, GitPack has been prepared for this kind of extension.
+
+> GitPack API has come a long way and it is pretty stable now. But it [wasn't always](https://github.com/dominiksalvet/gim) like that.
+
 ## Suggestions
 
 If you have any suggestions or bug reports for GitPack, follow these steps:
