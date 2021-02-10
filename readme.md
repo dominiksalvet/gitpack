@@ -1,4 +1,4 @@
-GitPack is going to go through [significant changes](https://github.com/dominiksalvet/gitpack/projects/1) in the future. **My [GitPack projects](https://github.com/topics/gitpack) are and will be compatible.**
+**GitPack 1.0.0 is very close!** Learn more [here](https://github.com/dominiksalvet/gitpack/projects/1) and [here](https://github.com/dominiksalvet/gitpack/discussions/10).
 
 ---
 
