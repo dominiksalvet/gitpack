@@ -43,11 +43,11 @@ export SHORT_HASH &&
 export GITPACK='sh -x src/gitpack' && # GitPack with tracing enabled
 export SUDO_GITPACK='sudo sh -x src/gitpack' && # root permissions
 export URL=github.com/dominiksalvet/gitpack &&
-export VERSION=ci-version && # latest GitPack version
+export VERSION=1.0.0 && # latest GitPack version
 export VERSION_HASH=b2842a2affe769f2aeb1c03bba2a299eb2959ea7 &&
 export VERSION_SHORT_HASH=b2842a2 &&
-export OLD_VERSION=ci-old-version &&
-export OLD_VERSION_HASH=91736b0a36530f58e87e0906940b94509c258a2a &&
+export OLD_VERSION=tmp-version &&
+export OLD_VERSION_HASH=b2842a2affe769f2aeb1c03bba2a299eb2959ea7 &&
 
 export EXTRA_URL=github.com/dominiksalvet/sandbox && # needed in some tests
 export EXTRA_VERSION=beforecommit && # use this and only this version
