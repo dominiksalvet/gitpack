@@ -1,4 +1,4 @@
-GitPack 1.0.0 is out! **If you have GitPack 0.7.0 and lower, please visit [this discussion](https://github.com/dominiksalvet/gitpack/discussions/10).**
+**GitPack 1.0.0 is out!** If you have GitPack 0.7.0 and lower, please visit [this discussion](https://github.com/dominiksalvet/gitpack/discussions/10).
 
 ---
 
