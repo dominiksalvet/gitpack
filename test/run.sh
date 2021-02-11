@@ -44,8 +44,8 @@ export GITPACK='sh -x src/gitpack' && # GitPack with tracing enabled
 export SUDO_GITPACK='sudo sh -x src/gitpack' && # root permissions
 export URL=github.com/dominiksalvet/gitpack &&
 export VERSION=1.0.0 && # latest GitPack version
-export VERSION_HASH=b2842a2affe769f2aeb1c03bba2a299eb2959ea7 &&
-export VERSION_SHORT_HASH=b2842a2 &&
+export VERSION_HASH=7fb5b5fad69002fc17421ef8b5809521f6b200c0 &&
+export VERSION_SHORT_HASH=7fb5b5f &&
 export OLD_VERSION=tmp-version &&
 export OLD_VERSION_HASH=b2842a2affe769f2aeb1c03bba2a299eb2959ea7 &&
 
