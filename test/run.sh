@@ -49,9 +49,9 @@ export VERSION_SHORT_HASH=7fb5b5f &&
 export OLD_VERSION=tmp-version &&
 export OLD_VERSION_HASH=b2842a2affe769f2aeb1c03bba2a299eb2959ea7 &&
 
-export EXTRA_URL=github.com/dominiksalvet/sandbox && # needed in some tests
-export EXTRA_VERSION=beforecommit && # use this and only this version
-export EXTRA_VERSION_HASH=12fa65e5a0caefb0760ed2e0e51e8568cad91ada &&
+export EXTRA_URL=github.com/dominiksalvet/nconv && # needed in some tests
+export EXTRA_VERSION=1.1.0 && # use this and only this version
+export EXTRA_VERSION_HASH=8fbccd124e723b023a32c6ebfb2fd2d10d22fade &&
 
 case "${MATRIX_OS:?}" in
     windows-*) export USE_SUDO=false ;;
