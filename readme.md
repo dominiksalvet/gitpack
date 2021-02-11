@@ -180,6 +180,7 @@ Unsure? There is **even more in GitPack**:
 * Smart repository cache
 * POSIX-friendly (i.e., very portable)
 * [Standalone script](src/gitpack) (for advanced uses)
+* Suitable even for self-hosted Git services
 
 So are you ready to try GitPack in your project? Then see [how it works](how-it-works.md).
 
