@@ -25,7 +25,7 @@ rm_empty_dir "$LOCAL_STATE_DIR"
 
 # clean cache
 rm -f "$LOCAL_CACHE_DIR/fetched"
-rm -rf "$LOCAL_CACHE_DIR/repos/"
+rm -rf "${LOCAL_CACHE_DIR:?}/repos/"
 rm_empty_dir "$LOCAL_CACHE_DIR"
 
 # clean installed
@@ -39,7 +39,7 @@ if [ "$USE_SUDO" = true ]; then
 
     # clean cache
     sudo rm -f "$GLOBAL_CACHE_DIR/fetched"
-    sudo rm -rf "$GLOBAL_CACHE_DIR/repos/"
+    sudo rm -rf "${GLOBAL_CACHE_DIR:?}/repos/"
     sudo_rm_empty_dir "$GLOBAL_CACHE_DIR"
 
     # clean installed
