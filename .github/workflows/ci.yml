@@ -24,8 +24,7 @@ jobs:
     - name: Check test files
       run: |
         shellcheck test/run.sh
-        shellcheck test/action-api/*
-        shellcheck test/command-api/*
+        shellcheck test/api/*
         shellcheck test/feature/*
         shellcheck test/xfail/*
         shellcheck test/helper/*

@@ -96,16 +96,16 @@ mkdir -p "$TRACE_DIR/" &&
 #-------------------------------------------------------------------------------
 
 # actions API
-run_test test/action-api/status.sh &&
-run_test test/action-api/install.sh &&
-run_test test/action-api/update.sh &&
-run_test test/action-api/downgrade.sh &&
+run_test test/api/status.sh &&
+run_test test/api/install.sh &&
+run_test test/api/update.sh &&
+run_test test/api/downgrade.sh &&
 
 # commands API
-run_test test/command-api/messages.sh &&
-run_test test/command-api/paths.sh &&
-run_test test/command-api/list.sh &&
-run_test test/command-api/clean.sh &&
+run_test test/api/messages.sh &&
+run_test test/api/paths.sh &&
+run_test test/api/list.sh &&
+run_test test/api/clean.sh &&
 
 # feature testing
 run_test test/helper/clean-files.sh &&
