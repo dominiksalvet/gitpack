@@ -51,7 +51,7 @@ out11="$($GITPACK -fh status "$URL")"
 test "$out11" = ">>> running status for $URL
 <<< not installed; candidate is $VERSION_SHORT_HASH"
 
-out12="$($GITPACK -nS status "$URL")"
+out12="$(GITPACK_SKIP_LOCK=true $GITPACK -n status "$URL")"
 test "$out12" = ">>> running status for $URL
 <<< not installed; candidate is $VERSION"
 
