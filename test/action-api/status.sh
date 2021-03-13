@@ -42,7 +42,7 @@ out9="$($GITPACK -r status "https://$URL.git")" # raw URL mode
 test "$out9" = ">>> running status for https://$URL.git
 <<< not installed; candidate is $VERSION"
 
-out10="$($GITPACK -S status "$URL")"
+out10="$(GITPACK_SKIP_LOCK=true $GITPACK status "$URL")"
 test "$out10" = ">>> running status for $URL
 <<< not installed; candidate is $VERSION"
 

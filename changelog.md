@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 The changes not yet present in any release are listed in this section.
 
+### Changed
+
+* Removed `-S` option, replaced by `GITPACK_SKIP_LOCK` environment variable.
+
 ## 1.0.0 (2021-02-11)
 
 ### Added
