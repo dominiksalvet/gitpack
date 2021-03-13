@@ -254,7 +254,7 @@ init_lock() {
     else # failed to acquire lock
         _lockfile="$(basename "$LOCK_PATH")"
         _pid="$(cat "$LOCK_PID_PATH")" # may not exist yet, not a problem though
-        echo "E17: lockfile $_lockfile is owned by process $_pid" >&2
+        echo "E17: $_lockfile was acquired by another process $_pid" >&2
         echo 'if the problem persists, try rebooting' >&2
         return 64 # user defined exit code
     fi
@@ -295,7 +295,7 @@ init_paths() {
     readonly STATUS_PATH="$STATE_DIR/status" # database of installed packages
     readonly REPOS_DIR="$CACHE_DIR/repos" # cache for local repositories
     readonly FETCHED_PATH="$CACHE_DIR/fetched" # repositories fetch timestamps
-    readonly LOCK_PATH="$LOCK_DIR/gitpack-$USER_ID" # lock is a directory
+    readonly LOCK_PATH="$LOCK_DIR/gitpack-$USER_ID.lock" # lock is a directory
     readonly LOCK_PID_PATH="$LOCK_PATH/pid" # process ID of the lock holder
 }
 
