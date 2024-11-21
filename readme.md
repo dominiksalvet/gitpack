@@ -27,13 +27,15 @@ GitPack not only saves time for end-users to figure out how to install a Git pro
 
 ## Table of Contents
 
-* [Requirements](#requirements)
-* [Installation](#installation)
-* [Usage](#usage)
-  * [Examples](#examples)
-* [For Developers](#for-developers)
-  * [Badge](#badge)
-* [Useful Resources](#useful-resources)
+- [GitPack](#gitpack)
+  - [Table of Contents](#table-of-contents)
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+  - [Usage](#usage)
+    - [Examples](#examples)
+  - [For Developers](#for-developers)
+    - [Badge](#badge)
+  - [Useful Resources](#useful-resources)
 
 ## Requirements
 
@@ -144,12 +146,12 @@ github.com/dominiksalvet/ux430ua-jack-volume 208f1a7bce8644482abdfa14107f90358a7
 $ gitpack paths
 state-dir /home/dominik/.local/share/gitpack
 cache-dir /home/dominik/.cache/gitpack
-lock-path /var/lock/gitpack-1000
+lock-path /tmp/gitpack-1000.lock
 
 $ sudo gitpack paths
 state-dir /var/lib/gitpack
 cache-dir /var/cache/gitpack
-lock-path /var/lock/gitpack-0
+lock-path /tmp/gitpack-0.lock
 ```
 
 > Did you know that **GitPack has sleek tab completion** for Bash shells?

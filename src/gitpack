@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #-------------------------------------------------------------------------------
-# Copyright 2019-2022 Dominik Salvet
+# Copyright 2019-2024 Dominik Salvet
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # This is GitPack, a simple Git-based package manager. It is particularly useful
@@ -307,7 +307,7 @@ init_linux_paths() {
         readonly STATE_DIR=/var/lib/gitpack
         readonly CACHE_DIR=/var/cache/gitpack
     fi
-    readonly LOCK_DIR=/var/lock # unified storage for locks
+    readonly LOCK_DIR=/tmp
 }
 
 init_macos_paths() {
