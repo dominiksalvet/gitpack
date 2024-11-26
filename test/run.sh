@@ -40,8 +40,8 @@ export HASH="${GITHUB_SHA:?}" && # current commit hash
 SHORT_HASH="$(echo "$HASH" | cut -c 1-7)" &&
 export SHORT_HASH &&
 
-export GITPACK='sh -x src/gitpack' && # GitPack with tracing enabled
-export SUDO_GITPACK='sudo sh -x src/gitpack' && # root permissions
+export GITPACK='sh src/gitpack' && # GitPack with tracing enabled
+export SUDO_GITPACK='sudo sh src/gitpack' && # root permissions
 export URL=github.com/dominiksalvet/gitpack &&
 export VERSION=1.1.0 && # latest GitPack version
 export VERSION_HASH=d6cf61871c93e89b5c622d77ff8fa517da5d3ce0 &&
