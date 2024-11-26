@@ -36,7 +36,7 @@ jobs:
     needs: Analysis
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-10.15, windows-2019]
+        os: [ubuntu-24.04, macos-14, windows-2022]
     runs-on: ${{matrix.os}}
     defaults:
       run:
