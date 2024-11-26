@@ -19,7 +19,7 @@ run_test() (
     test_name="$(echo "$1" | sed 's|/|_|g; s/\.sh$//')" && # derive test name
 
     # run test and store its execution trace
-    if ! test_trace="$(sh -eux "$1" 2>&1)"; then
+    if ! test_trace="$(sh -eu "$1" 2>&1)"; then
         echo 'recent trace (more in artifacts):' &&
         echo "$test_trace" | tail -n 20 && # recent trace
         echo "failed $1" &&
