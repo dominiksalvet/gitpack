@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #-------------------------------------------------------------------------------
-# Copyright 2019-2021 Dominik Salvet
+# Copyright 2019-2024 Dominik Salvet
 # https://github.com/dominiksalvet/gitpack
 #-------------------------------------------------------------------------------
 # This file represents a GitPack extension, which incorporates a prompting tab
@@ -116,11 +116,9 @@ _gitpack_get_urls() (
 )
 
 _gitpack_get_db_urls() {
-    cut -f 1 -d ' ' "$LOCAL_STATE_DIR/status" \
-                    "$GLOBAL_STATE_DIR/status" 2>/dev/null
+    cut -f 1 -d ' ' "$STATE_DIR/status" 2>/dev/null
     test "$command" != uninstall && # only installed packages for uninstall
-    cut -f 1 -d ' ' "$LOCAL_CACHE_DIR/fetched" \
-                    "$GLOBAL_CACHE_DIR/fetched" 2>/dev/null
+    cut -f 1 -d ' ' "$CACHE_DIR/fetched" 2>/dev/null
     true # always successful
 }
 
@@ -133,9 +131,7 @@ _gitpack_get_versions() (
     fi
 
     _gitpack_init_paths &&
-    {   cd "$LOCAL_CACHE_DIR/repos/$1/" 2>/dev/null &&
-        test -d .git/ && git show-ref
-        cd "$GLOBAL_CACHE_DIR/repos/$1/" 2>/dev/null &&
+    {   cd "$CACHE_DIR/repos/$1/" 2>/dev/null &&
         test -d .git/ && git show-ref
         true # just for sure
     } | sed 's/^.* //; s|^.*/||; s/\^{}$//' # beautify show-ref output
@@ -146,27 +142,56 @@ _gitpack_get_versions() (
 #-------------------------------------------------------------------------------
 
 _gitpack_init_paths() {
-    local system &&
+    local user_id access system &&
+
+    user_id="$(id -u)" &&
+    if [ "$user_id" -eq 0 ]; then
+        access=global
+    else
+        access=local
+    fi &&
+
     system="$(uname)" &&
 
     case "$system" in
-    Linux)  readonly LOCAL_STATE_DIR="$HOME/.local/share/gitpack"
-            readonly GLOBAL_STATE_DIR=/var/lib/gitpack
-            readonly LOCAL_CACHE_DIR="$HOME/.cache/gitpack"
-            readonly GLOBAL_CACHE_DIR=/var/cache/gitpack
-            ;;
-    Darwin) readonly LOCAL_STATE_DIR="$HOME/.local/share/gitpack"
-            readonly GLOBAL_STATE_DIR=/var/lib/gitpack
-            readonly LOCAL_CACHE_DIR="$HOME/Library/Caches/gitpack"
-            readonly GLOBAL_CACHE_DIR=/Library/Caches/gitpack
-            ;;
-    # fallback paths are now the same as Linux ones (separated to keep the idea)
-    *)  readonly LOCAL_STATE_DIR="$HOME/.local/share/gitpack"
-        readonly GLOBAL_STATE_DIR=/var/lib/gitpack
-        readonly LOCAL_CACHE_DIR="$HOME/.cache/gitpack"
-        readonly GLOBAL_CACHE_DIR=/var/cache/gitpack
-        ;;
+        Linux) init_linux_paths "$access" ;;
+        Darwin) init_macos_paths "$access" ;;
+        *) init_fallback_paths "$access" ;;
     esac
+}
+
+# $1 - local/global access
+init_linux_paths() {
+    if [ "$1" = local ]; then # respect XDG
+        readonly STATE_DIR="$HOME/.local/share/gitpack"
+        readonly CACHE_DIR="$HOME/.cache/gitpack"
+    else # respect FHS
+        readonly STATE_DIR=/var/lib/gitpack
+        readonly CACHE_DIR=/var/cache/gitpack
+    fi
+}
+
+# $1 - local/global access
+init_macos_paths() {
+    if [ "$1" = local ]; then
+        readonly STATE_DIR="$HOME/.local/share/gitpack"
+        readonly CACHE_DIR="$HOME/Library/Caches/gitpack"
+    else
+        readonly STATE_DIR=/var/lib/gitpack
+        readonly CACHE_DIR=/Library/Caches/gitpack
+    fi
+}
+
+# $1 - local/global access
+init_fallback_paths() {
+    # fallback paths are now the same as Linux ones (separated to keep the idea)
+    if [ "$1" = local ]; then
+        readonly STATE_DIR="$HOME/.local/share/gitpack"
+        readonly CACHE_DIR="$HOME/.cache/gitpack"
+    else
+        readonly STATE_DIR=/var/lib/gitpack
+        readonly CACHE_DIR=/var/cache/gitpack
+    fi
 }
 
 #-------------------------------------------------------------------------------

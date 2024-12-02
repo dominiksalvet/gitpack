@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 The changes not yet present in any release are listed in this section.
 
+### Fixed
+
+* The Bash completion now uses only files that are in its current access scope (root vs user).
+
 ## 1.2.0 (2024-11-27)
 
 ### Changed

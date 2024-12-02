@@ -49,7 +49,7 @@ OPTION:   -h/-H  show short/full version hashes
     readonly ABOUT_MESSAGE="GitPack $VERSION
 Simple Git-based package manager
 
-Copyright 2019-2022 Dominik Salvet
+Copyright 2019-2024 Dominik Salvet
 https://github.com/dominiksalvet/gitpack"
 }
 
